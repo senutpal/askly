@@ -14,7 +14,7 @@ const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
       </AuthLayout>
     );
   }
-  return <div>{children}</div>;
+  return <AuthLayout>{children}</AuthLayout>;
 };
 
 export default OrganizationGuard;
