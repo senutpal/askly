@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface TranscriptMessage {
   role: "user" | "assistant";
-  text: "string";
+  text: string;
 }
 
 export const useVapi = () => {
@@ -12,10 +12,15 @@ export const useVapi = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    //Only For Testing, Otherwise Customers will Provide Their Own Api Keys
-    const vapiInstance = new Vapi("17e866d7-8d0a-48f0-b70b-bd6b466b78d8");
+    const apiKey = process.env.NEXT_PUBLIC_VAPI_API_KEY;
+    if (!apiKey) {
+      console.error("VAPI_API_KEY is not configured");
+      return;
+    }
+    const vapiInstance = new Vapi(apiKey);
     setVapi(vapiInstance);
     vapiInstance.on("call-start", () => {
       setIsConnected(true);
@@ -34,7 +39,8 @@ export const useVapi = () => {
       setIsSpeaking(false);
     });
     vapiInstance.on("error", (error) => {
-      console.log(error, "_ERROR");
+      console.error("Vapi error:", error);
+      setError(error);
       setIsConnecting(false);
     });
 
@@ -56,9 +62,14 @@ export const useVapi = () => {
   }, []);
   const startCall = () => {
     setIsConnecting(true);
-    //Only For Testing, Otherwise Customers will Provide Their Own Assistant ID
     if (vapi) {
-      vapi.start("86802137-58bb-46ce-a3a4-451b903588f3");
+      const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+      if (!assistantId) {
+        console.error("VAPI_ASSISTANT_ID is not configured");
+        setIsConnecting(false);
+        return;
+      }
+      vapi.start(assistantId);
     }
   };
 
@@ -71,6 +82,7 @@ export const useVapi = () => {
     isSpeaking,
     isConnected,
     isConnecting,
+    error,
     transcript,
     startCall,
     endCall,
