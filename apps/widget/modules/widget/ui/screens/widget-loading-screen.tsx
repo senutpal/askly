@@ -7,7 +7,6 @@ import {
   loadingMessageAtom,
   organizationIdAtom,
   screenAtom,
-  widgetSettingsAtom,
 } from "@/modules/widget/atoms/widget-atoms";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { LoaderIcon } from "lucide-react";
@@ -29,7 +28,7 @@ export const WidgetLoadingScreen = ({
   const loadingMessage = useAtomValue(loadingMessageAtom);
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const setScreen = useSetAtom(screenAtom);
-  const setWidgetSettings = useSetAtom(widgetSettingsAtom);
+  // const setWidgetSettings = useSetAtom(widgetSettingsAtom);
 
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
@@ -45,7 +44,7 @@ export const WidgetLoadingScreen = ({
     setLoadingMessage("Finding organization ID...");
 
     if (!organizationId) {
-      setErrorMessage("organization Id required");
+      setErrorMessage("Organization Id Required");
       setScreen("error");
       return;
     }
@@ -104,27 +103,27 @@ export const WidgetLoadingScreen = ({
       });
   }, [step, contactSessionId, validateContactSession, setLoadingMessage]);
 
-  const widgetSettings = useQuery(
-    api.public.widgetSettings.getByorganizationId,
-    organizationId
-      ? {
-          organizationId,
-        }
-      : "skip"
-  );
+  // const widgetSettings = useQuery(
+  //   api.public.widgetSettings.getByorganizationId,
+  //   organizationId
+  //     ? {
+  //         organizationId,
+  //       }
+  //     : "skip"
+  // );
 
-  useEffect(() => {
-    if (step !== "settings") {
-      return;
-    }
+  // useEffect(() => {
+  //   if (step !== "settings") {
+  //     return;
+  //   }
 
-    setLoadingMessage("Loading Widget Settings");
+  //   setLoadingMessage("Loading Widget Settings");
 
-    if (widgetSettings !== undefined) {
-      setWidgetSettings(widgetSettings);
-      setStep("done");
-    }
-  }, [step, setStep, widgetSettings, setWidgetSettings, setLoadingMessage]);
+  //   // if (widgetSettings !== undefined) {
+  //   //   setWidgetSettings(widgetSettings);
+  //   //   setStep("done");
+  //   // }
+  // }, [step, setStep,  setLoadingMessage]);
 
   useEffect(() => {
     if (step !== "done") {
