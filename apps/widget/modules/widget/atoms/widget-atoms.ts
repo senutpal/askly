@@ -4,7 +4,7 @@ import { WidgetScreen } from "../types";
 import { CONTACT_SESSION_KEY } from "../constants";
 import { Doc, Id } from "@workspace/backend/_generated/dataModel";
 
-export const screenAtom = atom<WidgetScreen>("selection");
+export const screenAtom = atom<WidgetScreen>("loading");
 
 export const organizationIdAtom = atom<string | null>(null);
 

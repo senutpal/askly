@@ -39,6 +39,13 @@ export const create = action({
       });
     }
 
+    if (conversation.contactSessionId !== contactSession._id) {
+      throw new ConvexError({
+        code: "FORBIDDEN",
+        message: "Conversation does not belong to this session",
+      });
+    }
+
     if (conversation.status === "resolved") {
       throw new ConvexError({
         code: "BAD REQUEST",
@@ -55,17 +62,18 @@ export const create = action({
         },
         {
           prompt: args.prompt,
-        //   tools: {
-        //     escalateConversationTool: escalateConversation,
-        //     resolveConversationTool: resolveConversation,
-        //     searchTool: search,
-        //   },
+          //   tools: {
+          //     escalateConversationTool: escalateConversation,
+          //     resolveConversationTool: resolveConversation,
+          //     searchTool: search,
+          //   },
         }
       );
     } else {
+      // RECHECK THIS  prompt: args.prompt, instead of message ;
       await saveMessage(ctx, components.agent, {
         threadId: args.threadId,
-        prompt: args.prompt,
+        message: { role: "user", content: args.prompt },
       });
     }
   },
@@ -84,6 +92,21 @@ export const getMany = query({
       throw new ConvexError({
         code: "UNAUTHORIZED",
         message: "Invalid Session",
+      });
+    }
+
+    const conversation = await ctx.db
+      .query("conversations")
+      .withIndex("by_thread_id", (q) => q.eq("threadId", args.threadId))
+      .unique();
+
+    if (
+      !conversation ||
+      conversation.contactSessionId !== args.contactSessionId
+    ) {
+      throw new ConvexError({
+        code: "FORBIDDEN",
+        message: "Conversation not found for this session",
       });
     }
 

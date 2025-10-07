@@ -30,9 +30,16 @@ export const WidgetLoadingScreen = ({
   const setScreen = useSetAtom(screenAtom);
   // const setWidgetSettings = useSetAtom(widgetSettingsAtom);
 
+  // ...existing code...
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
   );
+  useEffect(() => {
+    console.log("Organization ID:", organizationId);
+    console.log("Contact Session Atom Value:", contactSessionId);
+  }, [organizationId, contactSessionId]);
+  // ...existing code...
+  console.log(contactSessionId);
 
   const validateOrganization = useAction(api.public.organizations.validate);
 
@@ -82,6 +89,7 @@ export const WidgetLoadingScreen = ({
     if (step !== "session") {
       return;
     }
+    console.log(validateContactSession);
 
     setLoadingMessage("Finding contact Session Id");
     if (!contactSessionId) {
@@ -112,18 +120,50 @@ export const WidgetLoadingScreen = ({
   //     : "skip"
   // );
 
-  // useEffect(() => {
-  //   if (step !== "settings") {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (step !== "settings") {
+      return;
+    }
 
-  //   setLoadingMessage("Loading Widget Settings");
+    setLoadingMessage("Loading Widget Settings");
+    setStep("done")
 
-  //   // if (widgetSettings !== undefined) {
-  //   //   setWidgetSettings(widgetSettings);
-  //   //   setStep("done");
-  //   // }
-  // }, [step, setStep,  setLoadingMessage]);
+    // if (widgetSettings !== undefined) {
+    //   setWidgetSettings(widgetSettings);
+    //   setStep("done");
+    // }
+  }, [step, setStep,  setLoadingMessage]);
+
+  useEffect(() => {
+    if (step !== "session") {
+      return;
+    }
+
+    setLoadingMessage("Finding contact Session Id");
+    console.log("Contact Session ID:", contactSessionId); // Add debug logging
+
+    if (!contactSessionId) {
+      console.log("No contact session ID found, moving to settings step");
+      setSessionValid(false);
+      setStep("settings");
+      return;
+    }
+
+    setLoadingMessage("Validating Session");
+    validateContactSession({
+      contactSessionId,
+    })
+      .then((result) => {
+        console.log("Session validation result:", result);
+        setSessionValid(result.valid);
+        setStep("settings");
+      })
+      .catch((error) => {
+        console.error("Session validation error:", error);
+        setSessionValid(false);
+        setStep("settings");
+      });
+  }, [step, contactSessionId, validateContactSession, setLoadingMessage]);
 
   useEffect(() => {
     if (step !== "done") {

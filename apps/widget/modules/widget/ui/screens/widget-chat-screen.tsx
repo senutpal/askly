@@ -7,7 +7,6 @@ import {
   conversationIdAtom,
   organizationIdAtom,
   screenAtom,
-  widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
@@ -71,6 +70,7 @@ export default function WidgetChatScreen() {
     defaultValues: {
       message: "",
     },
+    mode: "onChange",
   });
 
   const onBack = () => {
@@ -115,7 +115,7 @@ export default function WidgetChatScreen() {
                 key={message.id}
               >
                 <AIMessageContent>
-                  <AIResponse>{message.content}</AIResponse>
+                  <AIResponse>{message.text}</AIResponse>
                 </AIMessageContent>
               </AIMessage>
             );
