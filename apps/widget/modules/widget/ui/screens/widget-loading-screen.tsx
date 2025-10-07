@@ -100,7 +100,7 @@ export const WidgetLoadingScreen = ({
       })
       .catch(() => {
         setSessionValid(false);
-        setStep("done");
+        setStep("settings");
       });
   }, [step, contactSessionId, validateContactSession, setLoadingMessage]);
 
