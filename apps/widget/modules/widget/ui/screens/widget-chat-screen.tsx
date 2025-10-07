@@ -83,12 +83,13 @@ export default function WidgetChatScreen() {
     if (!conversation || !contactSessionId) {
       return;
     }
-    form.reset();
+
     await createMessage({
       threadId: conversation.threadId,
       prompt: values.message,
       contactSessionId,
     });
+    form.reset();
   };
 
   return (
