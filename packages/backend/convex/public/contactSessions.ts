@@ -26,6 +26,10 @@ export const create = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(args.email)) {
+      throw new Error("Invalid email format");
+    }
     const now = Date.now();
     const expiresAt = now + SESSION_DURATION;
 
