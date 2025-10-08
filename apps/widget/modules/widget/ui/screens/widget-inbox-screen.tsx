@@ -85,11 +85,11 @@ export const WidgetInboxScreen = () => {
               </div>
             </Button>
           ))}
-        {/* (
+        {conversations?.results.length === 0 && (
           <div className="flex flex-1 items-center justify-center text-muted-foreground">
             <p className="text-sm">No conversations yet</p>
           </div>
-        ) */}
+        )}
         <InfiniteScrollTrigger
           canLoadMore={canLoadMore}
           isLoadingMore={isLoadingMore}
