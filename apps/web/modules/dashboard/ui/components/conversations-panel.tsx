@@ -28,6 +28,7 @@ import { usePathname } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai/react";
 import { statusFilterAtom } from "../../atoms";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { Doc } from "@workspace/backend/_generated/dataModel";
 
 export const ConversationsPanel = () => {
   const statusFilter = useAtomValue(statusFilterAtom);
@@ -61,7 +62,9 @@ export const ConversationsPanel = () => {
       <div className="flex flex-col gap-3.5 border-b p-2">
         <Select
           defaultValue="all"
-          onValueChange={(value) => setStatusFilter(value as "unresolved")}
+          onValueChange={(value) =>
+            setStatusFilter(value as Doc<"conversations">["status"] | "all")
+          }
           value={statusFilter}
         >
           <SelectTrigger className="h-8 border-none px-1.5 shadow-none ring-0 hover:bg-accent hover:text-accent-foreground focus-visible:ring-0">
@@ -143,7 +146,8 @@ export const ConversationsPanel = () => {
                         <span
                           className={cn(
                             "line-clamp-1 text-xs text-muted-foreground",
-                            !isLastMessageFromOperator && "font-medium text-black"
+                            !isLastMessageFromOperator &&
+                              "font-medium text-black"
                           )}
                         >
                           {conversation.lastMessage?.text}
