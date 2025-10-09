@@ -32,7 +32,7 @@ export const UploadDialog = ({
   onFileUploaded,
 }: UploadDialogProps) => {
   const addFile = useAction(api.private.files.addFile);
-
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadForm, setUploadForm] = useState({
@@ -55,9 +55,11 @@ export const UploadDialog = ({
 
   const handleUpload = async () => {
     setIsUploading(true);
+    setUploadError(null);
     try {
       const blob = uploadedFiles[0];
       if (!blob) {
+        setIsUploading(false);
         return;
       }
 
@@ -66,7 +68,7 @@ export const UploadDialog = ({
       await addFile({
         bytes: await blob.arrayBuffer(),
         filename,
-        mimeType: blob.type || "text/plain",
+        mimeType: blob.type || "",
         category: uploadForm.category,
       });
 
@@ -74,6 +76,7 @@ export const UploadDialog = ({
       handleCancel();
     } catch (error) {
       console.error(error);
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setIsUploading(false);
     }
@@ -155,6 +158,9 @@ export const UploadDialog = ({
             <DropzoneContent />
           </Dropzone>
         </div>
+        {uploadError && (
+          <p className="text-right text-destructive text-sm">{uploadError}</p>
+        )}
         <DialogFooter>
           <Button
             disabled={isUploading}
