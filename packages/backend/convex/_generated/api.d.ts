@@ -12,6 +12,8 @@ import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as private_conversations from "../private/conversations.js";
 import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
+import type * as private_plugins from "../private/plugins.js";
+import type * as private_secrets from "../private/secrets.js";
 import type * as public_contactSessions from "../public/contactSessions.js";
 import type * as public_conversations from "../public/conversations.js";
 import type * as public_messages from "../public/messages.js";
@@ -24,11 +26,9 @@ import type * as system_ai_tools_resolveConversation from "../system/ai/tools/re
 import type * as system_ai_tools_search from "../system/ai/tools/search.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_conversations from "../system/conversations.js";
-import type * as system_getUserApiKey from "../system/getUserApiKey.js";
-import type * as system_insertUserApiKey from "../system/insertUserApiKey.js";
-import type * as userApiKeys_fetchUserApiKey from "../userApiKeys/fetchUserApiKey.js";
+import type * as system_plugins from "../system/plugins.js";
+import type * as system_secrets from "../system/secrets.js";
 import type * as userApiKeys_helpers from "../userApiKeys/helpers.js";
-import type * as userApiKeys_storeUserApiKey from "../userApiKeys/storeUserApiKey.js";
 
 import type {
   ApiFromModules,
@@ -49,6 +49,8 @@ declare const fullApi: ApiFromModules<{
   "private/conversations": typeof private_conversations;
   "private/files": typeof private_files;
   "private/messages": typeof private_messages;
+  "private/plugins": typeof private_plugins;
+  "private/secrets": typeof private_secrets;
   "public/contactSessions": typeof public_contactSessions;
   "public/conversations": typeof public_conversations;
   "public/messages": typeof public_messages;
@@ -61,11 +63,9 @@ declare const fullApi: ApiFromModules<{
   "system/ai/tools/search": typeof system_ai_tools_search;
   "system/contactSessions": typeof system_contactSessions;
   "system/conversations": typeof system_conversations;
-  "system/getUserApiKey": typeof system_getUserApiKey;
-  "system/insertUserApiKey": typeof system_insertUserApiKey;
-  "userApiKeys/fetchUserApiKey": typeof userApiKeys_fetchUserApiKey;
+  "system/plugins": typeof system_plugins;
+  "system/secrets": typeof system_secrets;
   "userApiKeys/helpers": typeof userApiKeys_helpers;
-  "userApiKeys/storeUserApiKey": typeof userApiKeys_storeUserApiKey;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

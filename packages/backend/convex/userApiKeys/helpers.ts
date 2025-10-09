@@ -1,5 +1,4 @@
 "use node";
-
 import crypto from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
@@ -21,13 +20,13 @@ export function encrypt(text: string) {
   };
 }
 
-export function decrypt(encrypted: { iv: string; content: string }) {
+export function decrypt(iv: string, content: string) {
   const decipher = crypto.createDecipheriv(
     ALGORITHM,
     Buffer.from(MASTER_KEY, "utf8"),
-    Buffer.from(encrypted.iv, "hex")
+    Buffer.from(iv, "hex")
   );
-  let decrypted = decipher.update(encrypted.content, "hex", "utf8");
+  let decrypted = decipher.update(content, "hex", "utf8");
   decrypted += decipher.final("utf8");
   return decrypted;
 }
