@@ -9,14 +9,18 @@ export const upsert = internalAction({
   args: {
     organizationId: v.string(),
     service: v.union(v.literal("vapi")),
-    text: v.string(),
+    text: v.any(),
   },
   handler: async (ctx, args) => {
-    const { content, iv } = encrypt(args.text);
+    const textToEncrypt =
+      typeof args.text === "string" ? args.text : JSON.stringify(args.text);
+
+    const { content, iv, authTag } = encrypt(textToEncrypt);
     await ctx.runMutation(internal.system.plugins.upsert, {
       service: args.service,
       secretContent: content,
       iv,
+      authTag,
       organizationId: args.organizationId,
     });
     return { status: "success" };
@@ -39,8 +43,14 @@ export const getByOrganisationIdAndService = internalAction({
     if (!encrypted) {
       throw new Error("Plugin not found");
     }
-    const { secretContent, iv } = encrypted;
-    const decrypted = decrypt(secretContent, iv);
-    return decrypted;
+    const { secretContent, iv, authTag } = encrypted;
+
+    const decrypted = decrypt(iv, secretContent, authTag);
+
+    try {
+      return JSON.parse(decrypted);
+    } catch {
+      return decrypted;
+    }
   },
 });

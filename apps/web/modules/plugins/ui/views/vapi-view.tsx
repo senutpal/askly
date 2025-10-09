@@ -8,7 +8,23 @@ import { useState } from "react";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Dialog } from "@workspace/ui/components/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+} from "@workspace/ui/components/form";
+import { Label } from "@workspace/ui/components/label";
+import { Input } from "@workspace/ui/components/input";
+import { Button } from "@workspace/ui/components/button";
 const vapiFeatures: Feature[] = [
   {
     icon: Globe2,
@@ -61,12 +77,69 @@ const VapiPluginForm = ({
           privateApiKey: values.privateApiKey,
         },
       });
-    } catch {
-      console.error(error);
+      setOpen(false);
+      toast.success("API keys saved successfully!");
+    } catch (err) {
+      console.error(err);
       toast.error("Something went wrong");
     }
   };
-
+  return (
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Enable Vapi</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          Your API keys are safely encrypted and stored.
+        </DialogDescription>
+        <Form {...form}>
+          <form
+            className="flex flex-col gap-y-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <FormField
+              control={form.control}
+              name="publicApiKey"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Public API Key</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Your Public API Key"
+                      type="password"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="privateApiKey"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Private API Key</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Your Public API Key"
+                      type="password"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button disabled={form.formState.isSubmitting} type="submit">
+                {form.formState.isSubmitting ? "Connecting..." : "Connect"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export const VapiView = () => {
@@ -74,28 +147,40 @@ export const VapiView = () => {
     service: "vapi",
   });
   const [connectOpen, setConnectOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+
+  const handleSubmit = () => {
+    if (vapiPlugin) {
+      setRemoveOpen(true);
+    } else {
+      setConnectOpen(true);
+    }
+  };
 
   return (
-    <div className="flex flex-col  min-h-screen bg-muted p-8">
-      <div className="mx-auto w-full max-w-screen-md">
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-4xl font-semibold">Vapi Plugin</h1>
-          <p>Connect Vapi to enable AI voice calls and phone</p>
-        </div>
-        <div className="mt-8">
-          {vapiPlugin ? (
-            <p>Connected</p>
-          ) : (
-            <PluginCard
-              onSubmit={() => {}}
-              isDisabled={vapiPlugin === undefined}
-              features={vapiFeatures}
-              serviceName="Vapi"
-              serviceImage="/vapi.jpg"
-            />
-          )}
+    <>
+      <VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
+      <div className="flex flex-col  min-h-screen bg-muted p-8">
+        <div className="mx-auto w-full max-w-screen-md">
+          <div className="space-y-2">
+            <h1 className="text-2xl md:text-4xl font-semibold">Vapi Plugin</h1>
+            <p>Connect Vapi to enable AI voice calls and phone</p>
+          </div>
+          <div className="mt-8">
+            {vapiPlugin ? (
+              <p>Connected</p>
+            ) : (
+              <PluginCard
+                onSubmit={handleSubmit}
+                isDisabled={vapiPlugin === undefined}
+                features={vapiFeatures}
+                serviceName="Vapi"
+                serviceImage="/vapi.jpg"
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -7,20 +7,21 @@ export const upsert = internalMutation({
     organizationId: v.string(),
     secretContent: v.string(),
     iv: v.string(),
+    authTag: v.string(), 
   },
   async handler(ctx, args) {
-    const existingPlugin = await ctx.db
+    const existing = await ctx.db
       .query("plugins")
       .withIndex("by_organization_id_and_service", (q) =>
         q.eq("organizationId", args.organizationId).eq("service", args.service)
       )
-      .unique();
+      .first();
 
-    if (existingPlugin) {
-      await ctx.db.patch(existingPlugin._id, {
-        service: args.service,
+    if (existing) {
+      await ctx.db.patch(existing._id, {
         secretContent: args.secretContent,
         iv: args.iv,
+        authTag: args.authTag,
       });
     } else {
       await ctx.db.insert("plugins", {
@@ -28,6 +29,7 @@ export const upsert = internalMutation({
         service: args.service,
         secretContent: args.secretContent,
         iv: args.iv,
+        authTag: args.authTag,
       });
     }
   },
@@ -44,6 +46,6 @@ export const getByOrganisationIdAndService = internalQuery({
       .withIndex("by_organization_id_and_service", (q) =>
         q.eq("organizationId", args.organizationId).eq("service", args.service)
       )
-      .unique();
+      .first();
   },
 });
