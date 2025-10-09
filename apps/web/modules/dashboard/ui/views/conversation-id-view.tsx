@@ -76,6 +76,7 @@ export const ConversationIdView = ({
     defaultValues: {
       message: "",
     },
+    mode:"onChange"
   });
   const [isEnhancing, setIsEnhancing] = useState(false);
   const enhanceResponse = useAction(api.private.messages.enhanceResponse);
