@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as functions_mutations_addUserApiKey from "../functions/mutations/addUserApiKey.js";
+import type * as lib_crypto from "../lib/crypto.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as private_conversations from "../private/conversations.js";
 import type * as private_files from "../private/files.js";
@@ -40,6 +42,8 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "functions/mutations/addUserApiKey": typeof functions_mutations_addUserApiKey;
+  "lib/crypto": typeof lib_crypto;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "private/conversations": typeof private_conversations;
   "private/files": typeof private_files;
