@@ -8,6 +8,10 @@ import { decrypt } from "./helpers";
 export const fetchUserApiKey = action({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }): Promise<string | null> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated");
+    }
     const apiKeyDoc = await ctx.runQuery(
       internal.system.getUserApiKey.getUserApiKey,
       {
@@ -15,6 +19,11 @@ export const fetchUserApiKey = action({
       }
     );
     if (!apiKeyDoc) return null;
-    return decrypt({ iv: apiKeyDoc.iv, content: apiKeyDoc.secretContent });
+    try {
+      return decrypt({ iv: apiKeyDoc.iv, content: apiKeyDoc.secretContent });
+    } catch (error) {
+      console.error("Failed to decrypt API key for userId:", userId, error);
+      throw new Error("Failed to decrypt API key");
+    }
   },
 });
