@@ -1,6 +1,5 @@
 "use client";
 
-import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -9,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
-import { Bot, CheckCircle, Phone, XCircle } from "lucide-react";
-import { Badge } from "@workspace/ui/components/badge";
+import { Bot} from "lucide-react";
 import { useVapiAssistants } from "../../hooks/use-vapi-data";
 
 export const VapiAssistantsTab = () => {
@@ -22,8 +20,8 @@ export const VapiAssistantsTab = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="px-8 py-4">Assistant</TableHead>
-            <TableHead className="px-6.5 py-4">Model</TableHead>
-            <TableHead className="px-9.5 py-4">First Message</TableHead>
+            <TableHead className="px-6 py-4">Model</TableHead>
+            <TableHead className="px-9 py-4">First Message</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,7 +66,7 @@ export const VapiAssistantsTab = () => {
                     {assistant.model?.model || "Not Configured"}
                   </span>
                 </TableCell>
-                <TableCell className=" max-w-xs px-6 py-4 ">
+                <TableCell className="max-w-xs px-6 py-4 ">
                   <p className="truncate text-muted-foreground text-sm px-3.5 ">
                     {assistant.firstMessage || "No Greeting Configured"}
                   </p>

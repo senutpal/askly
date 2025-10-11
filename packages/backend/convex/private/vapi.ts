@@ -34,7 +34,7 @@ export const getPhoneNumbers = action({
     const { privateApiKey, publicApiKey } = plugin;
     if (!privateApiKey || !publicApiKey) {
       throw new ConvexError({
-        code: "NOT FOUND",
+        code: "NOT_FOUND",
         message: "Credentials incomplete. Please reconnect your Vapi account",
       });
     }

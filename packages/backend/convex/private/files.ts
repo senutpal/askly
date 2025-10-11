@@ -223,7 +223,7 @@ type EntryMetadata = {
   storageId: Id<"_storage">;
   uploadedBy: string;
   filename: string;
-  category: string | "null";
+  category: string | null;
 };
 
 async function convertEntryToPublicFile(

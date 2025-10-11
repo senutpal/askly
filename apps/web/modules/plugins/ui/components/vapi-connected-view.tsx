@@ -15,7 +15,7 @@ import {
 } from "@workspace/ui/components/tabs";
 import Image from "next/image";
 import { Button } from "@workspace/ui/components/button";
-import { Bot, Phone, PhoneIcon, Settings, UnplugIcon } from "lucide-react";
+import { Bot, Phone, Settings, UnplugIcon } from "lucide-react";
 import Link from "next/link";
 import { VapiPhoneNumbersTab } from "./vapi-phone-numbers-tab";
 import { VapiAssistantsTab } from "./vapi-assistants-tab";

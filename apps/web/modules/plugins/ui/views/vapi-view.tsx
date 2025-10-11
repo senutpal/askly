@@ -124,7 +124,7 @@ const VapiPluginForm = ({
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="Your Public API Key"
+                      placeholder="Your Private API Key"
                       type="password"
                     />
                   </FormControl>
@@ -151,9 +151,11 @@ const VapiPluginRemoveForm = ({
   setOpen: (value: boolean) => void;
 }) => {
   const removePlugin = useMutation(api.private.plugins.remove);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async () => {
     try {
+      setIsSubmitting(true);
       await removePlugin({
         service: "vapi",
       });
@@ -162,6 +164,8 @@ const VapiPluginRemoveForm = ({
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -174,8 +178,12 @@ const VapiPluginRemoveForm = ({
           Are you sure you want to disconnect the Vapi plugin ?
         </DialogDescription>
         <DialogFooter>
-          <Button onClick={onSubmit} variant="destructive">
-            Disconnect
+          <Button
+            onClick={onSubmit}
+            variant="destructive"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Disconnecting..." : "Disconnect"}
           </Button>
         </DialogFooter>
       </DialogContent>

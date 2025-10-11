@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
-import { CheckCircle, Phone, XCircle } from "lucide-react";
+import { CheckCircle, Copy, Phone, XCircle } from "lucide-react";
 import { Badge } from "@workspace/ui/components/badge";
 
 export const VapiPhoneNumbersTab = () => {
@@ -29,9 +29,9 @@ export const VapiPhoneNumbersTab = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-11 py-4">Phone Number</TableHead>
+            <TableHead className="px-6 py-4">Phone Number</TableHead>
             <TableHead className="px-6 py-4">Name</TableHead>
-            <TableHead className="px-9.5 py-4">Status</TableHead>
+            <TableHead className="px-6 py-4">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,6 +69,15 @@ export const VapiPhoneNumbersTab = () => {
                     <span className="font-mono">
                       {phone.number || "Not Configured"}
                     </span>
+                    {phone.number && (
+                      <button
+                        onClick={() => copyToClipboard(phone.number!)}
+                        className="ml-2 p-1 hover:bg-muted rounded"
+                        title="Copy to clipboard"
+                      >
+                        <Copy className="size-3 text-muted-foreground" />
+                      </button>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
