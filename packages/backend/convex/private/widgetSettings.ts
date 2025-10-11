@@ -29,13 +29,13 @@ export const upsert = mutation({
     if (!orgId) {
       throw new ConvexError({
         code: "UNAUTHORIZED",
-        message: "Organisation Not Found",
+        message: "organization Not Found",
       });
     }
 
     const existingWidgetSettings = await ctx.db
       .query("widgetSettings")
-      .withIndex("by_organisation_id", (q) => q.eq("organisationId", orgId))
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
       .unique();
 
     if (existingWidgetSettings) {
@@ -46,7 +46,7 @@ export const upsert = mutation({
       });
     } else {
       await ctx.db.insert("widgetSettings", {
-        organisationId: orgId,
+        organizationId: orgId,
         greetMessage: args.greetMessage,
         defaultSuggestions: args.defaultSuggestions,
         vapiSettings: args.vapiSettings,
@@ -74,13 +74,13 @@ export const getOne = query({
     if (!orgId) {
       throw new ConvexError({
         code: "UNAUTHORIZED",
-        message: "Organisation Not Found",
+        message: "organization Not Found",
       });
     }
 
     const widgetSettings = await ctx.db
       .query("widgetSettings")
-      .withIndex("by_organisation_id", (q) => q.eq("organisationId", orgId))
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
       .unique();
 
     return widgetSettings;

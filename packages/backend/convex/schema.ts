@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 export default defineSchema({
   widgetSettings: defineTable({
-    organisationId: v.string(),
+    organizationId: v.string(),
     greetMessage: v.string(),
     defaultSuggestions: v.object({
       suggestion1: v.optional(v.string()),
@@ -14,7 +14,7 @@ export default defineSchema({
       assistantId: v.optional(v.string()),
       phoneNumber: v.optional(v.string()),
     }),
-  }).index("by_organisation_id", ["organisationId"]),
+  }).index("by_organization_id", ["organizationId"]),
   conversations: defineTable({
     threadId: v.string(),
     organizationId: v.string(),
