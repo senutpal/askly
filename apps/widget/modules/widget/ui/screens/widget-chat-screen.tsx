@@ -133,7 +133,7 @@ export default function WidgetChatScreen() {
           </Button>
         </div>
       </WidgetHeader>
-      <AIConversation className="min-h-[calc(100vh-180px)] max-h-[calc(100vh-180px)]">
+      <AIConversation className=" max-h-[calc(100vh-180px)]">
         <AIConversationContent>
           <InfiniteScrollTrigger
             canLoadMore={canLoadMore}
@@ -182,7 +182,7 @@ export default function WidgetChatScreen() {
         </AIConversationContent>
       </AIConversation>
 
-      {toUIMessages?.length === 1 && (
+      {toUIMessages(messages.results ?? [])?.length === 1 && (
         <AISuggestions className="flex w-full flex-col items-end p-2">
           {suggestions?.map((suggestion) => {
             if (!suggestion) {

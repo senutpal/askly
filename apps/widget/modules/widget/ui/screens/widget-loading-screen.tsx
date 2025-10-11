@@ -120,7 +120,6 @@ export const WidgetLoadingScreen = ({
     }
 
     setLoadingMessage("Loading Widget Settings");
-    setStep("done");
 
     if (widgetSettings !== undefined) {
       setWidgetSettings(widgetSettings);
