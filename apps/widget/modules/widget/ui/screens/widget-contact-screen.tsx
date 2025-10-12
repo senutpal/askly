@@ -16,7 +16,11 @@ export const WidgetContactScreen = () => {
 
   const handleCopy = async () => {
     if (!phoneNumber) {
-      return;
+      return (
+        <div className="flex h-full flex-col items-center justify-center">
+          <p className="text-muted-foreground">Phone number not configured</p>
+        </div>
+      );
     }
     try {
       await navigator.clipboard.writeText(phoneNumber);

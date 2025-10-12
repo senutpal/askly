@@ -199,8 +199,7 @@ export const CustomizationForm = ({
               <CardHeader>
                 <CardTitle>Voice Assistant Settings</CardTitle>
                 <CardDescription>
-                  Configure Voice CConfigure Voice Calling Features powered by
-                  Vapalling Features powered by Vapi
+                  Configure Voice Calling features powered by Vapi
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

@@ -27,7 +27,7 @@ export const getOneByConversationId = query({
 
     if (!conversation) {
       throw new ConvexError({
-        code: "NOT FOUND",
+        code: "NOT_FOUND",
         message: "Conversation Not Found",
       });
     }
