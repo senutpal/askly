@@ -30,7 +30,7 @@ export const IntegrationsView = () => {
       toast.error("Organization ID not found");
       return;
     }
-    const snippet = createScript(integrationId, organization.id) ?? "";
+    const snippet = createScript(integrationId, organization.id);
     setSelectedSnippet(snippet);
     setDialogOpen(true);
   };
@@ -92,6 +92,8 @@ export const IntegrationsView = () => {
                 <button
                   className="flex items-center gap-4 rounded-lg border bg-background p-4 hover:bg-accent"
                   key={integration.id}
+                  type="button"
+                  aria-label={`Select ${integration.title} integration`}
                   onClick={() => handleIntegrationClick(integration.id)}
                 >
                   <Image
@@ -149,7 +151,7 @@ export const IntegrationDialog = ({
                 {snippet}
               </pre>
               <Button
-                className="absolute bottom-2 right-2 size-5  opacity-0 transition-opacit group-hover:opacity-100"
+                className="absolute bottom-2 right-2 size-5 opacity-0 transition-opacity group-hover:opacity-100"
                 size="icon"
                 variant="secondary"
                 onClick={handleCopy}
@@ -163,7 +165,7 @@ export const IntegrationDialog = ({
               2. Add the code in your page
             </div>
             <p className="text-muted-foreground text-sm">
-              Paste the chatbox code above in your page.You can add it in the
+              Paste the chatbox code above in your page. You can add it in the
               HTML head section.
             </p>
           </div>

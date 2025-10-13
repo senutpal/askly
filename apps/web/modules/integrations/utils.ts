@@ -9,7 +9,7 @@ import {
 export const createScript = (
   integrationId: IntegrationId,
   organizationId: string
-) => {
+): string => {
   if (integrationId === "html") {
     return HTML_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
   }
@@ -22,4 +22,6 @@ export const createScript = (
   if (integrationId === "javascript") {
     return JAVASCRIPT_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
   }
+
+  throw new Error(`Unknown integration ID: ${integrationId}`);
 };
