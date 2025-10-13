@@ -1,5 +1,6 @@
 import { OrganizationSwitcher } from "@clerk/nextjs";
 import { Button } from "@workspace/ui/components/button";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Page() {
   return (
@@ -8,6 +9,7 @@ export default function Page() {
         <h1 className="text-2xl font-bold">Hello World</h1>
         <OrganizationSwitcher hidePersonal={true} />
         <Button size="sm">Button</Button>
+        <ModeToggle />
       </div>
     </div>
   );

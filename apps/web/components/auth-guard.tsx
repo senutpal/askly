@@ -18,6 +18,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
       <Unauthenticated>
         <AuthLayout>
           <SignInView />
+          {/* Create Landing Page */}
         </AuthLayout>
       </Unauthenticated>
     </>

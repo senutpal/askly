@@ -3,6 +3,7 @@ import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@workspace/ui/components/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -10,6 +11,7 @@ const dmSans = DM_Sans({
   variable: "--font-sans",
   display: "swap",
 });
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -19,10 +21,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} font-sans antialiased`}>
         <ClerkProvider>
-          <Providers>
-            <Toaster />
-            {children}
-          </Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Providers>
+              <Toaster />
+              {children}
+            </Providers>
+          </ThemeProvider>
         </ClerkProvider>
       </body>
     </html>
