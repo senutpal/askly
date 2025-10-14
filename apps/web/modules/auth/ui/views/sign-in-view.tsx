@@ -4,7 +4,6 @@ export const SignInView = () => {
   return (
     <>
       <SignIn routing="hash" />
-      <div></div>
     </>
   );
 };
