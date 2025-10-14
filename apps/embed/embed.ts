@@ -119,7 +119,13 @@ import { chatBubbleIcon, closeIcon } from "./icons";
   }
 
   function handleMessage(event: MessageEvent) {
-    if (event.origin !== new URL(EMBED_CONFIG.WIDGET_URL).origin) return;
+    try {
+      const allowedOrigin = new URL(EMBED_CONFIG.WIDGET_URL).origin;
+      if (event.origin !== allowedOrigin) return;
+    } catch (error) {
+      console.error("Echo Widget: Invalid WIDGET_URL configuration", error);
+      return;
+    }
 
     const { type, payload } = event.data;
 

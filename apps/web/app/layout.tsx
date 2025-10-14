@@ -4,6 +4,26 @@ import { Providers } from "@/components/providers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ASKLY - Multilingual Campus AI Assistant",
+  description:
+    "Revolutionize campus communication with AI-powered multilingual chatbot support in Hindi, English, and regional languages. 24/7 automated student assistance.",
+  keywords: [
+    "campus chatbot",
+    "multilingual AI",
+    "student support",
+    "educational technology",
+    "conversational AI",
+  ],
+  openGraph: {
+    title: "ASKLY - Multilingual Campus AI Assistant",
+    description:
+      "Transform campus communication with intelligent multilingual chatbot support",
+    type: "website",
+  },
+};
 
 const dmSans = DM_Sans({
   subsets: ["latin"],

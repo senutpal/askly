@@ -102,12 +102,12 @@ export default function Page() {
                       <MessageSquare className="size-5 text-primary" />
                       <h2 className="font-semibold">Recent Conversations</h2>
                     </div>
-                    <Link href="/conversations">
-                      <Button size="sm" variant="ghost">
+                    <Button asChild size="sm" variant="ghost">
+                      <Link href="/conversations">
                         View All
                         <ArrowRight className="ml-2 size-4" />
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </div>
                 </div>
                 <CardContent className="p-0">
@@ -152,12 +152,11 @@ export default function Page() {
                       <FileText className="size-5 text-primary" />
                       <h2 className="font-semibold">Knowledge Base</h2>
                     </div>
-                    <Link href="/files">
-                      <Button size="sm" variant="ghost">
-                        Manage Files
-                        <ArrowRight className="ml-2 size-4" />
-                      </Button>
-                    </Link>
+                    <Button asChild size="sm" variant="ghost">
+                      <Link href="/files">
+                        Manage Files <ArrowRight className="ml-2 size-4" />
+                      </Link>
+                    </Button>
                   </div>
                 </div>
                 <CardContent className="p-4">
@@ -175,11 +174,15 @@ export default function Page() {
                       <p className="text-sm text-muted-foreground">
                         No files uploaded yet
                       </p>
-                      <Link href="/files">
-                        <Button className="mt-4" size="sm" variant="outline">
-                          Upload Files
-                        </Button>
-                      </Link>
+
+                      <Button
+                        asChild
+                        className="mt-4"
+                        size="sm"
+                        variant="outline"
+                      >
+                        <Link href="/files">Upload Files</Link>
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -286,7 +289,6 @@ const StatCard = ({
   );
 };
 
-// Status Badge Component
 const StatusBadge = ({
   status,
 }: {

@@ -74,11 +74,11 @@ export default function SolutionSection() {
               </div>
               <div className="bg-gradient-to-br from-gray-50 to-white">
                 <Image
-                  alt="Logo"
+                  alt="ASKLY Dashboard Preview"
                   height={582}
                   width={1080}
                   src="/dashboard.png"
-                  className="object-covers"
+                  className="object-cover"
                 />
               </div>
             </div>

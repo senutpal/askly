@@ -110,15 +110,14 @@
       </div>
     </div>
 
-    <!-- Load the widget with default config -->
-    <script
-      type="module"
-      src="/embed.ts"
-      data-organization-id="org_33bNghBskeYYLFgWEu9iHzhIfdy"
-    ></script>
-
     <script type="module">
       import { EMBED_CONFIG } from "./config.ts";
+
+      const embedScript = document.createElement("script");
+      embedScript.type = "module";
+      embedScript.src = "/embed.ts";
+      embedScript.dataset.organizationId = EMBED_CONFIG.DEFAULT_ORG_ID;
+      document.body.appendChild(embedScript);
 
       // Set display values on load
       document.getElementById("example-org-id").textContent =
