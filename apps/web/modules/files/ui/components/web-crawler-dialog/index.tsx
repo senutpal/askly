@@ -25,20 +25,17 @@ type CrawlStep = "input" | "crawling" | "results" | "importing" | "complete";
 interface WebCrawlerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImportComplete?: () => void;
 }
 
 export const WebCrawlerDialog = ({
   open,
   onOpenChange,
-  onImportComplete,
 }: WebCrawlerDialogProps) => {
   const startCrawl = useAction(api.private.webCrawl.startCrawl);
   const addSelectedResources = useAction(
     api.private.webCrawl.addSelectedResources
   );
 
-  // Form state
   const [step, setStep] = useState<CrawlStep>("input");
   const [url, setUrl] = useState("");
   const [maxDepth, setMaxDepth] = useState("1");
@@ -47,15 +44,13 @@ export const WebCrawlerDialog = ({
   const [includeText, setIncludeText] = useState(true);
   const [crawlError, setCrawlError] = useState<string | null>(null);
 
-  // Job state
+
   const [jobId, setJobId] = useState<Id<"crawlJobs"> | null>(null);
 
-  // Selection state
   const [selectedResourceIds, setSelectedResourceIds] = useState<Set<string>>(
     new Set()
   );
 
-  // Import state
   const [importProgress, setImportProgress] = useState({
     current: 0,
     total: 0,
@@ -63,7 +58,6 @@ export const WebCrawlerDialog = ({
     failed: 0,
   });
 
-  // Fetch job status and results
   const job = useQuery(api.private.webCrawl.getJob, jobId ? { jobId } : "skip");
 
   const results = useQuery(
@@ -71,18 +65,15 @@ export const WebCrawlerDialog = ({
     jobId ? { jobId } : "skip"
   );
 
-  // Auto-transition from crawling to results
   useEffect(() => {
     if (step === "crawling" && job?.status === "completed") {
       setStep("results");
-      // Auto-select all resources
       if (results) {
         setSelectedResourceIds(new Set(results.map((r) => r._id)));
       }
     }
   }, [step, job?.status, results]);
 
-  // Handle failed crawl
   useEffect(() => {
     if (step === "crawling" && job?.status === "failed") {
       setCrawlError(job.error || "Crawl failed");
@@ -93,7 +84,6 @@ export const WebCrawlerDialog = ({
   const handleStartCrawl = async () => {
     setCrawlError(null);
 
-    // Validate URL
     try {
       new URL(url);
     } catch {
@@ -151,9 +141,6 @@ export const WebCrawlerDialog = ({
       });
 
       setStep("complete");
-      onImportComplete?.();
-
-      // Auto-close after 2 seconds if all succeeded
       if (result.failed === 0) {
         setTimeout(() => {
           handleClose();
@@ -170,7 +157,6 @@ export const WebCrawlerDialog = ({
 
   const handleClose = () => {
     onOpenChange(false);
-    // Reset state after dialog close animation
     setTimeout(() => {
       setStep("input");
       setUrl("");
@@ -202,14 +188,12 @@ export const WebCrawlerDialog = ({
     );
 
     if (allFilteredSelected) {
-      // Deselect all filtered items
       setSelectedResourceIds((prev) => {
         const newSet = new Set(prev);
         filteredIds.forEach((id) => newSet.delete(id));
         return newSet;
       });
     } else {
-      // Select all filtered items
       setSelectedResourceIds((prev) => {
         const newSet = new Set(prev);
         filteredIds.forEach((id) => newSet.add(id));

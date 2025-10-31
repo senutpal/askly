@@ -36,7 +36,6 @@ async function startCrawlHandler(
   args: StartCrawlArgs
 ): Promise<{ jobId: Id<"crawlJobs"> }> {
   const identity = await ctx.auth.getUserIdentity();
-  console.log(identity);
 
   if (identity === null) {
     throw new ConvexError({
@@ -284,7 +283,7 @@ export const addSelectedResources = action({
           });
           continue;
         }
-        
+
         if (resource.addedToKnowledgeBase) {
           results.push({
             resourceId,
@@ -311,7 +310,7 @@ export const addSelectedResources = action({
           const response = await axios.get(resource.url, {
             responseType: "arraybuffer",
             timeout: 30000,
-            maxContentLength: 50 * 1024 * 1024,
+            maxContentLength: 10 * 1024 * 1024,
           });
           bytes = response.data as ArrayBuffer;
           mimeType =

@@ -68,10 +68,7 @@ export const FilesView = () => {
     setSelectedFile(null);
   };
 
-  const handleImportComplete = () => {
-    // Files will automatically refresh due to Convex reactivity
-  };
-
+  
   return (
     <>
       <DeleteFileDialog
@@ -87,7 +84,6 @@ export const FilesView = () => {
       <WebCrawlerDialog
         onOpenChange={setCrawlerDialogOpen}
         open={crawlerDialogOpen}
-        onImportComplete={handleImportComplete}
       />
       <div className="flex min-h-screen flex-col bg-muted p-8">
         <div className="mx-auto w-full max-w-screen-md">

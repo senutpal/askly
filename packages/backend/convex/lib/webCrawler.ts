@@ -1,8 +1,9 @@
 import { parseHTML } from "linkedom";
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import robotsParser from "robots-parser";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_PROTOCOLS = ["http:", "https:"];
 const CRAWL_TIMEOUT = 30000;
 const REQUEST_DELAY = 500;
@@ -100,7 +101,7 @@ export async function crawlWebsite(
         }
       }
     } else if (contentType.includes("application/pdf") && includePdfs) {
-      const hash = hashBytes(data);
+      const hash = hashString(current.url);
       resources.push({
         url: current.url,
         type: "pdf",
@@ -110,7 +111,7 @@ export async function crawlWebsite(
         size,
       });
     } else if (contentType.startsWith("image/") && includeImages) {
-      const hash = hashBytes(data);
+      const hash = hashString(current.url);
       resources.push({
         url: current.url,
         type: "image",
@@ -128,16 +129,19 @@ export async function crawlWebsite(
   };
 }
 
-async function checkRobotsTxt(origin: string): Promise<boolean> {
+async function checkRobotsTxt(url: string): Promise<boolean> {
+  const userAgent = "AsklyBot";
   try {
-    const res = await axios.get(`${origin}/robots.txt`, { timeout: 3000 });
-    const txt: string = res.data.toString().toLowerCase();
-    return !txt.includes("disallow: /");
+    const origin = new URL(url).origin;
+    const robotsUrl = `${origin}/robots.txt`;
+    const res = await axios.get(robotsUrl, { timeout: 3000 });
+    const robots = robotsParser(robotsUrl, res.data);
+    const allowed = robots.isAllowed(url, userAgent);
+    return allowed !== false;
   } catch {
     return true;
   }
 }
-
 async function extractResourcesFromHtml(
   html: string,
   pageUrl: string,
@@ -227,7 +231,6 @@ function extractText(doc: Document): string {
   const text = clone.textContent ?? "";
   return text.replace(/\s+/g, " ").trim();
 }
-
 
 function hashString(str: string): string {
   return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex);
