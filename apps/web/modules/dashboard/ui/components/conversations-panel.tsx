@@ -59,7 +59,7 @@ export const ConversationsPanel = () => {
 
   return (
     <div className="flex h-full w-full flex-col bg-background text-sidebar-foreground">
-      <div className="flex flex-col gap-3.5 border-b p-2">
+      <div className="flex flex-col gap-3.5 border-b light:border-gray-200 dark:border-gray-700 p-2">
         <Select
           defaultValue="all"
           onValueChange={(value) =>
@@ -111,7 +111,7 @@ export const ConversationsPanel = () => {
                 <Link
                   key={conversation._id}
                   className={cn(
-                    "relative flex cursor-pointer items-start gap-3 border-b p-4 py-4 text-sm leading-tight hover:bg-accent hover:text-accent-foreground",
+                    "relative flex cursor-pointer items-start gap-3 border-b light:border-gray-200 dark:border-gray-700 p-4 py-4 text-sm leading-tight hover:bg-accent hover:text-accent-foreground",
                     pathname === `/conversations/${conversation._id}` &&
                       "bg-accent text-accent-foreground"
                   )}

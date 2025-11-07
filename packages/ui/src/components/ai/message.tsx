@@ -1,5 +1,9 @@
 import type { ComponentProps, HTMLAttributes } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@workspace/ui/components/avatar";
 import { cn } from "@workspace/ui/lib/utils";
 
 export type AIMessageProps = HTMLAttributes<HTMLDivElement> & {
@@ -28,9 +32,9 @@ export const AIMessageContent = ({
   <div
     className={cn(
       "break-words",
-      "flex flex-col gap-2 rounded-lg border border-border px-3 py-2 text-sm",
+      "flex flex-col gap-2 rounded-lg px-3 py-2 text-sm",
       "bg-background text-foreground",
-      "group-[.is-user]:border-transparent group-[.is-user]:bg-gradient-to-b group-[.is-user]:from-primary group-[.is-user]:to-[#0b63f3] group-[.is-user]:text-primary-foreground",
+      "group-[.is-user]:bg-gradient-to-b group-[.is-user]:from-blue-500 group-[.is-user]:to-blue-600 group-[.is-user]:text-white",
       className
     )}
     {...props}

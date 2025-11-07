@@ -1,0 +1,11 @@
+/**
+ * Design Tokens Index
+ * Central import file for all design tokens
+ */
+
+/* Import all token files */
+@import "./colors.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./shadows.css";
+@import "./animations.css";

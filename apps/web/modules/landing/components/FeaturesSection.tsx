@@ -1,119 +1,173 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import {
-  MessageSquare,
-  Globe,
-  Brain,
-  BarChart,
-  Phone,
-  Shield,
-  Zap,
-  Users,
-  FileText,
-} from "lucide-react";
-import { Badge } from "@workspace/ui/components/badge";
+"use client";
 
+import { easeOut, motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import {
+  Globe,
+  FileText,
+  MessageSquare,
+  Phone,
+  Users,
+  Zap,
+} from "lucide-react";
+import { GlowingEffect } from "@workspace/ui/components/glowing-effect";
+import { Badge } from "@workspace/ui/components/badge";
+import ShinyText from "@workspace/ui/components/shinytext";
+import { cn } from "@workspace/ui/lib/utils";
+
+// Feature data
 const features = [
   {
-    icon: Globe,
-    title: "Multilingual Communication",
+    icon: <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
+    title: "Language Diversity",
     description:
-      "Native support for Hindi, English, and configurable regional languages with accurate intent recognition across all supported languages.",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
+      "Understand and respond in Hindi, English, and regional languages — powered by intelligent language models.",
+    accent: "from-blue-500/20 to-blue-300/10",
   },
   {
-    icon: FileText,
+    icon: <FileText className="w-5 h-5 text-green-600 dark:text-green-400" />,
     title: "Knowledge Integration",
     description:
-      "Seamless ingestion of institutional FAQs, circulars, and documents with RAG (Retrieval-Augmented Generation) for accurate responses.",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
+      "Ingest FAQs, circulars, and PDFs automatically. Retrieve precise answers with factual RAG pipelines.",
+    accent: "from-green-500/20 to-green-300/10",
   },
   {
-    icon: MessageSquare,
+    icon: (
+      <MessageSquare className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+    ),
     title: "Smart Widget System",
     description:
-      "Lightweight embeddable widgets that integrate into any college website with just a few lines of code.",
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
+      "Embed lightweight conversational widgets into any site with a single line of code.",
+    accent: "from-orange-500/20 to-orange-300/10",
   },
   {
-    icon: Phone,
+    icon: <Phone className="w-5 h-5 text-pink-600 dark:text-pink-400" />,
     title: "Voice Support",
     description:
-      "Students can interact through voice calls in their preferred language, accessible to users with varying digital literacy levels.",
-    color: "text-pink-600",
-    bgColor: "bg-pink-100",
+      "Enable natural, voice-based conversations in any language — accessible across all devices.",
+    accent: "from-pink-500/20 to-pink-300/10",
   },
   {
-    icon: Users,
+    icon: <Users className="w-5 h-5 text-teal-600 dark:text-teal-400" />,
     title: "Fallback Mechanisms",
     description:
-      "Seamless escalation to human operators when queries exceed AI capabilities, with full conversation history for context.",
-    color: "text-teal-600",
-    bgColor: "bg-teal-100",
+      "Seamlessly hand over chats to human operators with preserved conversation context.",
+    accent: "from-teal-500/20 to-teal-300/10",
   },
   {
-    icon: Zap,
+    icon: <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />,
     title: "24/7 Availability",
     description:
-      "Students get instant answers regardless of office hours or holidays. Cloud-based architecture handles thousands of concurrent conversations.",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
+      "Always-on infrastructure handling thousands of concurrent sessions efficiently.",
+    accent: "from-yellow-500/20 to-yellow-300/10",
   },
 ];
 
 export default function FeaturesSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+  // Animation for container and cards
+  const containerVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: easeOut, staggerChildren: 0.15 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 30 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: easeOut },
+    },
+  };
+
   return (
-    <section id="features" className="py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center space-y-4 mb-16">
-          <Badge variant="secondary" className="mb-4">
+    <section id="features" ref={ref} className="relative py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* --- Header --- */}
+        <motion.div
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+          className="text-center mb-20 space-y-6"
+        >
+          <Badge variant="secondary" className="px-4 py-1">
             Features
           </Badge>
-          <div className="text-3xl sm:text-4xl md:text-5xl font-bold">
-            <div className="pb-2 md:pb-5"> Everything You Need to</div>
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Transform Campus Communication
-            </span>
-          </div>
-          <p className="max-w-2xl mx-auto text-lg text-gray-600">
-            Comprehensive AI-powered platform with all the tools you need to
-            provide exceptional multilingual support to your students.
-          </p>
-        </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <Card
-              key={index}
-              className="border-2 hover:border-blue-300 transition-all duration-300 hover:shadow-lg group"
+          <h2 className="text-4xl md:text-6xl font-bold font-sans-alt  dark:from-white dark:to-gray-400 bg-gradient-to-b from-gray-500 to-gray-900 text-transparent bg-clip-text">
+            Powering the{" "}
+            <span className=" bg-gradient-to-b from-violet-500 to-violet-600 text-transparent bg-clip-text inline-block">
+              Future of Communication
+            </span>
+          </h2>
+
+          <ShinyText
+            text="An adaptive AI platform built for seamless, multilingual, and voice-enabled experiences — always learning, always available."
+            className="max-w-3xl mx-auto text-lg md:text-xl text-muted-foreground"
+            disabled={false}
+            speed={8}
+          />
+        </motion.div>
+
+        {/* --- Features Grid --- */}
+        <motion.ul
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {features.map((feature) => (
+            <motion.li
+              key={feature.title}
+              variants={cardVariants}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 120 }}
+              className="relative list-none"
             >
-              <CardHeader>
+              {/* Outer glow frame */}
+              <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border/50 p-2 md:rounded-[1.5rem] md:p-3">
+                <GlowingEffect
+                  spread={40}
+                  glow
+                  disabled={false}
+                  proximity={64}
+                  inactiveZone={0.02}
+                  borderWidth={3}
+                />
+                {/* Actual Card */}
                 <div
-                  className={`w-12 h-12 rounded-lg ${feature.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                  className={cn(
+                    "relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-gradient-to-b p-8 shadow-sm backdrop-blur-xl transition-transform duration-500",
+                    feature.accent
+                  )}
                 >
-                  <feature.icon className={`w-6 h-6 ${feature.color}`} />
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 rounded-lg bg-background/80 dark:bg-gray-900/60 border border-border flex items-center justify-center shadow-inner">
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-2xl font-semibold text-foreground font-sans-alt">
+                      {feature.title}
+                    </h3>
+                    <p className="text-muted-foreground text-base leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.li>
           ))}
-        </div>
+        </motion.ul>
       </div>
+
+      {/* Background Glow Accent */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.08),transparent_60%)]" />
     </section>
   );
 }

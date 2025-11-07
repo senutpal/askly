@@ -1,4 +1,4 @@
-import "./global.css";
+import "@workspace/ui/globals.css";
 
 export default function LandingLayout({
   children,

@@ -1,7 +1,6 @@
 import { parseHTML } from "linkedom";
 import axios from "axios";
 import CryptoJS from "crypto-js";
-import robotsParser from "robots-parser";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_PROTOCOLS = ["http:", "https:"];
@@ -47,9 +46,6 @@ export async function crawlWebsite(
   } catch {
     throw new Error("Invalid URL");
   }
-
-  const canCrawl = await checkRobotsTxt(baseUrl.origin);
-  if (!canCrawl) throw new Error("Disallowed by robots.txt");
 
   const resources: CrawledResource[] = [];
   const visitedUrls = new Set<string>();
@@ -129,19 +125,6 @@ export async function crawlWebsite(
   };
 }
 
-async function checkRobotsTxt(url: string): Promise<boolean> {
-  const userAgent = "AsklyBot";
-  try {
-    const origin = new URL(url).origin;
-    const robotsUrl = `${origin}/robots.txt`;
-    const res = await axios.get(robotsUrl, { timeout: 3000 });
-    const robots = robotsParser(robotsUrl, res.data);
-    const allowed = robots.isAllowed(url, userAgent);
-    return allowed !== false;
-  } catch {
-    return true;
-  }
-}
 async function extractResourcesFromHtml(
   html: string,
   pageUrl: string,
@@ -154,18 +137,16 @@ async function extractResourcesFromHtml(
 ): Promise<CrawledResource[]> {
   const resources: CrawledResource[] = [];
   const { document } = parseHTML(html);
-
   if (opts.includeText) {
-    const title =
-      document.querySelector("title")?.textContent?.trim() || "Untitled Page";
-
+    const title = document.querySelector("title")?.textContent?.trim() || "Untitled Page";
     const content = extractText(document);
     if (content.length > 50) {
+      const contentHash = hashString(content);
       resources.push({
         url: pageUrl,
         type: "text",
         title,
-        contentHash: hashString(content),
+        contentHash,
         sourceUrl: pageUrl,
       });
     }
@@ -174,13 +155,17 @@ async function extractResourcesFromHtml(
   if (opts.includeImages) {
     for (const img of Array.from(document.querySelectorAll("img[src]"))) {
       const src = img.getAttribute("src");
-      if (!src || src.startsWith("data:") || src.endsWith(".svg")) continue;
+      if (!src || src.startsWith("data:") || src.endsWith(".svg")) {
+        continue;
+      }
+
       const imageUrl = new URL(src, pageUrl).href;
+      const contentHash = hashString(imageUrl);
       resources.push({
         url: imageUrl,
         type: "image",
         title: getFilenameFromUrl(imageUrl),
-        contentHash: hashString(imageUrl),
+        contentHash,
         sourceUrl: pageUrl,
       });
     }
@@ -189,20 +174,39 @@ async function extractResourcesFromHtml(
   if (opts.includePdfs) {
     for (const a of Array.from(document.querySelectorAll("a[href]"))) {
       const href = a.getAttribute("href");
-      if (!href?.toLowerCase().includes(".pdf")) continue;
+      if (!href?.toLowerCase().includes(".pdf")) {
+        continue;
+      }
+
       const pdfUrl = new URL(href, pageUrl).href;
+      const contentHash = hashString(pdfUrl);
       resources.push({
         url: pdfUrl,
         type: "pdf",
         title: getFilenameFromUrl(pdfUrl),
-        contentHash: hashString(pdfUrl),
+        contentHash,
         sourceUrl: pageUrl,
       });
     }
   }
-
   return resources;
 }
+
+function extractText(doc: Document): string {
+  const clone = doc.cloneNode(true) as Document;
+
+  for (const el of Array.from(
+    clone.querySelectorAll("script,style,nav,footer,header,aside,iframe")
+  )) {
+    el.remove();
+  }
+
+  const body = clone.querySelector("body");
+  const rawText = body?.textContent ?? "";
+  const cleaned = rawText.replace(/\s+/g, " ").trim();
+  return cleaned;
+}
+
 
 function extractLinks(html: string, pageUrl: string, origin: string): string[] {
   const { document } = parseHTML(html);
@@ -218,20 +222,6 @@ function extractLinks(html: string, pageUrl: string, origin: string): string[] {
   }
   return links;
 }
-
-function extractText(doc: Document): string {
-  const clone = doc.cloneNode(true) as Document;
-
-  for (const el of Array.from(
-    clone.querySelectorAll("script,style,nav,footer,header,aside,iframe")
-  )) {
-    el.remove();
-  }
-
-  const text = clone.textContent ?? "";
-  return text.replace(/\s+/g, " ").trim();
-}
-
 function hashString(str: string): string {
   return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex);
 }

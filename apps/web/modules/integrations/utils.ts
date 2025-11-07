@@ -10,18 +10,15 @@ export const createScript = (
   integrationId: IntegrationId,
   organizationId: string
 ): string => {
-  if (integrationId === "html") {
-    return HTML_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
-  }
-  if (integrationId === "react") {
-    return REACT_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
-  }
-  if (integrationId === "nextjs") {
-    return NEXTJS_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
-  }
-  if (integrationId === "javascript") {
-    return JAVASCRIPT_SCRIPT.replace(/{{ORGANIZATION_ID}}/g, organizationId);
-  }
+  const map = {
+    html: HTML_SCRIPT,
+    react: REACT_SCRIPT,
+    nextjs: NEXTJS_SCRIPT,
+    javascript: JAVASCRIPT_SCRIPT,
+  } as const;
 
-  throw new Error(`Unknown integration ID: ${integrationId}`);
+  const script = map[integrationId];
+  if (!script) throw new Error(`Unknown integration ID: ${integrationId}`);
+
+  return script.replace(/{{ORGANIZATION_ID}}/g, organizationId);
 };

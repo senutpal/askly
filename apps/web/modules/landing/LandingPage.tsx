@@ -1,24 +1,22 @@
-import CTASection from "./components/CTASection";
+import SplashCursor from "../../../../packages/ui/src/components/splash-cursor";
 import FeaturesSection from "./components/FeaturesSection";
 import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
-import HowItWorks from "./components/HowItWorks";
 import Navbar from "./components/Navbar";
 import ProblemSection from "./components/ProblemSection";
 import SolutionSection from "./components/SolutionSection";
-import TechStack from "./components/TechStack";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen">
-      <Navbar />
-      <HeroSection />
-      <ProblemSection />
+    <main className="min-h-screen ">
+      <div>
+        <Navbar />
+        <HeroSection />
+        <ProblemSection />
+        <SplashCursor />
+      </div>
       <SolutionSection />
       <FeaturesSection />
-      <HowItWorks />
-      <TechStack />
-      <CTASection />
       <Footer />
     </main>
   );

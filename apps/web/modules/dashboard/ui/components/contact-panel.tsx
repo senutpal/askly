@@ -196,7 +196,7 @@ export const ContactPanel = () => {
 
       {contactSession.metadata && accordionSections.length > 0 && (
         <Accordion
-          className="w-full rounded-none border-y border-gray-200"
+          className="w-full rounded-none border-y light:border-gray-200 dark:border-gray-700"
           collapsible
           type="single"
         >

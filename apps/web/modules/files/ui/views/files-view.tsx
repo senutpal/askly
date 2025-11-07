@@ -68,7 +68,6 @@ export const FilesView = () => {
     setSelectedFile(null);
   };
 
-  
   return (
     <>
       <DeleteFileDialog
@@ -98,14 +97,17 @@ export const FilesView = () => {
           <div className="mt-8 rounded-lg border bg-background">
             <div className="flex items-center justify-end gap-2 border-b px-4 py-4">
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => setCrawlerDialogOpen(true)}
               >
                 <GlobeIcon className="size-4 mr-2" />
                 Crawl Website
               </Button>
-              <Button onClick={() => setUploadDialogOpen(true)}>
-                <PlusIcon className="size-4 mr-2" />
+              <Button
+                variant="default"
+                onClick={() => setUploadDialogOpen(true)}
+              >
+                <PlusIcon className="size-4 mr-1" />
                 Add New
               </Button>
             </div>
