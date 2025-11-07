@@ -17,6 +17,7 @@ import {
 import {
   CreditCardIcon,
   InboxIcon,
+  LayoutDashboard,
   LayoutDashboardIcon,
   LibraryBigIcon,
   Mic,
@@ -25,7 +26,15 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@workspace/ui/lib/utils";
+import { ModeToggle } from "@/components/mode-toggle";
 
+const primaryItems = [
+  {
+    title: "Dashboard",
+    url: "/",
+    icon: LayoutDashboard,
+  },
+];
 const customerSupportItems = [
   {
     title: "Conversations",
@@ -105,6 +114,30 @@ export const DashboardSidebar = () => {
 
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {primaryItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    tooltip={item.title}
+                    className={cn(
+                      isActive(item.url) &&
+                        "bg-gradient-to-b from-blue-500 to-blue-600! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                    )}
+                  >
+                    <Link href={item.url}>
+                      <item.icon className="size-4" />
+                      <span className="font-medium">{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
           <SidebarGroupLabel>Customer Support</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -116,7 +149,7 @@ export const DashboardSidebar = () => {
                     tooltip={item.title}
                     className={cn(
                       isActive(item.url) &&
-                        "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                        "bg-gradient-to-b from-blue-500 to-blue-600! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
                     )}
                   >
                     <Link href={item.url}>
@@ -142,7 +175,7 @@ export const DashboardSidebar = () => {
                     tooltip={item.title}
                     className={cn(
                       isActive(item.url) &&
-                        "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                        "bg-gradient-to-b from-blue-500 to-blue-600! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
                     )}
                   >
                     <Link href={item.url}>
@@ -156,7 +189,7 @@ export const DashboardSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -168,7 +201,7 @@ export const DashboardSidebar = () => {
                     tooltip={item.title}
                     className={cn(
                       isActive(item.url) &&
-                        "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                        "bg-gradient-to-b from-blue-500 to-blue-600! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
                     )}
                   >
                     <Link href={item.url}>
@@ -180,11 +213,17 @@ export const DashboardSidebar = () => {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuButton
+            tooltip="Toggle Theme"
+            className="opacity-0 group-data-[collapsible=icon]:opacity-100 justify-center items-center"
+          >
+            <ModeToggle />
+          </SidebarMenuButton>
           <SidebarMenuItem>
             <UserButton
               showName

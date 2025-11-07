@@ -150,7 +150,7 @@ export const ConversationIdView = ({
 
   return (
     <div className="flex h-full flex-col bg-muted">
-      <header className="flex items-center justify-between border-b bg-background p-2.5">
+      <header className="flex items-center justify-between border-b bg-background light:border-gray-200 dark:border-gray-700 p-2.5 ">
         <Button size="sm" variant="ghost">
           <MoreHorizontalIcon />
         </Button>
@@ -261,7 +261,7 @@ export const ConversationIdView = ({
 export const ConversationIdViewLoading = () => {
   return (
     <div className="flex h-full flex-col bg-muted">
-      <header className="flex items-center justify-between border-b border-gray-200 bg-background p-2.5">
+      <header className="flex items-center justify-between border-b light:border-gray-200 dark:border-gray-700 bg-background p-2.5">
         <Button disabled size="sm" variant="ghost">
           <MoreHorizontalIcon />
         </Button>
@@ -282,9 +282,9 @@ export const ConversationIdViewLoading = () => {
                 key={index}
               >
                 <Skeleton
-                  className={`h-9 ${width} rounded-lg bg-neutral-200 `}
+                  className={`h-9 ${width} rounded-lg bg-neutral-200 dark:bg-gray-600 `}
                 />
-                <Skeleton className="size-8 rounded-full bg-neutral-200" />
+                <Skeleton className="size-8 rounded-full bg-neutral-200 dark:bg-gray-600" />
               </div>
             );
           })}

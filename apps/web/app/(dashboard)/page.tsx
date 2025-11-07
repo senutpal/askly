@@ -21,6 +21,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { formatDistanceToNow } from "date-fns";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Page() {
   const conversations = useQuery(api.private.conversations.getMany, {
@@ -63,6 +64,7 @@ export default function Page() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ModeToggle />
             <OrganizationSwitcher hidePersonal={true} />
           </div>
         </header>
@@ -337,7 +339,10 @@ const ActionCard = ({
 
   return (
     <Link href={href}>
-      <div className="group flex h-full flex-col rounded-lg border bg-background p-4 transition-all hover:border-primary hover:shadow-sm">
+      <div
+        className="group flex h-full flex-col rounded-lg border bg-background p-4 transition-all 
+      dark:hover:border-gray-700 hover:border-gray-300 hover:shadow-sm"
+      >
         <div className="mb-3 flex items-center justify-between">
           <div className="rounded-lg bg-primary/10 p-2">
             <Icon className="size-5 text-primary" />

@@ -108,18 +108,18 @@ export const ResultsSelectionStep = ({
           {searchQuery && ` (${filteredResults.length} matching)`}
         </p>
         <Button
-  variant="ghost"
-  size="sm"
-  onClick={() => onToggleSelectAll(filteredResults)}
-  disabled={filteredResults.length === 0}
->
-  {filteredResults.every(r => selectedResourceIds.has(r._id))
-    ? "Deselect All"
-    : "Select All"}
-</Button>
+          variant="ghost"
+          size="sm"
+          onClick={() => onToggleSelectAll(filteredResults)}
+          disabled={filteredResults.length === 0}
+        >
+          {filteredResults.every((r) => selectedResourceIds.has(r._id))
+            ? "Deselect All"
+            : "Select All"}
+        </Button>
       </div>
 
-      <ScrollArea className="h-[400px] rounded-lg border">
+      <ScrollArea className="h-[400px] max-w-[720px] rounded-lg border">
         <div className="space-y-2 p-4">
           {filteredResults.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

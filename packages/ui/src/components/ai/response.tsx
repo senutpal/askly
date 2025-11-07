@@ -88,7 +88,7 @@ export const AIResponse = memo(
     <div
       className={cn(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
-        className,
+        className
       )}
       {...props}
     >
@@ -101,7 +101,7 @@ export const AIResponse = memo(
       </ReactMarkdown>
     </div>
   ),
-  (prevProps, nextProps) => prevProps.children === nextProps.children,
+  (prevProps, nextProps) => prevProps.children === nextProps.children
 );
 
 AIResponse.displayName = "AIResponse";
