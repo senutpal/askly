@@ -6,6 +6,7 @@
   [![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
   [![pnpm](https://img.shields.io/badge/pnpm-10.4.1-orange)](https://pnpm.io/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/senutpal/askly)
 </div>
 
 ---
@@ -443,9 +444,13 @@ export default function Layout({ children }) {
 ```
 
 # Architecture
+
 ## High-Level Overview
+
 ![System Architecture](apps/web/public/image.png)
+
 ## Data Flow
+
 1. **User Interaction:** Student clicks embedded widget button
 2. **Widget Load:** iframe loads chat interface from widget app
 3. **Authentication:** Anonymous or authenticated via Clerk
@@ -456,11 +461,15 @@ export default function Layout({ children }) {
    - AI generates contextualized response
 5. **Response Delivery:** Message streamed back to widget
 6. **Escalation:** Complex queries automatically escalated to staff
+
 ## Key Design Decisions
+
 - Monorepo: Turborepo for efficient development and builds
 - Real-Time: Convex for live updates and serverless functions
 - Type-Safety: Full TypeScript for compile-time safety
 - Component Library: shadcn/ui for consistent, accessible UI
 - Multi-Tenancy: Clerk organizations for campus isolation
+
 # License
+
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.

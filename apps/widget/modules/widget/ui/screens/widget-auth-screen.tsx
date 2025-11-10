@@ -16,13 +16,16 @@ import { useMutation } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
+import {
+  contactSessionIdAtomFamily,
+  organizationIdAtom,
+  screenAtom,
+} from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.email("Invalid email address"),
 });
-
 
 export default function WidgetAuthScreen() {
   const setScreen = useSetAtom(screenAtom);
@@ -65,7 +68,7 @@ export default function WidgetAuthScreen() {
         : {};
 
     try {
-        console.log("Creating contact session...");
+      console.log("Creating contact session...");
       const contactSessionId = await createContactSession({
         ...values,
         organizationId,
@@ -80,16 +83,15 @@ export default function WidgetAuthScreen() {
   };
 
   return (
-    <>
-      <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 py-6 font-semibold">
-          <p className=" text-3xl">Hi there</p>
-          <p className="text-lg">Lets&apos;s get you started</p>
-        </div>
-      </WidgetHeader>
+    <div>
+      <WidgetHeader
+        title="Welcome to Askly"
+        subtitle="Let’s get you started"
+        className="text-center"
+      />
       <Form {...form}>
         <form
-          className="flex flex-1 flex-col gap-y-4 p-4"
+          className="flex flex-1 flex-col gap-y-6 p-4 animate-fade-in"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -100,9 +102,8 @@ export default function WidgetAuthScreen() {
                 <FormLabel>Name</FormLabel>
                 <FormControl>
                   <Input
-                    className="h-10 bg-background"
+                    className="h-12 rounded-md border border-gray-300 px-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     placeholder="Enter your name"
-                    type="text"
                     {...field}
                   />
                 </FormControl>
@@ -119,9 +120,8 @@ export default function WidgetAuthScreen() {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    className="h-10 bg-background"
+                    className="h-12 rounded-md border border-gray-300 px-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                     placeholder="Enter your email"
-                    type="email"
                     {...field}
                   />
                 </FormControl>
@@ -134,11 +134,12 @@ export default function WidgetAuthScreen() {
             type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
+            className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all"
           >
             Continue
           </Button>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
