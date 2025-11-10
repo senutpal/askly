@@ -18,12 +18,15 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
 function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
 
+  const appearance = React.useMemo(
+    () => ({
+      baseTheme: resolvedTheme === "dark" ? dark : neobrutalism,
+    }),
+    [resolvedTheme]
+  );
+
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: resolvedTheme === "dark" ? dark : neobrutalism,
-      }}
-    >
+    <ClerkProvider appearance={appearance}>
       <ConvexProviderWithClerk useAuth={useAuth} client={convex}>
         <Toaster />
         {children}
