@@ -15,13 +15,13 @@ import {
   SidebarRail,
 } from "@workspace/ui/components/sidebar";
 import {
-  CreditCardIcon,
-  InboxIcon,
+  Blocks,
+  CreditCard,
+  Inbox,
   LayoutDashboard,
-  LayoutDashboardIcon,
-  LibraryBigIcon,
+  LibraryBig,
   Mic,
-  PaletteIcon,
+  Palette,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,12 +39,12 @@ const customerSupportItems = [
   {
     title: "Conversations",
     url: "/conversations",
-    icon: InboxIcon,
+    icon: Inbox,
   },
   {
     title: "Knowledge Base",
     url: "/files",
-    icon: LibraryBigIcon,
+    icon: LibraryBig,
   },
 ];
 
@@ -52,12 +52,12 @@ const configurationItems = [
   {
     title: "Widget Customization",
     url: "/customization",
-    icon: PaletteIcon,
+    icon: Palette,
   },
   {
     title: "Integrations",
     url: "/integrations",
-    icon: LayoutDashboardIcon,
+    icon: Blocks,
   },
   {
     title: "Voice Assistant",
@@ -70,7 +70,7 @@ const accountItems = [
   {
     title: "Plans & Billing",
     url: "/billing",
-    icon: CreditCardIcon,
+    icon: CreditCard,
   },
 ];
 

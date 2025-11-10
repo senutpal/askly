@@ -21,7 +21,7 @@ export const WidgetVoiceScreen = () => {
     isConnected,
     isSpeaking,
     transcript,
-     endCall,
+    endCall,
     isConnecting,
     startCall,
   } = useVapi();
@@ -93,10 +93,10 @@ export const WidgetVoiceScreen = () => {
               </Button>
             ) : (
               <Button
-                className="w-full"
                 disabled={isConnecting}
                 size="lg"
                 onClick={() => startCall()}
+                className="w-full bg-gradient-to-b from-blue-500 to-blue-600 text-white"
               >
                 <Mic />
                 Start Call

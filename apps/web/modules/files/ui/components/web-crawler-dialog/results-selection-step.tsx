@@ -119,7 +119,7 @@ export const ResultsSelectionStep = ({
         </Button>
       </div>
 
-      <ScrollArea className="h-[400px] max-w-[720px] rounded-lg border">
+      <ScrollArea className="h-[400px] max-w-[720px] rounded-lg border max-h-64">
         <div className="space-y-2 p-4">
           {filteredResults.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

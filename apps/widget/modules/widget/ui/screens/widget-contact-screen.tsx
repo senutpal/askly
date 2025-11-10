@@ -76,7 +76,11 @@ export const WidgetContactScreen = () => {
               </>
             )}
           </Button>
-          <Button asChild className="w-full " size="lg">
+          <Button
+            asChild
+            className="w-full bg-gradient-to-b from-blue-500 to-blue-600 text-white"
+            size="lg"
+          >
             <Link href={`tel:${phoneNumber}`}>
               <PhoneIcon />
               Call Now

@@ -9,12 +9,13 @@ import {
   MessageSquare,
   FileText,
   Palette,
-  Code,
-  Phone,
   ArrowRight,
   Users,
   CheckCircle2,
   AlertCircle,
+  LibraryBig,
+  Mic,
+  Blocks,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -149,7 +150,7 @@ export default function Page() {
                 <div className="border-b bg-background p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <FileText className="size-5 text-primary" />
+                      <LibraryBig className="size-5 text-primary" />
                       <h2 className="font-semibold">Knowledge Base</h2>
                     </div>
                     <Button asChild size="sm" variant="ghost">
@@ -221,21 +222,21 @@ export default function Page() {
                       status={widgetSettings ? "configured" : "pending"}
                     />
                     <ActionCard
-                      icon={Code}
+                      icon={Blocks}
                       title="Integrations"
                       description="Setup website integration"
                       href="/integrations"
                       status="ready"
                     />
                     <ActionCard
-                      icon={Phone}
+                      icon={Mic}
                       title="Voice Assistant"
                       description="Configure Vapi plugin"
                       href="/vapi"
                       status={vapiPlugin ? "connected" : "disconnected"}
                     />
                     <ActionCard
-                      icon={FileText}
+                      icon={LibraryBig}
                       title="Knowledge Base"
                       description="Upload documents"
                       href="/files"

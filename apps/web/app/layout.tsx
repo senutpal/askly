@@ -1,8 +1,6 @@
 import { DM_Sans } from "next/font/google";
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
-import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "@workspace/ui/components/sonner";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -39,12 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <body className={`${dmSans.variable} font-sans antialiased`}>
-        <ClerkProvider>
-          <Providers>
-            <Toaster />
-            {children}
-          </Providers>
-        </ClerkProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
