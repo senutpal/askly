@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { AlertBadge } from "@workspace/ui/components/alert-badge";
+import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 interface Problem {
   id: string;
@@ -30,6 +31,7 @@ interface ProblemNarrativeProps {
  */
 export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
   ({ activeCard, problems, scrollYProgress }) => {
+    const { isMobile } = useMobileDetect();
     const activeProblem = problems[activeCard] || problems[0];
 
     return (
@@ -90,11 +92,11 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-500">
+          {!isMobile && (<div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-500">
             <span>0{activeCard + 1}</span>
             <div className="w-12 h-[1px] bg-neutral-300 dark:bg-neutral-700" />
             <span>0{problems.length}</span>
-          </div>
+          </div>)}
         </div>
       </div>
     );
