@@ -51,7 +51,11 @@ export const ProblemCard = React.memo<ProblemCardProps>(
         opacity: isActive
           ? 1
           : isPast
-          ? Math.max(0, 1 - (activeCard - index) * 0.3)
+          ? isMobile
+            ? index === activeCard - 1
+              ? 0.8
+              : 0
+            : Math.max(0, 1 - (activeCard - index) * 0.3)
           : Math.max(0, 0.4 - (index - activeCard) * 0.1),
         // Disable 3D transforms on mobile for performance
         rotateX: isMobile ? 0 : (isActive ? 0 : isPast ? 10 : -10),
