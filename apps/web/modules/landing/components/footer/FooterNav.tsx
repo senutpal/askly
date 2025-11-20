@@ -19,7 +19,7 @@ interface FooterNavProps {
  */
 export const FooterNav = React.memo<FooterNavProps>(({ links }) => {
   return (
-    <div className="lg:col-span-5 flex flex-col lg:items-end lg:text-right justify-end">
+    <div className="hidden md:block lg:col-span-5 flex flex-col lg:items-end lg:text-right justify-end">
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
