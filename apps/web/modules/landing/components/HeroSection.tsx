@@ -187,7 +187,7 @@ const ChatSimulation = () => {
         </div>
         
       </div>
-      <div className="space-y-4 h-[240px] md:h-[220px] overflow-hidden relative">
+      <div className="space-y-4 min-h-[280px] sm:h-[240px] md:h-[220px] overflow-hidden relative">
         <AnimatePresence mode="popLayout">
           {currentSet?.slice(0, visibleIndex + 1).map((msg) => (
             <motion.div
@@ -250,7 +250,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1]"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1]"
             >
               <span className="text-transparent bg-clip-text bg-gradient-to-b from-black/40 to-black dark:from-white dark:to-gray-300 ">
                 Campus Communication

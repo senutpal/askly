@@ -9,12 +9,12 @@ import SolutionSection from "./components/SolutionSection";
 export default function LandingPage() {
   return (
     <main className="min-h-screen ">
-      <div>
+      <SplashCursor />
         <Navbar />
         <HeroSection />
         <ProblemSection />
-        <SplashCursor />
-      </div>
+        
+      
       <SolutionSection />
       <FeaturesSection />
       <Footer />
