@@ -1,5 +1,6 @@
 import { DM_Sans } from "next/font/google";
 import "@workspace/ui/globals.css";
+import "../styles/mobile-optimizations.css";
 import { Providers } from "@/components/providers";
 import { Metadata } from "next";
 
