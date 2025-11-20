@@ -32,7 +32,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
   }
 
   if (!organizationId) {
-    console.error("Echo Widget: data-organization-id attribute is required");
+    console.error("Askly Widget: data-organization-id attribute is required");
     return;
   }
 
@@ -46,7 +46,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 
   function render() {
     button = document.createElement("button");
-    button.id = "echo-widget-button";
+    button.id = "askly-widget-button";
     button.innerHTML = chatBubbleIcon;
     button.style.cssText = `
       position: fixed;
@@ -78,7 +78,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
     document.body.appendChild(button);
 
     container = document.createElement("div");
-    container.id = "echo-widget-container";
+    container.id = "askly-widget-container";
     container.style.cssText = `
       position: fixed;
       ${position === "bottom-right" ? "right: 20px;" : "left: 20px;"}
@@ -123,7 +123,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
       const allowedOrigin = new URL(EMBED_CONFIG.WIDGET_URL).origin;
       if (event.origin !== allowedOrigin) return;
     } catch (error) {
-      console.error("Echo Widget: Invalid WIDGET_URL configuration", error);
+      console.error("Askly Widget: Invalid WIDGET_URL configuration", error);
       return;
     }
 
@@ -206,7 +206,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
     init();
   }
 
-  (window as any).EchoWidget = {
+  (window as any).AsklyWidget = {
     init: reinit,
     show,
     hide,

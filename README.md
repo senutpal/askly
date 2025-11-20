@@ -242,6 +242,10 @@ VAPI_API_KEY=xxxxx
 
 ## Clerk (for backend)
 CLERK_SECRET_KEY=sk_test_xxxxx
+
+## Security
+MASTER_KEY=your-master-key-min-32-chars
+
 ```
 
 ## Clerk Setup
