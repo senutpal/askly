@@ -1,248 +1,355 @@
 "use client";
 
-import {
-  ContainerScroll,
-  CardSticky,
-} from "@workspace/ui/components/cardsticky";
-import { GlowingEffect } from "@workspace/ui/components/glowing-effect";
+import React, { useRef, useState, useEffect, useMemo } from "react";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "motion/react";
 import {
   Clock,
   Users,
   MessageSquareX,
   Languages,
-  AlertCircle,
   TrendingDown,
+  AlertCircle,
+  ArrowRight,
+  Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 
-const problemCards = [
+// --- Data Configuration ---
+const problems = [
   {
+    id: "time",
     icon: Clock,
-    title: "Time Wasted on Repetitive Queries",
+    title: "The Efficiency Black Hole",
+    subtitle: "Time Wasted on Repetition",
     description:
-      "Administrative staff spend countless hours answering the same questions every day.",
-    stat: "1000+",
-    statLabel: "Hours wasted annually",
-    color: "text-red-500 dark:text-red-400",
-    bgColor: "bg-red-50 dark:bg-red-950/30",
+      "Administrative brilliance is being suffocated by repetitive queries. Your talented staff spends thousands of hours annually functioning as human search engines.",
+    stat: "1,000+",
+    statLabel: "Hours lost / year",
+    accent: "from-red-400 to-orange-500",
+    shadow: "shadow-red-500/20",
   },
   {
+    id: "wait",
     icon: Users,
-    title: "Long Wait Times for Students",
+    title: "The Friction Point",
+    subtitle: "Unacceptable Wait Times",
     description:
-      "Students queue for hours just to get simple information about fees, exams, or schedules.",
-    stat: "45 min",
-    statLabel: "Average wait time",
-    color: "text-orange-500 dark:text-orange-400",
-    bgColor: "bg-orange-50 dark:bg-orange-950/30",
+      "Students queue for hours for minutes of information. This friction creates a barrier between the institution and the learner, damaging the campus experience.",
+    stat: "45m",
+    statLabel: "Avg. wait time",
+    accent: "from-orange-500 to-amber-500",
+    shadow: "shadow-orange-500/20",
   },
   {
+    id: "comms",
     icon: MessageSquareX,
-    title: "Communication Breakdown",
+    title: "Signal Lost",
+    subtitle: "Communication Breakdown",
     description:
-      "Important announcements and updates get lost in email chains and notice boards.",
+      "Critical updates die in email chains. When information doesn't flow, opportunities are missed and confusion becomes the default campus culture.",
     stat: "60%",
-    statLabel: "Miss critical updates",
-    color: "text-yellow-500 dark:text-yellow-400",
-    bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
+    statLabel: "Missed updates",
+    accent: "from-amber-500 to-yellow-500",
+    shadow: "shadow-amber-500/20",
   },
   {
+    id: "lang",
     icon: Languages,
-    title: "Language Barriers",
+    title: "The Silent Barrier",
+    subtitle: "Accessibility Gaps",
     description:
-      "Non-English speakers struggle to get help, creating accessibility issues across campus.",
+      "Education should have no borders. Yet, non-native speakers face a wall of silence, creating an inequitable environment for international talent.",
     stat: "40%",
-    statLabel: "Face language issues",
-    color: "text-purple-500 dark:text-purple-400",
-    bgColor: "bg-purple-50 dark:bg-purple-950/30",
+    statLabel: "Language friction",
+    accent: "from-blue-400 to-blue-600",
+    shadow: "shadow-blue-500/20",
   },
   {
+    id: "resource",
     icon: TrendingDown,
-    title: "Inefficient Resource Allocation",
+    title: "Misaligned Potential",
+    subtitle: "Resource Drain",
     description:
-      "Staff resources are tied up with simple queries instead of complex student needs.",
+      "High-value staff are tied up with low-value tasks. It is an invisible tax on your institution's growth and strategic capability.",
     stat: "70%",
-    statLabel: "Are simple queries",
-    color: "text-blue-500 dark:text-blue-400",
-    bgColor: "bg-blue-50 dark:bg-blue-950/30",
+    statLabel: "Resource misuse",
+    accent: "from-purple-400 to-purple-600",
+    shadow: "shadow-indigo-500/20",
   },
 ];
 
-export default function ProblemSection() {
-  const [isMd, setIsMd] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia("(min-width: 768px)");
-    const update = (event: MediaQueryListEvent) => setIsMd(event.matches);
+// --- Components ---
 
-    setIsMd(mql.matches);
-    mql.addEventListener("change", update);
-    return () => mql.removeEventListener("change", update);
-  }, []);
+const NoiseOverlay = () => (
+  <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.5] mix-blend-overlay">
+    <svg className="w-full h-full">
+      <filter id="noiseFilter">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.6"
+          numOctaves="3"
+          stitchTiles="stitch"
+        />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+    </svg>
+  </div>
+);
+
+const Badge = ({ text, icon: Icon }: { text: string; icon: any }) => (
+  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 backdrop-blur-md">
+    <Icon className="w-3.5 h-3.5 text-red-500" />
+    <span className="text-xs font-semibold tracking-wide text-red-600 dark:text-red-400 uppercase">
+      {text}
+    </span>
+  </div>
+);
+
+// --- Main Section ---
+const TopographyPattern = () => (
+  <div className="absolute inset-0 -z-10 h-full w-full">
+  {/* SVG Pattern Definition */}
+  <div className="absolute inset-0 h-full w-full  [mask-image:radial-gradient(ellipse_at_center,white_40%,transparent_80%)] opacity-[0.1] dark:opacity-[0.2]"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+    }}
+  ></div>
+  
+  {/* Vignette for focus */}
+  
+</div>
+);
+
+export default function ProblemSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeCard, setActiveCard] = useState(0);
+
+  // Scroll logic
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Transform scroll progress to index
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (latest) => {
+      const cardCount = problems.length;
+      // Divide scroll space into segments. slightly dampen the end to ensure last card shows.
+      const step = 1 / cardCount;
+      const index = Math.min(
+        Math.floor(latest / step),
+        cardCount - 1
+      );
+      setActiveCard(index);
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
 
   return (
-    <section
-      id="problem"
-      className="relative py-8 -mb-60 md:mb-0 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-12"
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
-          <div className="lg:col-span-2">
-            <div className="lg:sticky lg:top-24 space-y-6 md:space-y-8">
-              {/* Badge */}
+    <section className="relative text-neutral-900 dark:text-white">
+      <TopographyPattern/>
+      {/* <NoiseOverlay /> */}
+      
+      {/* Spacer for previous content */}
+      
+
+      <div ref={containerRef} className="relative h-[300vh]">
+        <div className="sticky top-0 h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden px-6 md:px-12 lg:px-24 py-12">
+          
+          {/* --- Left Side: Narrative Engine --- */}
+          <div className="w-full lg:w-1/2 h-full flex flex-col justify-center z-10 mb-12 lg:mb-0 relative">
+            <div className="absolute top-1/4 left-0 w-1 h-1/2 bg-neutral-200 dark:bg-neutral-800 rounded-full hidden lg:block">
+              <motion.div 
+                className="w-full bg-red-500 rounded-full"
+                style={{ height: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]) }} 
+              />
+            </div>
+
+            <div className="lg:pl-12 space-y-8 max-w-lg">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800"
-              >
-                <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                  The Problem
-                </span>
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              ><div className="hidden md:block">
+                <Badge text="Critical Analysis" icon={AlertCircle} /></div>
+                <h2 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-black/60 to-black dark:from-neutral-400 dark:to-neutral-300">
+                  Campus communication <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-600 to-neutral-800 dark:from-neutral-500 dark:to-neutral-300">
+                    is broken.
+                  </span>
+                </h2>
               </motion.div>
 
-              {/* Heading */}
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight"
-              >
-                <span className="bg-gradient-to-b from-gray-600 to-gray-900 dark:from-white dark:to-gray-400 text-transparent bg-clip-text">
-                  Campus Communication
-                </span>
-                <br />
-                <span className="bg-gradient-to-b from-red-400 to-red-600 dark:from-red-400 dark:to-red-600 text-transparent bg-clip-text">
-                  Is Broken
-                </span>
-              </motion.h2>
+              <div className="relative min-h-[180px]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeCard}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="absolute top-0 left-0"
+                  >
+                    {(() => {
+                      const activeProblem = problems[activeCard] || problems[0];
+                      return (
+                        <>
+                          <h3 className={cn(
+                            "text-2xl font-semibold mb-4 bg-gradient-to-b text-transparent bg-clip-text",
+                            activeProblem?.accent
+                          )}>
+                            {activeProblem?.title}
+                          </h3>
+                          <p className="text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            {activeProblem?.description}
+                          </p>
+                        </>
+                      );
+                    })()}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-              {/* Quote */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="relative pl-4 md:pl-6 border-l-4 border-red-500 dark:border-red-400"
-              >
-                <blockquote className="text-base md:text-lg lg:text-xl leading-relaxed text-gray-700 dark:text-gray-300 italic">
-                  &quot;We spend thousands of hours answering the same
-                  questions, while students wait in long queues for simple
-                  information.&quot;
-                </blockquote>
-                <cite className="block mt-3 md:mt-4 text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 not-italic">
-                  — Common frustration across campus administrative offices
-                </cite>
-              </motion.div>
-
-              {/* Stats Summary */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="grid grid-cols-2 gap-3 md:gap-4 pt-2 md:pt-4"
-              >
-                <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border p-1 md:rounded-[1.5rem] md:p-2">
-                  <GlowingEffect
-                    spread={40}
-                    glow={true}
-                    disabled={false}
-                    proximity={64}
-                    inactiveZone={0.01}
-                    borderWidth={3}
-                  />
-                  <div className="p-4 md:p-5 rounded-lg   md:rounded-xl bg-gradient-to-b from-white to-gray-200/50 dark:bg-gradient-to-b dark:from-gray-800 dark:to-black/5 border border-gray-200 dark:border-gray-700">
-                    <div className="text-2xl md:text-3xl font-bold text-red-600 dark:text-red-400">
-                      85%
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Staff overwhelmed
-                    </div>
-                  </div>
-                </div>
-                <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border p-1 md:rounded-[1.5rem] md:p-2">
-                  <GlowingEffect
-                    spread={40}
-                    glow={true}
-                    disabled={false}
-                    proximity={64}
-                    inactiveZone={0.01}
-                    borderWidth={3}
-                  />
-                  <div className="p-4 md:p-5 rounded-lg   md:rounded-xl bg-gradient-to-b from-white to-gray-200/50 dark:bg-gradient-to-b dark:from-gray-800 dark:to-black/5 border border-gray-200 dark:border-gray-700">
-                    <div className="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400">
-                      92%
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Students frustrated
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Mobile hint */}
-              <p className="lg:hidden text-sm text-gray-500 dark:text-gray-400 pt-4 text-center">
-                Scroll to see the challenges →
-              </p>
+              <div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-500">
+                <span>0{activeCard + 1}</span>
+                <div className="w-12 h-[1px] bg-neutral-300 dark:bg-neutral-700" />
+                <span>0{problems.length}</span>
+              </div>
             </div>
           </div>
 
-          <div className="lg:col-span-2 relative ">
-            <ContainerScroll className="space-y-6">
-              {problemCards.map((card, index) => (
-                <CardSticky
-                  key={index}
-                  index={index}
-                  incrementY={isMd ? 40 : 85}
-                  scale={0.95}
-                  stickyTop={isMd ? 180 : 160}
-                  className="bg-gradient-to-b from-white to-gray-100 dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-950 rounded-xl md:rounded-2xl p-5 md:p-6 lg:p-8 min-h-[280px] md:min-h-[320px]"
-                >
-                  {/* Icon */}
-                  <div
-                    className={`inline-flex p-3 md:p-4 rounded-xl ${card.bgColor} mb-4 md:mb-5`}
-                  >
-                    <card.icon
-                      className={`w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 ${card.color}`}
-                    />
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold font-sans-alt text-gray-900 dark:text-white mb-2 md:mb-3 leading-tight">
-                    {card.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-4 md:mb-6">
-                    {card.description}
-                  </p>
-
-                  {/* Stat */}
-                  <div
-                    className={`inline-flex items-baseline gap-2 px-3 md:px-4 py-2 rounded-lg ${card.bgColor}`}
-                  >
-                    <span
-                      className={`text-xl md:text-2xl lg:text-3xl font-bold ${card.color}`}
-                    >
-                      {card.stat}
-                    </span>
-                    <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                      {card.statLabel}
-                    </span>
-                  </div>
-                </CardSticky>
-              ))}
-            </ContainerScroll>
-
-            {/* Add spacing at the bottom so last card can stick */}
-            <div className="h-96" />
+          {/* --- Right Side: Visual Stack --- */}
+          <div className="w-full lg:w-1/2 h-[50vh] lg:h-full flex items-center justify-center lg:justify-end perspective-1000">
+            <div className="relative w-full max-w-md aspect-square">
+              {problems.map((card, index) => {
+                return (
+                  <ProblemCard
+                    key={card.id}
+                    card={card}
+                    index={index}
+                    activeCard={activeCard}
+                    total={problems.length}
+                  />
+                );
+              })}
+            </div>
           </div>
+
         </div>
       </div>
+    
+      
     </section>
+  );
+}
+
+// --- Isolated Card Component ---
+
+function ProblemCard({
+  card,
+  index,
+  activeCard,
+  total,
+}: {
+  card: typeof problems[0];
+  index: number;
+  activeCard: number;
+  total: number;
+}) {
+  // Physics-based springing for interactions
+  const isActive = index === activeCard;
+  const isPast = index < activeCard;
+  const isUpcoming = index > activeCard;
+
+  // Calculate visual state based on active index
+  // We use direct values here but in a real app you might interpolate standard framer motion values
+  // for buttery smoothness, we use 'animate' prop with spring transition
+  
+  return (
+    <motion.div
+      layout
+      initial={false}
+      animate={{
+        y: isActive ? 0 : isPast ? -50 * (activeCard - index) : 20 * (index - activeCard),
+        scale: isActive ? 1 : isPast ? 1 - (activeCard - index) * 0.05 : 0.9 - (index - activeCard) * 0.05,
+        opacity: isActive ? 1 : isPast ? Math.max(0, 1 - (activeCard - index) * 0.3) : Math.max(0, 0.4 - (index - activeCard) * 0.1),
+        rotateX: isActive ? 0 : isPast ? 10 : -10,
+        z: isActive ? 0 : -100,
+        filter: isActive ? "blur(0px)" : "blur(8px)",
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 120,
+        damping: 20,
+        mass: 1,
+      }}
+      className={cn(
+        "absolute inset-0 rounded-3xl p-1",
+        "bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5",
+        "border border-white/20 dark:border-white/10",
+        "backdrop-blur-2xl shadow-2xl",
+        isActive ? "z-30" : "z-0",
+        // Dynamic shadow based on card color when active
+        isActive && card.shadow
+      )}
+      style={{
+        transformStyle: "preserve-3d",
+      }}
+    >
+      <div className="relative h-full w-full rounded-[20px] bg-white/50 dark:bg-neutral-900/80 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-white/40 dark:border-white/5">
+        {/* Abstract Geometric Background decoration */}
+        <div className={cn(
+            "absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl opacity-20 pointer-events-none bg-gradient-to-br",
+            card.accent
+        )} />
+
+        {/* Header */}
+        <div className="relative z-10 flex justify-between items-start">
+            <div className={cn(
+                "p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white",
+                card.accent
+            )}>
+                <card.icon className="w-6 h-6" />
+            </div>
+            <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+                <Zap className="w-3 h-3" />
+                <span>Pain Point</span>
+            </div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 mt-auto space-y-6">
+            <div>
+                <h4 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wider">
+                    {card.subtitle}
+                </h4>
+                <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
+                    {card.stat} 
+                    <span className="text-lg md:text-xl text-neutral-500 dark:text-neutral-500 font-medium ml-2">
+                        {card.statLabel}
+                    </span>
+                </h3>
+            </div>
+
+            {/* Visualization Bar (Dummy data for visual aesthetics) */}
+            <div className="space-y-2">
+                <div className="flex justify-between text-[10px] uppercase font-medium text-neutral-400">
+                    <span>Impact Level</span>
+                    
+                </div>
+                <div className="h-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: isActive ? "85%" : "0%" }}
+                        transition={{ delay: 0.2, duration: 1, ease: "circOut" }}
+                        className={cn("h-full rounded-full bg-gradient-to-r", card.accent)} 
+                    />
+                </div>
+            </div>
+        </div>
+
+        
+      </div>
+    </motion.div>
   );
 }
