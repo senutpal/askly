@@ -1,163 +1,89 @@
-import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
-import Image from "next/image";
+"use client";
 
-const footerLinks = {
-  product: [
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Technology", href: "#tech-stack" },
-    { label: "Pricing", href: "#pricing" },
-  ],
-  resources: [
-    { label: "Documentation", href: "/docs" },
-    { label: "API Reference", href: "/api-docs" },
-    { label: "Support", href: "/support" },
-    { label: "Blog", href: "/blog" },
-  ],
-  company: [
-    { label: "About Us", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Careers", href: "/careers" },
-    { label: "Partners", href: "/partners" },
-  ],
-  legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
-    { label: "GDPR", href: "/gdpr" },
-  ],
-};
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { CrossDotPattern } from "@workspace/ui/components/cross-dot-pattern";
+import { FooterBrand } from "./footer/FooterBrand";
+import { FooterNav } from "./footer/FooterNav";
+import { SocialButtons } from "./footer/SocialButtons";
+import { FooterBottom } from "./footer/FooterBottom";
+
+// --- Data ---
+const productLinks = [
+  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Technology", href: "#tech-stack" },
+  { label: "Pricing", href: "#pricing" },
+];
 
 const socialLinks = [
   { icon: Twitter, href: "https://twitter.com/askly", label: "Twitter" },
   { icon: Github, href: "https://github.com/askly", label: "GitHub" },
-  {
-    icon: Linkedin,
-    href: "https://linkedin.com/company/askly",
-    label: "LinkedIn",
-  },
-  { icon: Mail, href: "mailto:hello@askly.ai", label: "Email" },
+  { icon: Linkedin, href: "https://linkedin.com/company/askly", label: "LinkedIn" },
+  { icon: Mail, href: "mailto:hello@ask ly.ai", label: "Email" },
 ];
 
-export default function Footer() {
+// Ambient Background Component
+const AmbientBackground = React.memo(() => {
   return (
-    <footer className="bg-gray-900 dark:bg-transparent text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
+    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+      <div className="absolute -bottom-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-blue-500/5 blur-[120px] animate-pulse-slow" />
+      <div className="absolute -bottom-[20%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-purple-500/5 blur-[120px] animate-pulse-slow delay-700" />
+    </div>
+  );
+});
+AmbientBackground.displayName = "AmbientBackground";
+
+/**
+ * Footer - Main footer section
+ * Refactored into smaller components for better maintainability
+ */
+export default function Footer() {
+  // Scroll parallax effect for the container
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end end"],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [-50, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [0.8, 1]);
+
+  return (
+    <footer
+      ref={containerRef}
+      className="relative w-full overflow-hidden  text-gray-900 dark:text-white pt-24 pb-12"
+    >
+      <CrossDotPattern />
+      <AmbientBackground />
+
+      <motion.div
+        style={{ y, opacity }}
+        className="max-w-[1232px] mx-auto xl:px-0 md:px-12 px-6 lg:px-24 sm:px-12"
+      >
+        {/* Top Section: Brand & Navigation */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 mb-8 border-b border-gray-200/50 dark:border-white/10 pb-10">
           {/* Brand Column */}
-          <div className="col-span-2">
-            <Link href="/" className="flex items-center space-x-2 mb-4">
-              <Image alt="Logo" height={25} width={25} src="/logo.svg" />
-              <span className="text-xl font-bold text-white">ASKLY</span>
-            </Link>
-            <p className="text-sm text-gray-400 mb-4">
-              Transforming campus communication with intelligent multilingual AI
-              chatbot support. Making education accessible in every language.
-            </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
+          <FooterBrand />
+
+          {/* Navigation Column */}
+          <FooterNav links={productLinks} />
+
+          {/* Socials (Desktop position) - attached to brand */}
+          <div className="lg:col-span-7">
+            <SocialButtons socialLinks={socialLinks} className="hidden lg:flex gap-4 mt-12" />
           </div>
 
-          {/* Product Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Product</h3>
-            <ul className="space-y-2">
-              {footerLinks.product.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Mobile Socials - attached to nav */}
+          <div className="lg:col-span-5">
+            <SocialButtons socialLinks={socialLinks} className="flex lg:hidden gap-4 mt-12" />
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-800">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} ASKLY. All rights reserved. Built
-              for educational institutions by Utpal Sen
-            </p>
-            <div className="flex items-center space-x-6 text-sm text-gray-400">
-              <span>Made with Next.js 15</span>
-              <span>•</span>
-              <span>Powered by AI</span>
-              <span>•</span>
-              <span>🇮🇳 Made in India</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        {/* Bottom Section: Legal & Credits */}
+        <FooterBottom />
+      </motion.div>
     </footer>
   );
 }

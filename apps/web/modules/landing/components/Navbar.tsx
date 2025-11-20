@@ -1,116 +1,119 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Button } from "@workspace/ui/components/button";
+import { motion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
-import { SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { ModeToggle } from "@/components/mode-toggle";
+import { DesktopNav } from "./navbar/DesktopNav";
+import { NavbarActions } from "./navbar/NavbarActions";
+import { MobileMenu } from "./navbar/MobileMenu";
+import { useThrottle } from "@/hooks/use-throttle";
 
 const navLinks = [
   { href: "#problem", label: "Problem" },
   { href: "#solution", label: "Solution" },
   { href: "#features", label: "Features" },
+  { href: "/docs", label: "Docs" },
 ];
 
+/**
+ * Navbar - Main navigation bar
+ * Refactored into smaller components for better maintainability
+ * Optimized with throttled scroll listener for performance
+ */
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Throttle scroll handler to reduce calculations (fires max every 100ms)
+  const handleScroll = useThrottle(() => {
+    setIsScrolled(window.scrollY >= 20);
+  }, 100);
+
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY >= 10);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [isMobileMenuOpen]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
   }, []);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
 
   return (
     <nav
-      className={`animate-slide-down fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled || isMobileMenuOpen
-          ? "bg-background/80 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
+          ? " bg-background/80 backdrop-blur-md border-b border-border/40"
+          : "bg-transparent "
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
+      <div className="container relative mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 mr-11">
+          <Link href="/" className="flex items-center space-x-2 z-50">
             <Image alt="Logo" height={25} width={25} src="/logo.svg" />
-            <span className="text-xl font-semibold">Askly</span>
+            <span className="text-xl font-bold tracking-tight">Askly</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8 mr-5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary hover:underline hover:underline-offset-4 hover:scale-105 transition-all duration-200"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          <DesktopNav links={navLinks} />
 
           {/* Desktop Auth */}
-          <div className="hidden md:flex items-center space-x-4">
-            <ModeToggle />
-            <SignInButton mode="modal">
-              <Button
-                size="sm"
-                className="bg-gradient-to-b from-blue-500 to-blue-600 text-white"
-              >
-                Sign in
-              </Button>
-            </SignInButton>
-          </div>
+          <NavbarActions />
 
-          {/* Mobile Menu Button */}
-          <div className="flex items-center md:hidden gap-2">
+          {/* Mobile Menu Toggle */}
+          <div className="flex items-center md:hidden gap-2 z-50">
             <ModeToggle />
-            <button className="p-2" onClick={toggleMobileMenu}>
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+            <button
+              className="p-2 rounded-full hover:bg-secondary transition-colors"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isMobileMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X className="w-6 h-6" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="w-6 h-6" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div
-            className={`md:hidden py-4 border-t transition-all duration-300 ${
-              isScrolled ? "" : ""
-            }`}
-          >
-            <div className="flex flex-col space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-primary hover:underline hover:underline-offset-4 transition-colors duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              <div className="pt-4 border-t flex flex-col space-y-2">
-                <SignInButton mode="modal">
-                  <Button className="w-full bg-gradient-to-b from-blue-500 to-blue-600 text-white">
-                    Sign in
-                  </Button>
-                </SignInButton>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={isMobileMenuOpen} links={navLinks} onClose={closeMobileMenu} />
     </nav>
   );
 }
