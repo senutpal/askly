@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { MagneticLink } from "@workspace/ui/components/magnetic-link";
+import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 interface NavLink {
   label: string;
@@ -16,10 +17,16 @@ interface FooterNavProps {
 /**
  * FooterNav - Navigation links column
  * Right-aligned list with magnetic link effects
+ * Hidden on mobile devices for better performance
  */
 export const FooterNav = React.memo<FooterNavProps>(({ links }) => {
+  const { isMobile } = useMobileDetect();
+  
+  // Don't render on mobile
+  if (isMobile) return null;
+  
   return (
-    <div className="hidden md:block lg:col-span-5 flex flex-col lg:items-end lg:text-right justify-end">
+    <div className="lg:col-span-5 flex flex-col lg:items-end lg:text-right justify-end">
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
