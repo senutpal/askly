@@ -1,10 +1,8 @@
 "use client";
 
 import { OrganizationSwitcher } from "@clerk/nextjs";
-import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { Button } from "@workspace/ui/components/button";
 import {
   MessageSquare,
   FileText,
@@ -18,12 +16,14 @@ import {
   Blocks,
 } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent } from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
-import { Skeleton } from "@workspace/ui/components/skeleton";
-import { formatDistanceToNow } from "date-fns";
 import { ModeToggle } from "@/components/mode-toggle";
-
+import { Card, CardContent } from "@workspace/ui";
+import { Badge } from "@workspace/ui";
+import { Button } from "@workspace/ui";
+import { Skeleton } from "@workspace/ui";
+import { SidebarTrigger } from "@workspace/ui";
+import { formatDistanceToNow } from "date-fns";
+ 
 export default function Page() {
   const conversations = useQuery(api.private.conversations.getMany, {
     paginationOpts: { numItems: 100, cursor: null },

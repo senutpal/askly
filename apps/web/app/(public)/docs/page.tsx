@@ -1,5 +1,5 @@
-import { NavigationCard } from "@/modules/docs/components/NavigationCard";
-import { documentationNavigation } from "@/modules/docs/config/navigation";
+import { NavigationCard } from "@/features/docs/components/NavigationCard";
+import { documentationNavigation } from "@/features/docs/config/navigation";
 import Link from "next/link";
 
 export default function DocsPage() {

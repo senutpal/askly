@@ -1,5 +1,5 @@
-import { DocLayout } from "@/modules/docs/components/DocLayout";
-import { CodeBlock } from "@/modules/docs/components/CodeBlock";
+import { DocLayout } from "@/features/docs/components/DocLayout";
+import { CodeBlock } from "@/features/docs/components/CodeBlock";
 
 export default function ContributingPage() {
   return (

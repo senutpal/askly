@@ -1,6 +1,6 @@
-import { DocLayout } from "@/modules/docs/components/DocLayout";
-import { CodeBlock } from "@/modules/docs/components/CodeBlock";
-import { envExamples } from "@/modules/docs/config/content";
+import { DocLayout } from "@/features/docs/components/DocLayout";
+import { CodeBlock } from "@/features/docs/components/CodeBlock";
+import { envExamples } from "@/features/docs/config/content";
 
 export default function SetupPage() {
   return (

@@ -4,8 +4,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@/features/*": ["./features/*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/hooks/*": ["./hooks/*"],
+      "@workspace/ui": ["../../packages/ui/src/index.ts"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
-      "@workspace/backend/*": ["../../packages/backend/convex/*"]
+      "@workspace/backend/*": ["../../packages/backend/convex/*"],
+      "@workspace/shared/*": ["../../packages/shared/src/*"]
     },
     "plugins": [
       {

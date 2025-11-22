@@ -4,7 +4,7 @@ import type { HTMLAttributes } from "react";
 import { memo } from "react";
 import ReactMarkdown, { type Options } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui";
 
 export type AIResponseProps = HTMLAttributes<HTMLDivElement> & {
   options?: Options;

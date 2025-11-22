@@ -1,4 +1,4 @@
-import { DocLayout } from "@/modules/docs/components/DocLayout";
+import { DocLayout } from "@/features/docs/components/DocLayout";
 
 export default function UsageGuidePage() {
   return (

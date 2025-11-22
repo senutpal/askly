@@ -1,9 +1,10 @@
+"use client";
 import React, { useRef, useState, useCallback } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
 
 interface MagneticLinkProps {
-  children: React.ReactNode;
+children: React.ReactNode;
   href: string;
 }
 

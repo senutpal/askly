@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence } from "motion/react";
-import { AuthLayout } from "@/modules/auth/ui/layouts/auth-layout";
-import LandingLayout from "@/modules/auth/ui/layouts/landing-layout";
-import LandingPage from "@/modules/landing/LandingPage";
-import Loader from "@/modules/landing/Loader";
+import { AuthLayout } from "@/features/auth/components/layouts/auth-layout";
+import LandingLayout from "@/features/auth/components/layouts/landing-layout";
+import LandingPage from "@/features/landing/LandingPage";
+import Loader from "@/features/landing/Loader";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 
 const MINIMUM_LOADING_TIME = 1500; // 3 seconds minimum

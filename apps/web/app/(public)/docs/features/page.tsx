@@ -1,4 +1,4 @@
-import { DocLayout } from "@/modules/docs/components/DocLayout";
+import { DocLayout } from "@/features/docs/components/DocLayout";
 import Link from "next/link";
 
 export default function FeaturesPage() {

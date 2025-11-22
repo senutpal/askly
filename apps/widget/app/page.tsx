@@ -1,6 +1,6 @@
 "use client";
 
-import { WidgetView } from "@/modules/widget/ui/views/widget-view";
+import { WidgetView } from "@/features/widget/components/views/widget-view";
 import { use } from "react";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { SignUpView } from "@/modules/auth/ui/views/sign-up-view";
+import { SignUpView } from "@/features/auth";
 
 export default function Page() {
   return <SignUpView />;

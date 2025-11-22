@@ -1,4 +1,4 @@
-import { VapiView } from "@/modules/plugins/ui/views/vapi-view";
+import { VapiView } from "@/features/plugins/components/views/vapi-view";
 
 export default function page() {
   return <VapiView />;

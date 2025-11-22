@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { HTMLMotionProps, motion } from "motion/react";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui";
 
 interface CardStickyProps extends HTMLMotionProps<"div"> {
   index: number;

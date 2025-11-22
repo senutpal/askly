@@ -1,4 +1,4 @@
-import { IntegrationsView } from '@/modules/integrations/ui/views/integration-view';
+import { IntegrationsView } from '@/features/integrations';
 
 const page = () => {
   return <IntegrationsView />;

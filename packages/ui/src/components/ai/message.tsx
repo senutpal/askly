@@ -3,8 +3,8 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@workspace/ui/components/avatar";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@workspace/ui";
+import { cn } from "@workspace/ui";
 
 export type AIMessageProps = HTMLAttributes<HTMLDivElement> & {
   from: "user" | "assistant";
