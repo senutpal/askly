@@ -1,305 +1,292 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { motion } from "motion/react";
+import {
+  Building2,
+  Database,
+  Settings,
+  MessageSquare,
+  BarChart3,
+  Users,
+  Zap,
+  CheckCircle2,
+  FileText,
+  Globe,
+  Shield,
+  Layout,
+  ChevronRight,
+  Lightbulb,
+  UploadCloud,
+  Search
+} from "lucide-react";
 import { DocLayout } from "@/features/docs/components/DocLayout";
+
+// --- Reusable UI Components (Matched to Reference) ---
+
+const SectionHeading = ({ children, icon: Icon }: { children: React.ReactNode; icon?: any }) => (
+  <div className="flex items-center gap-3 mb-8">
+    {Icon && <Icon className="w-5 h-5 text-zinc-400" />}
+    <h2 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-white">
+      {children}
+    </h2>
+  </div>
+);
+
+const StepItem = ({ number, title, children }: { number: string, title: string, children: React.ReactNode }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      className="relative pl-12 pb-12 border-l border-zinc-200 dark:border-zinc-800 last:pb-0 last:border-l-0"
+    >
+      <div className="absolute -left-[17px] top-0 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-sm font-mono font-medium text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-black dark:text-zinc-400">
+        {number}
+      </div>
+      <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">{title}</h3>
+      <div className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
+const InfoCard = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
+  <motion.div
+    whileHover={{ y: -4 }}
+    className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300 h-full"
+  >
+    <div className="flex items-center gap-2 mb-4 text-zinc-900 dark:text-white">
+      <Icon className="w-5 h-5 text-zinc-500" />
+      <h4 className="font-medium">{title}</h4>
+    </div>
+    <div className="text-sm text-zinc-600 dark:text-zinc-400 space-y-3">
+      {children}
+    </div>
+  </motion.div>
+);
+
+const TipBox = ({ children }: { children: React.ReactNode }) => (
+  <div className="mt-6 p-4 rounded-lg bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 flex gap-3">
+    <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+    <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">{children}</p>
+  </div>
+);
+
+const BestPracticeItem = ({ text }: { text: string }) => (
+  <div className="flex items-start gap-3 p-4 rounded-xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800">
+    <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 shrink-0">
+      <CheckCircle2 className="h-3.5 w-3.5" />
+    </div>
+    <p className="text-sm text-zinc-600 dark:text-zinc-300">{text}</p>
+  </div>
+);
+
+// --- Main Page Component ---
 
 export default function UsageGuidePage() {
   return (
     <DocLayout
       title="Usage Guide"
-      description="Complete guide for administrators to manage Askly"
+      description="Complete guide for administrators to manage Askly. From setting up your organization to monitoring conversations and analytics."
     >
-      <div className="space-y-8">
-        {/* Getting Started */}
+      <div className="space-y-24">
+        
+        {/* Introduction Section */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Administrator Guide</h2>
-          <p className="text-lg mb-6">
-            This guide covers everything you need to know to effectively manage Askly for your
-            campus. From setting up your organization to monitoring conversations and analytics.
-          </p>
-        </section>
+          <SectionHeading icon={Building2}>Creating Your Organization</SectionHeading>
+          <div className="mt-8">
+            <StepItem number="01" title="Sign Up">
+              <p className="mb-4">
+                Navigate to your Askly dashboard and create an account using email or social login providers like Google or GitHub.
+              </p>
+            </StepItem>
 
-        {/* Creating Organization */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">1. Creating Your Organization</h2>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Step 1: Sign Up</h4>
-              <p className="text-sm text-muted-foreground">
-                Navigate to your Askly dashboard and create an account using email or social login
-                (Google, GitHub).
+            <StepItem number="02" title="Create Organization">
+              <p className="mb-4">
+                You will be prompted to create or select an organization. Enter your campus or institution name to complete the initial workspace setup.
               </p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Step 2: Create Organization</h4>
-              <p className="text-sm text-muted-foreground">
-                You'll be prompted to create or select an organization. Enter your campus/institution
-                name and complete the setup.
+            </StepItem>
+
+            <StepItem number="03" title="Get Organization ID">
+              <p className="mb-4">
+                Go to <span className="font-medium text-zinc-900 dark:text-white">Settings &rarr; Organization</span>. 
+                Copy your unique organization ID. You will need this identifier when configuring the widget embed code.
               </p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Step 3: Get Organization ID</h4>
-              <p className="text-sm text-muted-foreground">
-                Go to Settings → Organization. Copy your organization ID - you'll need this for the
-                widget embed code.
-              </p>
-            </div>
+            </StepItem>
           </div>
         </section>
 
-        {/* Managing Knowledge Base */}
+        {/* Knowledge Base Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">2. Managing Knowledge Base</h2>
-          <p className="mb-4">
-            The knowledge base is the foundation of intelligent responses. Add comprehensive
-            information to ensure accurate answers.
+          <SectionHeading icon={Database}>Managing Knowledge Base</SectionHeading>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-8 text-lg leading-relaxed">
+            The knowledge base is the foundation of intelligent responses. Add comprehensive information to ensure accurate answers.
           </p>
 
-          <h3 className="text-xl font-semibold mb-3 mt-6">Uploading Files</h3>
-          <div className="space-y-3">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Navigate to Files</h4>
-              <p className="text-sm text-muted-foreground">
-                In the dashboard sidebar, click on "Files" to access the file management interface.
-              </p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Upload Documents</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Click "Upload Files" button</li>
-                <li>• Select PDF files or documents</li>
-                <li>• Wait for processing to complete</li>
-                <li>• Files are automatically indexed for AI</li>
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <InfoCard title="Uploading Files" icon={FileText}>
+              <p>Navigate to <span className="font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Files</span> in the dashboard sidebar.</p>
+              <ul className="space-y-2 ml-2">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Select PDF files or documents</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Wait for OCR processing</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Files are indexed automatically</span>
+                </li>
               </ul>
-            </div>
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 rounded-r-lg">
-              <p className="text-sm">
-                <strong>Tip:</strong> Upload admission brochures, fee structures, course catalogs,
-                FAQs, policies, and any other frequently referenced documents.
-              </p>
-            </div>
+            </InfoCard>
+
+            <InfoCard title="Web Crawling" icon={Globe}>
+              <p>Navigate to <span className="font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Integrations &rarr; Web Crawling</span>.</p>
+              <ul className="space-y-2 ml-2">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Enter website URL</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Set crawl depth (1-3 recommended)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  <span>Review and select content</span>
+                </li>
+              </ul>
+            </InfoCard>
           </div>
 
-          <h3 className="text-xl font-semibold mb-3 mt-6">Web Crawling</h3>
-          <div className="space-y-3">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Start a Crawl Job</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>1. Navigate to "Integrations" → "Web Crawling"</li>
-                <li>2. Enter your website URL (e.g., https://yourcampus.edu)</li>
-                <li>3. Set crawl depth (1-3 levels recommended)</li>
-                <li>4. Select content types to crawl (text, images, PDFs)</li>
-                <li>5. Click "Start Crawl"</li>
-              </ol>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Monitor Progress</h4>
-              <p className="text-sm text-muted-foreground">
-                The crawl job status shows pages visited, resources found, and completion progress.
-                This can take several minutes depending on your site size.
-              </p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Review Results</h4>
-              <p className="text-sm text-muted-foreground">
-                After completion, review the crawled pages. Select which content to add to the
-                knowledge base.
-              </p>
-            </div>
+          <TipBox>
+            <strong>Pro Tip:</strong> Upload admission brochures, fee structures, course catalogs, FAQs, policies, and any other frequently referenced documents to improve AI accuracy.
+          </TipBox>
+        </section>
+
+        {/* Widget Settings */}
+        <section>
+          <SectionHeading icon={Settings}>Widget Configuration</SectionHeading>
+          <div className="grid md:grid-cols-3 gap-6">
+            <InfoCard title="Greeting Message" icon={MessageSquare}>
+              <p className="mb-2">Set a welcoming first message that users see when opening the chat.</p>
+              <div className="p-3 bg-white dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 rounded text-sm font-mono text-zinc-500">
+                "Hi! How can I help you today?"
+              </div>
+            </InfoCard>
+
+            <InfoCard title="Quick Suggestions" icon={Layout}>
+              <p>Add up to 3 quick suggestion buttons for common queries:</p>
+              <div className="space-y-1">
+                <span className="block text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-600 dark:text-zinc-400">Admission requirements?</span>
+                <span className="block text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-600 dark:text-zinc-400">How do I pay fees?</span>
+              </div>
+            </InfoCard>
+
+            <InfoCard title="Voice Settings" icon={Zap}>
+              <p>Configure Vapi assistant ID and optional phone number for voice call integration.</p>
+            </InfoCard>
           </div>
         </section>
 
-        {/* Widget Configuration */}
+        {/* Monitoring & Analytics */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">3. Configuring Widget Settings</h2>
-          <p className="mb-4">
-            Navigate to "Customization" to configure how your widget appears and behaves.
-          </p>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Greeting Message</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Set a welcoming first message that users see when opening the chat:
-              </p>
-              <div className="p-3 bg-muted/50 rounded text-sm font-mono">
-                "Hi! 👋 How can I help you today?"
+          <SectionHeading icon={BarChart3}>Monitoring & Analytics</SectionHeading>
+          <div className="space-y-6">
+            <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-1">
+              <div className="grid divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800 md:grid-cols-3">
+                <div className="p-6">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-zinc-400" />
+                    Conversations
+                  </h4>
+                  <p className="text-sm text-zinc-500">View interactions in real-time. See student details, device metadata, and AI confidence scores. Take over chats manually when needed.</p>
+                </div>
+                <div className="p-6">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Search className="w-4 h-4 text-zinc-400" />
+                    Knowledge Gaps
+                  </h4>
+                  <p className="text-sm text-zinc-500">Monitor questions where AI lacked confidence. This highlights missing information in your knowledge base.</p>
+                </div>
+                <div className="p-6">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-zinc-400" />
+                    Metrics
+                  </h4>
+                  <p className="text-sm text-zinc-500">Track total volume, average response times, and resolution rates to optimize your support strategy.</p>
+                </div>
               </div>
             </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Quick Suggestions</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Add up to 3 quick suggestion buttons:
-              </p>
-              <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                <li>• "What are the admission requirements?"</li>
-                <li>• "How do I pay my fees?"</li>
-                <li>• "Where is the library?"</li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Voice Settings</h4>
-              <p className="text-sm text-muted-foreground">
-                Configure Vapi assistant ID and optional phone number for voice call integration.
-              </p>
-            </div>
           </div>
         </section>
 
-        {/* Monitoring Conversations */}
+        {/* Team & Security */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">4. Monitoring Conversations</h2>
-          <p className="mb-4">
-            The Conversations page shows all student interactions in real-time.
-          </p>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Conversation List</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• View all conversations by status (unresolved, escalated, resolved)</li>
-                <li>• Click on any conversation to view full message history</li>
-                <li>• See student name, email, and session metadata</li>
-                <li>• Real-time updates as new messages arrive</li>
-              </ul>
+          <SectionHeading icon={Shield}>Team & Security</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-white">Managing Members</h3>
+              <div className="pl-4 border-l-2 border-zinc-200 dark:border-zinc-800 space-y-4">
+                <div>
+                  <span className="block text-sm font-medium text-zinc-900 dark:text-white">Invitation Flow</span>
+                  <p className="text-sm text-zinc-500">Go to Settings &rarr; Organization &rarr; Invite Members. Enter email addresses to send access links.</p>
+                </div>
+                <div>
+                  <span className="block text-sm font-medium text-zinc-900 dark:text-white">Roles</span>
+                  <ul className="mt-1 space-y-1 text-sm text-zinc-500">
+                    <li><strong className="text-zinc-700 dark:text-zinc-300">Admin:</strong> Full access including billing.</li>
+                    <li><strong className="text-zinc-700 dark:text-zinc-300">Member:</strong> View conversations and analytics only.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Conversation Details</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Click on a conversation to see:
-              </p>
-              <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                <li>• Complete message thread</li>
-                <li>• Student information and metadata</li>
-                <li>• Device and browser details</li>
-                <li>• Timestamp for each message</li>
-                <li>• AI confidence and sources used</li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Taking Over Conversations</h4>
-              <p className="text-sm text-muted-foreground">
-                For complex queries, staff can take over from the AI and respond manually. The
-                conversation history is preserved.
-              </p>
-            </div>
-          </div>
-        </section>
 
-        {/* Analytics */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">5. Understanding Analytics</h2>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Conversation Metrics</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Total conversations over time</li>
-                <li>• Average response time</li>
-                <li>• Resolution rate (AI vs human escalation)</li>
-                <li>• Peak usage hours and days</li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Popular Questions</h4>
-              <p className="text-sm text-muted-foreground">
-                Identify most frequently asked questions to improve knowledge base and add as quick
-                suggestions.
-              </p>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Knowledge Gaps</h4>
-              <p className="text-sm text-muted-foreground">
-                Monitor questions where AI couldn't provide confident answers. This indicates missing
-                information in the knowledge base.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Team Management */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">6. Managing Team Members</h2>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Inviting Members</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>1. Go to Settings → Organization</li>
-                <li>2. Click "Invite Members"</li>
-                <li>3. Enter email addresses</li>
-                <li>4. Assign roles (Admin or Member)</li>
-                <li>5. Send invitations</li>
-              </ol>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Roles & Permissions</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>
-                  • <strong>Admin:</strong> Full access to all features including settings and billing
-                </li>
-                <li>
-                  • <strong>Member:</strong> Can view conversations and analytics, limited settings
-                  access
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Plugins */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">7. Managing Integrations & Plugins</h2>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Vapi Voice Integration</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Navigate to "Plugins" to configure voice integration:
-              </p>
-              <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                <li>• Add Vapi API keys</li>
-                <li>• Keys are encrypted and stored securely</li>
-                <li>• Used for voice call functionality</li>
-              </ul>
-            </div>
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 rounded-r-lg">
-              <p className="text-sm">
-                <strong>Security:</strong> All plugin secrets are encrypted using AES-256-GCM before
-                storage. Only your organization can decrypt them.
-              </p>
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-white">Plugin Security</h3>
+              <div className="p-5 rounded-xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+                  When configuring integrations like Vapi Voice:
+                </p>
+                <div className="flex items-center gap-3 text-sm text-zinc-500">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  <span>Secrets are encrypted (AES-256-GCM)</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-zinc-500 mt-2">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  <span>Keys are never exposed to the client</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Best Practices */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Best Practices</h2>
-          <div className="space-y-3">
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Regular Knowledge Base Updates:</strong> Add new policies, announcements,
-                and information as they become available
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Monitor Daily:</strong> Check conversations regularly to identify issues and
-                opportunities for improvement
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Use Analytics:</strong> Review weekly analytics to understand student needs
-                and peak usage patterns
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Respond to Escalations:</strong> When AI escalates complex queries, respond
-                promptly to maintain student trust
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Update Suggestions:</strong> Periodically refresh quick suggestions based on
-                current trends and seasons
-              </p>
-            </div>
+          <SectionHeading icon={CheckCircle2}>Best Practices</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-4">
+            <BestPracticeItem text="Update the Knowledge Base regularly with new policies and announcements." />
+            <BestPracticeItem text="Monitor conversations daily to identify issues and opportunities." />
+            <BestPracticeItem text="Review weekly analytics to understand peak usage patterns." />
+            <BestPracticeItem text="Respond promptly when the AI escalates complex queries." />
+            <BestPracticeItem text="Refresh quick suggestions seasonally based on student trends." />
           </div>
         </section>
+
+        {/* Footer Help */}
+        <div className="mt-20 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-sm text-zinc-500">
+          <p>Need assistance?</p>
+          <Link href="/docs/troubleshooting" className="flex items-center gap-2 hover:text-zinc-900 dark:hover:text-white transition-colors">
+            <MessageSquare className="w-4 h-4" />
+            Contact Support
+          </Link>
+        </div>
+
       </div>
     </DocLayout>
   );

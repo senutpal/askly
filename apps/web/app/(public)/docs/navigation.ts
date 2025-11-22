@@ -12,11 +12,12 @@ import {
   Search,
   Handshake,
 } from "lucide-react";
+
 export interface NavigationSection {
   title: string;
   href: string;
   description: string;
-  icon?: React.ComponentType;
+  icon: React.ComponentType<any>;
 }
 
 export interface NavigationGroup {
@@ -31,19 +32,19 @@ export const documentationNavigation: NavigationGroup[] = [
       {
         title: "Introduction",
         href: "/docs/introduction",
-        description: "Learn what Askly is and how it can help your campus",
+        description: "Learn what Askly is and how it can help.",
         icon: BookOpen,
       },
       {
         title: "Features",
         href: "/docs/features",
-        description: "Explore all the features Askly has to offer",
+        description: "Explore all the features Askly has to offer.",
         icon: Sparkles,
       },
       {
         title: "Quick Start",
         href: "/docs/quick-start",
-        description: "Quick start guide to get Askly running",
+        description: "Get Askly running in minutes.",
         icon: Rocket,
       },
     ],
@@ -54,13 +55,13 @@ export const documentationNavigation: NavigationGroup[] = [
       {
         title: "Setup & Installation",
         href: "/docs/setup",
-        description: "Detailed configuration and environment setup",
+        description: "Detailed environment setup.",
         icon: Settings,
       },
       {
         title: "Deployment",
         href: "/docs/deployment",
-        description: "Deploy Askly to production",
+        description: "Deploy Askly to production.",
         icon: Globe,
       },
     ],
@@ -71,13 +72,13 @@ export const documentationNavigation: NavigationGroup[] = [
       {
         title: "Widget Integration",
         href: "/docs/integration",
-        description: "Embed Askly on your website",
+        description: "Embed Askly on your website.",
         icon: Plug,
       },
       {
         title: "Customization",
         href: "/docs/customization",
-        description: "Customize appearance and behavior",
+        description: "Customize appearance and behavior.",
         icon: Palette,
       },
     ],
@@ -88,19 +89,19 @@ export const documentationNavigation: NavigationGroup[] = [
       {
         title: "Architecture",
         href: "/docs/architecture",
-        description: "Understand how Askly works under the hood",
+        description: "Under the hood deep dive.",
         icon: Layers,
       },
       {
         title: "Usage Guide",
         href: "/docs/usage-guide",
-        description: "Complete guide for administrators",
+        description: "Guide for administrators.",
         icon: BookCopy,
       },
       {
         title: "API Reference",
         href: "/docs/api-reference",
-        description: "API documentation and endpoints",
+        description: "Endpoints and methods.",
         icon: Wrench,
       },
     ],
@@ -111,22 +112,15 @@ export const documentationNavigation: NavigationGroup[] = [
       {
         title: "Troubleshooting",
         href: "/docs/troubleshooting",
-        description: "Common issues and solutions",
+        description: "Common issues and solutions.",
         icon: Search,
       },
       {
         title: "Contributing",
         href: "/docs/contributing",
-        description: "Contribute to Askly open source project",
+        description: "Join the open source project.",
         icon: Handshake,
       },
     ],
   },
 ];
-
-export const sidebarNavigation = documentationNavigation.flatMap((group) =>
-  group.sections.map((section) => ({
-    ...section,
-    group: group.group,
-  }))
-);

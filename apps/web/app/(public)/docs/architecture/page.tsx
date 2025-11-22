@@ -1,23 +1,135 @@
+"use client";
+
+import React, { useState } from "react";
+import { motion } from "motion/react";
+import {
+  Layers,
+  Server,
+  Globe,
+  LayoutDashboard,
+  MessageSquare,
+  Database,
+  Cpu,
+  ShieldCheck,
+  Workflow,
+  Check,
+  Copy,
+  Zap,
+  Code2,
+  Lock,
+  Share2,
+  FileText,
+  Search,
+  ArrowRightLeft
+} from "lucide-react";
 import { DocLayout } from "@/features/docs/components/DocLayout";
 
-export default function ArchitecturePage() {
+
+
+const SectionHeading = ({ children, icon: Icon }: { children: React.ReactNode; icon?: any }) => (
+  <div className="flex items-center gap-3 mb-6">
+    {Icon && <Icon className="w-5 h-5 text-zinc-400" />}
+    <h2 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-white">
+      {children}
+    </h2>
+  </div>
+);
+
+const EnhancedCodeBlock = ({ code, filename }: { code: string; filename?: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <DocLayout
-      title="Architecture"
-      description="Understand how Askly works under the hood"
+    <div className="group relative my-6 overflow-hidden rounded-xl bg-[#0D0D0D] border border-white/10 shadow-2xl">
+      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+        </div>
+        {filename && <span className="text-xs font-mono text-zinc-500">{filename}</span>}
+      </div>
+      <div className="relative p-6 overflow-x-auto">
+        <pre className="font-mono text-xs sm:text-sm leading-relaxed text-zinc-300">
+          <code>{code}</code>
+        </pre>
+      </div>
+      <button
+        onClick={handleCopy}
+        className="absolute top-14 right-4 p-2 rounded-md bg-white/5 text-zinc-400 opacity-0 transition-all duration-200 hover:bg-white/10 hover:text-white group-hover:opacity-100 focus:opacity-100"
+      >
+        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+};
+
+const StepItem = ({ number, title, children }: { number: string; title: string; children: React.ReactNode }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      className="relative pl-12 pb-12 border-l border-zinc-200 dark:border-zinc-800 last:pb-0 last:border-l-0"
     >
-      <div className="space-y-8">
-        {/* High-Level Overview */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">High-Level Architecture</h2>
-          <p className="text-lg mb-6">
-            Askly is built as a modern, scalable monorepo with three main applications and a
-            serverless backend. Here's how everything fits together:
-          </p>
-          
-          <div className="p-6 border rounded-lg bg-muted/50 mb-6">
-            <pre className="text-sm overflow-x-auto">
-{`┌─────────────────────────────────────────────────────────────┐
+      <div className="absolute -left-[17px] top-0 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-sm font-mono font-medium text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-black dark:text-zinc-400">
+        {number}
+      </div>
+      <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">{title}</h3>
+      <div className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
+const TechStackCard = ({ title, items }: { title: string; items: { label: string; desc: string }[] }) => (
+  <motion.div
+    whileHover={{ y: -4 }}
+    className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300"
+  >
+    <h4 className="font-medium text-zinc-900 dark:text-white mb-4">{title}</h4>
+    <ul className="space-y-3">
+      {items.map((item, idx) => (
+        <li key={idx} className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+          <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 shrink-0" />
+          <div className="flex flex-col">
+            <span className="font-medium text-zinc-900 dark:text-zinc-200">
+              {item.label}
+            </span>
+            <span className="text-xs opacity-70">{item.desc}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </motion.div>
+);
+
+const ComponentCard = ({ title, desc, icon: Icon, items }: { title: string, desc: string, icon: any, items: string[] }) => (
+  <div className="p-6 rounded-xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800">
+    <Icon className="w-6 h-6 mb-4 text-zinc-500 dark:text-zinc-400" />
+    <h4 className="font-medium text-zinc-900 dark:text-white mb-2">{title}</h4>
+    <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">
+      {desc}
+    </p>
+    <div className="space-y-2">
+      {items.map((item, i) => (
+        <div key={i} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+          <div className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+          {item}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// --- ASCII Diagram Content ---
+const asciiDiagram = `┌─────────────────────────────────────────────────────────────┐
 │                    User's Website                           │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │         Embed Script (Vite)                          │   │
@@ -33,8 +145,7 @@ export default function ArchitecturePage() {
           │  (Next.js)      │       │  (Next.js)      │
           ├─────────────────┤       ├─────────────────┤
           │ • Chat UI       │       │ • Admin Panel   │
-          │ • Voice calls   │       │ • Analytics     │
-          │ • Sessions      │       │ • Settings      │
+          │ • Voice calls   │       │ • Sessions      │
           └────────┬────────┘       └────────┬────────┘
                    │                         │
                    └────────┬────────────────┘
@@ -43,11 +154,6 @@ export default function ArchitecturePage() {
                   ┌──────────────────┐
                   │  Convex Backend  │
                   │  (Serverless)    │
-                  ├──────────────────┤
-                  │ • Real-time DB   │
-                  │ • AI Functions   │
-                  │ • RAG System     │
-                  │ • Auth (Clerk)   │
                   └────────┬─────────┘
                            │
             ┌──────────────┼──────────────┐
@@ -55,335 +161,215 @@ export default function ArchitecturePage() {
     ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
     │   Gemini    │ │    Vapi     │ │   Clerk     │
     │     AI      │ │   (Voice)   │ │   (Auth)    │
-    └─────────────┘ └─────────────┘ └─────────────┘`}
-            </pre>
+    └─────────────┘ └─────────────┘ └─────────────┘`;
+
+// --- Main Page Component ---
+
+export default function ArchitecturePage() {
+  return (
+    <DocLayout
+      title="Architecture"
+      description="Deep dive into the technical design, data flow, and component structure of the Askly platform."
+    >
+      <div className="space-y-24">
+
+        {/* High Level Overview */}
+        <section>
+          <SectionHeading icon={Layers}>High-Level Overview</SectionHeading>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-6 leading-relaxed">
+            Askly is engineered as a modern, scalable monorepo comprising three distinct applications 
+            unified by a serverless backend. The architecture prioritizes type safety, 
+            real-time performance, and strict separation of concerns.
+          </p>
+          <EnhancedCodeBlock code={asciiDiagram} filename="system-architecture.txt" />
+        </section>
+
+        {/* Core Components Grid */}
+        <section>
+          <SectionHeading icon={Code2}>Core Components</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6">
+            <ComponentCard 
+              title="Embed Script"
+              desc="Lightweight Vite build that injects the widget via iframe. Handles parent-window communication and configuration."
+              icon={Globe}
+              items={["apps/embed", "~10KB gzipped", "Zero-dependency"]}
+            />
+            <ComponentCard 
+              title="Widget App"
+              desc="The consumer-facing chat interface loaded inside the iframe. Optimized for high interactivity and streaming responses."
+              icon={MessageSquare}
+              items={["apps/widget", "Next.js App Router", "Vapi Voice Integration"]}
+            />
+            <ComponentCard 
+              title="Web Dashboard"
+              desc="Administrative interface for managing organizations, knowledge bases, and monitoring conversations."
+              icon={LayoutDashboard}
+              items={["apps/web", "Recharts Analytics", "Settings Management"]}
+            />
+            <ComponentCard 
+              title="Convex Backend"
+              desc="Serverless backend handling database operations, vector search, and third-party API orchestration."
+              icon={Server}
+              items={["packages/backend", "Real-time Database", "Vector Search"]}
+            />
           </div>
         </section>
 
-        {/* Components */}
+        {/* Data Flow Timeline */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Core Components</h2>
-          <div className="space-y-6">
-            <div className="p-6 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-3">🌐 Embed Script (apps/embed)</h3>
-              <p className="text-muted-foreground mb-3">
-                A lightweight Vite-built script that can be added to any website with a single{" "}
-                <code className="px-1.5 py-0.5 bg-muted rounded">&lt;script&gt;</code> tag.
+          <SectionHeading icon={ArrowRightLeft}>Data Flow Lifecycle</SectionHeading>
+          <div className="mt-8">
+            <StepItem number="01" title="User Interaction">
+              <p>
+                The user types a message in the Widget interface. The client performs an optimistic update 
+                to show the message immediately while sending a mutation to the Convex backend.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Creates iframe pointing to widget app</li>
-                <li>• Handles configuration (org ID, position)</li>
-                <li>• Provides JavaScript API (show/hide/destroy)</li>
-                <li>• Minimal footprint (~10KB gzipped)</li>
-              </ul>
-            </div>
+            </StepItem>
 
-            <div className="p-6 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-3">💬 Widget App (apps/widget)</h3>
-              <p className="text-muted-foreground mb-3">
-                The actual chat interface loaded in an iframe. Built with Next.js for performance
-                and SEO.
+            <StepItem number="02" title="Context Retrieval (RAG)">
+              <p>
+                The backend receives the message and generates a vector embedding. It performs a cosine similarity 
+                search against the stored knowledge base chunks to retrieve relevant institutional context.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Real-time chat interface</li>
-                <li>• Voice call integration (Vapi)</li>
-                <li>• Message streaming</li>
-                <li>• Session management</li>
-                <li>• Multilingual support</li>
-              </ul>
-            </div>
+            </StepItem>
 
-            <div className="p-6 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-3">📊 Web Dashboard (apps/web)</h3>
-              <p className="text-muted-foreground mb-3">
-                Admin interface for managing conversations,knowledge base, and settings.
+            <StepItem number="03" title="AI Generation">
+              <p>
+                The retrieved context, along with conversation history, is injected into the system prompt. 
+                This payload is sent to Google Gemini to generate a response grounded in the provided data.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Conversation monitoring and management</li>
-                <li>• Real-time analytics and insights</li>
-                <li>• Knowledge base upload and management</li>
-                <li>• Widget customization settings</li>
-                <li>• Organization and team management</li>
-              </ul>
-            </div>
+            </StepItem>
 
-            <div className="p-6 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-3">⚡ Convex Backend (packages/backend)</h3>
-              <p className="text-muted-foreground mb-3">
-                Serverless backend handling all business logic, database, and AI processing.
+            <StepItem number="04" title="Real-time Sync">
+              <p>
+                The AI response is streamed back to Convex, which pushes updates to the Widget via WebSockets. 
+                Simultaneously, the Dashboard receives these updates via reactive queries, allowing admins 
+                to monitor the chat in real-time.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Real-time database with instant sync</li>
-                <li>• AI conversation processing</li>
-                <li>• RAG (Retrieval Augmented Generation) system</li>
-                <li>• Document indexing and search</li>
-                <li>• Secure API endpoints</li>
-                <li>• Multi-tenancy with org isolation</li>
-              </ul>
-            </div>
+            </StepItem>
           </div>
         </section>
 
-        {/* Data Flow */}
+        {/* RAG System Breakdown */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Data Flow</h2>
-          <div className="space-y-4">
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">1. User Sends Message</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>• User types message in widget chat interface</li>
-                <li>• Widget sends message to Convex backend via mutation</li>
-                <li>• Message stored in conversations table with metadata</li>
-              </ol>
-            </div>
-
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">2. AI Processing</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>• Backend retrieves conversation history</li>
-                <li>• RAG system searches knowledge base for relevant context</li>
-                <li>• Context + history sent to AI model (Gemini)</li>
-                <li>• AI generates response based on context</li>
-              </ol>
-            </div>
-
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">3. Response Streaming</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>• AI response streamed back in real-time</li>
-                <li>• Convex streams updates to widget via WebSocket</li>
-                <li>• User sees response appear progressively</li>
-                <li>• Final response stored in database</li>
-              </ol>
-            </div>
-
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">4. Dashboard Sync</h4>
-              <ol className="space-y-2 text-sm text-muted-foreground ml-6">
-                <li>• Admin dashboard subscribes to conversations</li>
-                <li>• Real-time updates via Convex reactive queries</li>
-                <li>• Admins see new messages instantly</li>
-                <li>• Can intervene or escalate if needed</li>
-              </ol>
+          <SectionHeading icon={Database}>RAG System Internals</SectionHeading>
+          <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-1">
+            <div className="grid divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800 md:grid-cols-3">
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-500">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Ingestion</h4>
+                <p className="text-sm text-zinc-500">
+                  PDFs and text documents are parsed, cleaned, and split into semantic chunks.
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-500">
+                  <Search className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Indexing</h4>
+                <p className="text-sm text-zinc-500">
+                  Chunks are converted to vector embeddings and stored in Convex's vector database.
+                </p>
+              </div>
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-500">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Retrieval</h4>
+                <p className="text-sm text-zinc-500">
+                  Queries trigger vector searches to find the most relevant chunks for context injection.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Technology Stack */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Technology Stack</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">Frontend</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <strong>Next.js 15:</strong> React framework with App Router
+          <SectionHeading icon={Cpu}>Technology Stack</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6">
+            <TechStackCard 
+              title="Frontend"
+              items={[
+                { label: "Next.js 15", desc: "App Router framework" },
+                { label: "React 19", desc: "UI library" },
+                { label: "Tailwind CSS 4", desc: "Styling engine" },
+                { label: "Jotai", desc: "Atomic state management" }
+              ]}
+            />
+            <TechStackCard 
+              title="Backend & AI"
+              items={[
+                { label: "Convex", desc: "Serverless backend & database" },
+                { label: "Google Gemini", desc: "Large Language Model" },
+                { label: "Vapi", desc: "Voice AI infrastructure" },
+                { label: "Clerk", desc: "Authentication & User Management" }
+              ]}
+            />
+          </div>
+        </section>
+
+        {/* Multi-Tenancy & Security */}
+        <section>
+          <SectionHeading icon={ShieldCheck}>Security & Isolation</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800">
+              <div className="flex items-center gap-2 mb-4">
+                <Share2 className="w-5 h-5 text-zinc-900 dark:text-white" />
+                <h4 className="font-medium text-zinc-900 dark:text-white">Multi-Tenancy</h4>
+              </div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
+                Data isolation is enforced at the database query level. Every operation requires an 
+                Organization ID, ensuring complete separation of data between different campuses.
+              </p>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                <li className="flex gap-2">
+                  <Check className="w-4 h-4 text-green-500" /> Isolated knowledge bases
                 </li>
-                <li>
-                  <strong>React 19:</strong> Latest React with new features
-                </li>
-                <li>
-                  <strong>TypeScript 5.7:</strong> Type-safe development
-                </li>
-                <li>
-                  <strong>Tailwind CSS 4:</strong> Utility-first styling
-                </li>
-                <li>
-                  <strong>shadcn/ui:</strong> Accessible component library
-                </li>
-                <li>
-                  <strong>Jotai:</strong> Lightweight state management
+                <li className="flex gap-2">
+                  <Check className="w-4 h-4 text-green-500" /> Separate analytics pipelines
                 </li>
               </ul>
             </div>
 
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">Backend</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <strong>Convex:</strong> Real-time serverless backend
+            <div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800">
+              <div className="flex items-center gap-2 mb-4">
+                <Lock className="w-5 h-5 text-zinc-900 dark:text-white" />
+                <h4 className="font-medium text-zinc-900 dark:text-white">Security Standards</h4>
+              </div>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
+                All communications are encrypted via TLS. Authentication is handled via Clerk JWTs, 
+                and sensitive configuration is encrypted at rest using AES-256-GCM.
+              </p>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                <li className="flex gap-2">
+                  <Check className="w-4 h-4 text-green-500" /> Zod schema validation
                 </li>
-                <li>
-                  <strong>Google Gemini:</strong> AI language model
-                </li>
-                <li>
-                  <strong>Clerk:</strong> Authentication & organizations
-                </li>
-                <li>
-                  <strong>Vapi:</strong> Voice AI integration
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">DevOps</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <strong>Turborepo:</strong> Monorepo build system
-                </li>
-                <li>
-                  <strong>pnpm:</strong> Fast, disk-efficient package manager
-                </li>
-                <li>
-                  <strong>Vite:</strong> Lightning-fast build tool (embed)
-                </li>
-                <li>
-                  <strong>Vercel:</strong> Deployment platform
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-6 border rounded-lg">
-              <h4 className="font-semibold mb-3">Development</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <strong>ESLint:</strong> Code linting
-                </li>
-                <li>
-                  <strong>Prettier:</strong> Code formatting
-                </li>
-                <li>
-                  <strong>React Hook Form:</strong> Form management
-                </li>
-                <li>
-                  <strong>Zod:</strong> Schema validation
+                <li className="flex gap-2">
+                  <Check className="w-4 h-4 text-green-500" /> Row-level security policies
                 </li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* RAG System */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">RAG (Retrieval Augmented Generation)</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="mb-4 text-muted-foreground">
-              Askly uses RAG to provide accurate, context-aware responses based on your institutional
-              knowledge base:
-            </p>
-            <div className="space-y-4">
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">1. Document Indexing</h4>
-                <p className="text-sm text-muted-foreground">
-                  PDFs and web content are processed, chunked, and embedded using vector embeddings.
-                  Stored in Convex vector database.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">2. Semantic Search</h4>
-                <p className="text-sm text-muted-foreground">
-                  When a user asks a question, it's converted to a vector embedding. System searches
-                  for most relevant document chunks using cosine similarity.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">3. Context Injection</h4>
-                <p className="text-sm text-muted-foreground">
-                  Retrieved chunks are injected into the AI prompt as context. AI generates response
-                  based on actual institutional data.
-                </p>
-              </div>
+        {/* Scalability Note */}
+        <div className="p-6 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30">
+          <div className="flex gap-4">
+            <Workflow className="w-6 h-6 text-blue-600 dark:text-blue-400 shrink-0" />
+            <div>
+              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Designed for Scale</h4>
+              <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                The architecture leverages Edge functions for low-latency responses and serverless databases 
+                that auto-scale with demand. Static assets are distributed via global CDNs, ensuring 
+                fast load times regardless of user location.
+              </p>
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Multi-Tenancy */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">Multi-Tenancy Architecture</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="mb-4 text-muted-foreground">
-              Each campus/organization has completely isolated data:
-            </p>
-            <ul className="space-y-3 text-sm text-muted-foreground ml-4">
-              <li>
-                • <strong>Organization Isolation:</strong> All database queries filtered by
-                organizationId
-              </li>
-              <li>
-                • <strong>Clerk Integration:</strong> User authentication and org management handled
-                by Clerk
-              </li>
-              <li>
-                • <strong>Separate Knowledge Bases:</strong> Each org has its own document
-                collection
-              </li>
-              <li>
-                • <strong>Widget Configuration:</strong> Each org can customize independently
-              </li>
-              <li>
-                • <strong>Analytics Separation:</strong> Conversation data never mixed between orgs
-              </li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Security */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">Security Considerations</h2>
-          <div className="space-y-4">
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Authentication:</strong> Clerk handles all auth with secure JWT tokens
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ API Security:</strong> Convex enforces authentication on all queries and
-                mutations
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Data Encryption:</strong> Sensitive data encrypted with AES-256-GCM using
-                MASTER_KEY
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ HTTPS Only:</strong> All communications use TLS encryption
-              </p>
-            </div>
-            <div className="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-950/20 rounded-r-lg">
-              <p className="text-sm">
-                <strong>✓ Input Validation:</strong> Zod schema validation on all user inputs
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Scalability */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">Scalability</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="mb-4">Askly is designed to scale effortlessly:</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">Serverless Backend</h4>
-                <p className="text-sm text-muted-foreground">
-                  Convex automatically scales based on load. Pay only for what you use.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">Edge Deployment</h4>
-                <p className="text-sm text-muted-foreground">
-                  Vercel deploys to edge locations worldwide for low latency.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">Real-Time Updates</h4>
-                <p className="text-sm text-muted-foreground">
-                  WebSocket connections managed automatically by Convex.
-                </p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">CDN Distribution</h4>
-                <p className="text-sm text-muted-foreground">
-                  Static assets served from global CDN for fast loading.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </DocLayout>
   );

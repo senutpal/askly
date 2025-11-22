@@ -1,220 +1,236 @@
+"use client";
+
+import React, { useState } from "react";
+import { motion } from "motion/react";
+import {
+  Code2,
+  Server,
+  Database,
+  Copy,
+  Check,
+  Globe,
+  Shield,
+  Zap,
+  AlertCircle,
+  Terminal,
+  Settings
+} from "lucide-react";
 import { DocLayout } from "@/features/docs/components/DocLayout";
-import { CodeBlock } from "@/features/docs/components/CodeBlock";
+
+// --- Reusable UI Components (Matched to Reference) ---
+
+const SectionHeading = ({ children, icon: Icon }: { children: React.ReactNode; icon?: any }) => (
+  <div className="flex items-center gap-3 mb-6">
+    {Icon && <Icon className="w-5 h-5 text-zinc-400" />}
+    <h2 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-white">
+      {children}
+    </h2>
+  </div>
+);
+
+const EnhancedCodeBlock = ({ code, language = "typescript", filename }: { code: string, language?: string, filename?: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="group relative my-6 overflow-hidden rounded-xl bg-[#0D0D0D] border border-white/10 shadow-2xl">
+      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+        </div>
+        {filename && <span className="text-xs font-mono text-zinc-500">{filename}</span>}
+      </div>
+      
+      <div className="relative p-6 overflow-x-auto">
+        <pre className="font-mono text-sm leading-relaxed text-zinc-300">
+          <code>{code}</code>
+        </pre>
+      </div>
+
+      <button
+        onClick={handleCopy}
+        className="absolute top-14 right-4 p-2 rounded-md bg-white/5 text-zinc-400 opacity-0 transition-all duration-200 hover:bg-white/10 hover:text-white group-hover:opacity-100 focus:opacity-100"
+      >
+        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+};
+
+const ApiCard = ({ title, description, children, label }: { title: string, description?: string, children: React.ReactNode, label?: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all duration-300 mb-8"
+  >
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-lg font-medium text-zinc-900 dark:text-white font-mono">{title}</h3>
+      {label && (
+        <span className="px-2 py-1 text-xs font-medium rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+          {label}
+        </span>
+      )}
+    </div>
+    {description && (
+      <p className="text-zinc-600 dark:text-zinc-400 mb-6 leading-relaxed">
+        {description}
+      </p>
+    )}
+    {children}
+  </motion.div>
+);
+
+const InfoBox = ({ icon: Icon, title, children }: { icon: any, title: string, children: React.ReactNode }) => (
+  <div className="p-4 rounded-lg bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 flex gap-3">
+    <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+    <div className="space-y-1">
+      <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200">{title}</h4>
+      <div className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">{children}</div>
+    </div>
+  </div>
+);
+
+const ParamTable = ({ params }: { params: { name: string, type: string, desc: string, required?: boolean }[] }) => (
+  <div className="mt-6 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+    <table className="w-full text-sm text-left">
+      <thead className="bg-zinc-100 dark:bg-zinc-900/50">
+        <tr>
+          <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-800">Property</th>
+          <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-800">Type</th>
+          <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-800">Description</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 bg-white dark:bg-zinc-900/20">
+        {params.map((row, i) => (
+          <tr key={i}>
+            <td className="px-4 py-3 font-mono text-zinc-700 dark:text-zinc-300">
+              {row.name}
+              {row.required && <span className="ml-2 text-red-500 text-xs">*</span>}
+            </td>
+            <td className="px-4 py-3 text-blue-600 dark:text-blue-400 font-mono text-xs">{row.type}</td>
+            <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{row.desc}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+// --- Main Page Component ---
 
 export default function ApiReferencePage() {
   return (
     <DocLayout
       title="API Reference"
-      description="Complete API documentation for Askly widget and backend"
+      description="Comprehensive documentation for the Askly Widget JavaScript API and Convex Backend endpoints."
     >
-      <div className="space-y-8">
+      <div className="space-y-24">
+
         {/* Widget JavaScript API */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Widget JavaScript API</h2>
-          <p className="mb-6">
-            The Askly widget exposes a global <code className="px-2 py-1 bg-muted rounded">window.AsklyWidget</code>{" "}
-            object for programmatic control.
+          <SectionHeading icon={Terminal}>Widget JavaScript API</SectionHeading>
+          <p className="mb-8 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            The Askly widget exposes a global <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-sm font-mono text-zinc-900 dark:text-zinc-200">window.AsklyWidget</code> object 
+            allows for programmatic control over the chat interface.
           </p>
 
-          {/* init() */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-3">init(config)</h3>
-            <div className="p-6 border rounded-lg">
-              <p className="text-muted-foreground mb-4">
-                Initialize or reinitialize the widget with configuration options.
-              </p>
-              <CodeBlock
-                code={`window.AsklyWidget.init({
+          <ApiCard 
+            title="init(config)" 
+            label="Method"
+            description="Initialize or reinitialize the widget with specific configuration options. This must be called before other methods."
+          >
+            <EnhancedCodeBlock
+              language="javascript"
+              code={`window.AsklyWidget.init({
   organizationId: 'org_xxxxxxxx',
-  position: 'bottom-right' // or 'bottom-left'
+  position: 'bottom-right',
+  theme: 'dark'
 });`}
-                language="javascript"
-              />
-              <div className="mt-4">
-                <h4 className="font-semibold mb-2">Parameters</h4>
-                <table className="w-full text-sm">
-                  <thead className="border-b">
-                    <tr>
-                      <th className="text-left py-2">Parameter</th>
-                      <th className="text-left py-2">Type</th>
-                      <th className="text-left py-2">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-muted-foreground">
-                    <tr className="border-b">
-                      <td className="py-2">
-                        <code className="px-1.5 py-0.5 bg-muted rounded">organizationId</code>
-                      </td>
-                      <td className="py-2">string</td>
-                      <td className="py-2">Your Clerk organization ID (required)</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2">
-                        <code className="px-1.5 py-0.5 bg-muted rounded">position</code>
-                      </td>
-                      <td className="py-2">string</td>
-                      <td className="py-2">"bottom-right" or "bottom-left" (optional)</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            />
+            <ParamTable
+              params={[
+                { name: "organizationId", type: "string", desc: "Your unique Clerk organization identifier.", required: true },
+                { name: "position", type: "string", desc: "'bottom-right' or 'bottom-left'. Defaults to right." },
+                { name: "theme", type: "string", desc: "Force 'light' or 'dark' mode. Defaults to system." },
+              ]}
+            />
+          </ApiCard>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <ApiCard title="show()" label="Void">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Programmatically opens the widget interface.</p>
+              <EnhancedCodeBlock code="window.AsklyWidget.show();" />
+            </ApiCard>
+            
+            <ApiCard title="hide()" label="Void">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Minimizes the widget interface.</p>
+              <EnhancedCodeBlock code="window.AsklyWidget.hide();" />
+            </ApiCard>
           </div>
 
-          {/* show() */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-3">show()</h3>
-            <div className="p-6 border rounded-lg">
-              <p className="text-muted-foreground mb-4">
-                Opens the chat widget interface.
-              </p>
-              <CodeBlock code={`window.AsklyWidget.show();`} language="javascript" />
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Returns:</strong> void
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* hide() */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-3">hide()</h3>
-            <div className="p-6 border rounded-lg">
-              <p className="text-muted-foreground mb-4">
-                Closes the chat widget interface.
-              </p>
-              <CodeBlock code={`window.AsklyWidget.hide();`} language="javascript" />
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Returns:</strong> void
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* destroy() */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-3">destroy()</h3>
-            <div className="p-6 border rounded-lg">
-              <p className="text-muted-foreground mb-4">
-                Completely removes the widget from the page and cleans up resources.
-              </p>
-              <CodeBlock code={`window.AsklyWidget.destroy();`} language="javascript" />
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground">
-                  <strong>Returns:</strong> void
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  <strong>Note:</strong> After calling destroy(), you'll need to reload the script to
-                  use the widget again.
-                </p>
-              </div>
-            </div>
-          </div>
+          <ApiCard title="destroy()" label="Void">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+              Removes the widget from the DOM and cleans up event listeners. Requires script reload to re-initialize.
+            </p>
+            <EnhancedCodeBlock code="window.AsklyWidget.destroy();" />
+          </ApiCard>
         </section>
 
         {/* Convex Backend API */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Convex Backend API</h2>
-          <p className="mb-6">
-            The backend exposes various queries and mutations through Convex. These are typically
-            called from the widget or dashboard apps.
+          <SectionHeading icon={Server}>Convex Backend API</SectionHeading>
+          <p className="mb-8 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Server-side queries and mutations exposed via the Convex client. These are utilized internally by the widget but can be accessed directly for custom implementations.
           </p>
+          
+          <InfoBox icon={Shield} title="Authentication Required">
+             Direct backend API access is secured via Clerk. The widget handles token management automatically. Custom implementations must ensure a valid session.
+          </InfoBox>
 
-          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500 rounded-r-lg mb-6">
-            <p className="text-sm">
-              <strong>Note:</strong> Direct backend API access requires authentication. The widget
-              handles this automatically via Convex client.
-            </p>
-          </div>
-
-          {/* Public Queries */}
-          <h3 className="text-2xl font-semibold mb-4">Public Endpoints</h3>
-
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3">Get Widget Settings</h4>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
-                code={`// Query widget settings for an organization
-const settings = await convex.query(
+          <div className="mt-8 space-y-8">
+            <ApiCard title="api.public.widgetSettings.get" label="Query">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Retrieves configuration for the chat interface.</p>
+              <EnhancedCodeBlock
+                code={`const settings = await convex.query(
   api.public.widgetSettings.get,
   { organizationId: "org_xxxxxxxx" }
-);
-
-// Returns:
-{
-  greetMessage: string;
-  defaultSuggestions: {
-    suggestion1?: string;
-    suggestion2?: string;
-    suggestion3?: string;
-  };
-  vapiSettings: {
-    assistantId?: string;
-    phoneNumber?: string;
-  };
-}`}
-                language="javascript"
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3">Send Message</h4>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
-                code={`// Send a user message
-await convex.mutation(
-  api.public.messages.send,
-  {
-    organizationId: "org_xxxxxxxx",
-    threadId: "thread_abc123",
-    content: "What are the admission requirements?",
-    contactSessionId: "session_xyz"
-  }
 );`}
-                language="javascript"
               />
-            </div>
-          </div>
+            </ApiCard>
 
-          <div className="mb-6">
-            <h4 className="text-lg font-semibold mb-3">Get Conversations</h4>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
-                code={`// Get all conversations for an organization
-const conversations = await convex.query(
-  api.public.conversations.list,
-  {
-    organizationId: "org_xxxxxxxx",
-    status: "unresolved" // optional: "unresolved" | "escalated" | "resolved"
-  }
-);
-
-// Returns array of:
-{
-  _id: string;
-  threadId: string;
-  organizationId: string;
-  contactSessionId: string;
-  status: "unresolved" | "escalated" | "resolved";
-  _creationTime: number;
-}`}
-                language="javascript"
+            <ApiCard title="api.public.messages.send" label="Mutation">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Sends a new message to the AI agent or support thread.</p>
+              <EnhancedCodeBlock
+                code={`await convex.mutation(api.public.messages.send, {
+  organizationId: "org_xxxxxxxx",
+  threadId: "thread_abc123",
+  content: "What are the admission requirements?",
+  contactSessionId: "session_xyz"
+});`}
               />
-            </div>
+            </ApiCard>
           </div>
         </section>
 
         {/* Data Models */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Data Models</h2>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3">Conversation</h3>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
+          <SectionHeading icon={Database}>Data Models</SectionHeading>
+          
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-white flex items-center gap-2">
+                <Code2 className="w-4 h-4 text-zinc-400" /> Conversation
+              </h3>
+              <EnhancedCodeBlock
+                filename="types/conversation.ts"
                 code={`interface Conversation {
   _id: Id<"conversations">;
   threadId: string;
@@ -223,40 +239,15 @@ const conversations = await convex.query(
   status: "unresolved" | "escalated" | "resolved";
   _creationTime: number;
 }`}
-                language="typescript"
               />
             </div>
-          </div>
 
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3">Contact Session</h3>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
-                code={`interface ContactSession {
-  _id: Id<"contactSessions">;
-  name: string;
-  email: string;
-  organizationId: string;
-  expiresAt: number;
-  metadata?: {
-    userAgent?: string;
-    language?: string;
-    platform?: string;
-    screenResolution?: string;
-    timezone?: string;
-    // ... more metadata
-  };
-  _creationTime: number;
-}`}
-                language="typescript"
-              />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3">Widget Settings</h3>
-            <div className="p-6 border rounded-lg">
-              <CodeBlock
+            <div className="space-y-3">
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-white flex items-center gap-2">
+                <Code2 className="w-4 h-4 text-zinc-400" /> Widget Settings
+              </h3>
+              <EnhancedCodeBlock
+                filename="types/settings.ts"
                 code={`interface WidgetSettings {
   _id: Id<"widgetSettings">;
   organizationId: string;
@@ -270,78 +261,88 @@ const conversations = await convex.query(
     assistantId?: string;
     phoneNumber?: string;
   };
-  _creationTime: number;
 }`}
-                language="typescript"
               />
             </div>
           </div>
         </section>
 
-        {/* Webhooks */}
+        {/* Webhooks & Integration */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Webhooks (Future)</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="text-muted-foreground mb-4">
-              Webhook support is planned for future releases. This will allow you to receive
-              real-time notifications for events like:
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-              <li>• New conversation created</li>
-              <li>• Message sent/received</li>
-              <li>• Conversation escalated</li>
-              <li>• Conversation resolved</li>
-            </ul>
+          <SectionHeading icon={Globe}>Webhooks (Beta)</SectionHeading>
+          <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-1">
+            <div className="grid divide-y md:divide-y-0 md:divide-x divide-zinc-200 dark:divide-zinc-800 md:grid-cols-3">
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+                  <Settings className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Configuration</h4>
+                <p className="text-sm text-zinc-500">Configure endpoints in the Dashboard settings panel.</p>
+              </div>
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Events</h4>
+                <p className="text-sm text-zinc-500">Listen for `message.created` and `thread.escalated`.</p>
+              </div>
+              <div className="p-6">
+                <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
+                  <Shield className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium mb-2">Security</h4>
+                <p className="text-sm text-zinc-500">All payloads are signed with your secret key.</p>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Error Handling */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Error Handling</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="text-muted-foreground mb-4">
-              All API calls should be wrapped in try-catch blocks:
-            </p>
-            <CodeBlock
-              code={`try {
-  await window.AsklyWidget.init({
-    organizationId: 'org_xxxxxxxx'
-  });
-} catch (error) {
-  console.error('Failed to initialize widget:', error);
-  // Handle error appropriately
-}`}
-              language="javascript"
-            />
-            <div className="mt-4">
-              <h4 className="font-semibold mb-2">Common Errors</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Invalid organization ID</li>
-                <li>• Network connectivity issues</li>
-                <li>• Missing required parameters</li>
-                <li>• Authentication failures</li>
+          <SectionHeading icon={AlertCircle}>Error Handling & Limits</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6">
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
+            >
+              <h4 className="font-medium mb-4 text-zinc-900 dark:text-white">Common Errors</h4>
+              <ul className="space-y-3">
+                {[
+                  { code: "401", label: "Unauthorized - Check Organization ID" },
+                  { code: "429", label: "Too Many Requests - Rate limit exceeded" },
+                  { code: "500", label: "Internal Server Error - Retry operation" },
+                ].map((err, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <span className="font-mono font-bold text-red-500">{err.code}</span>
+                    <span className="text-zinc-600 dark:text-zinc-400">{err.label}</span>
+                  </li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
+
+            <motion.div 
+              whileHover={{ y: -4 }}
+              className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
+            >
+              <h4 className="font-medium mb-4 text-zinc-900 dark:text-white">Rate Limits</h4>
+              <ul className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  Standard API: Managed by Convex infrastructure
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  File Storage: Max 10MB per upload
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+                  AI Inference: Subject to LLM provider limits
+                </li>
+              </ul>
+            </motion.div>
           </div>
         </section>
 
-        {/* Rate Limits */}
-        <section>
-          <h2 className="text-3xl font-bold mb-4">Rate Limits</h2>
-          <div className="p-6 border rounded-lg">
-            <p className="text-muted-foreground mb-4">
-              Convex handles rate limiting automatically. For the free tier:
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-              <li>• Standard API calls: handled by Convex limits</li>
-              <li>• File uploads: subject to storage limits</li>
-              <li>• AI requests: subject to provider rate limits</li>
-            </ul>
-            <p className="text-sm text-muted-foreground mt-4">
-              For production deployments with high traffic, consider upgrading your Convex plan.
-            </p>
-          </div>
-        </section>
       </div>
     </DocLayout>
   );

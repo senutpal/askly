@@ -66,13 +66,6 @@ const configurationItems = [
   },
 ];
 
-const accountItems = [
-  {
-    title: "Plans & Billing",
-    url: "/billing",
-    icon: CreditCard,
-  },
-];
 
 export const DashboardSidebar = () => {
   const pathname = usePathname();

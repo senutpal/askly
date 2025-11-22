@@ -1,270 +1,317 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { motion } from "motion/react";
+import { 
+  Layout, 
+  MessageSquare, 
+  Code2, 
+  Server, 
+  Lock, 
+  Database, 
+  ShieldAlert, 
+  Check, 
+  Copy, 
+  Key, 
+  Globe, 
+  Terminal,
+  Settings
+} from "lucide-react";
 import { DocLayout } from "@/features/docs/components/DocLayout";
-import { CodeBlock } from "@/features/docs/components/CodeBlock";
 import { envExamples } from "@/features/docs/config/content";
+
+// --- Shared UI Components (Reused from GettingStartedPage) ---
+
+const SectionHeading = ({ children, icon: Icon }: { children: React.ReactNode; icon?: any }) => (
+  <div className="flex items-center gap-3 mb-6 mt-12 first:mt-0">
+    {Icon && <Icon className="w-5 h-5 text-zinc-400" />}
+    <h2 className="text-2xl font-medium tracking-tight text-zinc-900 dark:text-white">
+      {children}
+    </h2>
+  </div>
+);
+
+const EnhancedCodeBlock = ({ code, language = "bash", filename }: { code: string, language?: string, filename?: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="group relative my-6 overflow-hidden rounded-xl bg-[#0D0D0D] border border-white/10 shadow-2xl">
+      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+        </div>
+        {filename && <span className="text-xs font-mono text-zinc-500">{filename}</span>}
+      </div>
+      <div className="relative p-6 overflow-x-auto">
+        <pre className="font-mono text-sm leading-relaxed text-zinc-300">
+          <code>{code}</code>
+        </pre>
+      </div>
+      <button
+        onClick={handleCopy}
+        className="absolute top-14 right-4 p-2 rounded-md bg-white/5 text-zinc-400 opacity-0 transition-all duration-200 hover:bg-white/10 hover:text-white group-hover:opacity-100 focus:opacity-100"
+      >
+        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+      </button>
+    </div>
+  );
+};
+
+const StepItem = ({ number, title, children }: { number: string, title: string, children: React.ReactNode }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      className="relative pl-12 pb-12 border-l border-zinc-200 dark:border-zinc-800 last:pb-0 last:border-l-0"
+    >
+      <div className="absolute -left-[17px] top-0 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white text-sm font-mono font-medium text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-black dark:text-zinc-400">
+        {number}
+      </div>
+      <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">{title}</h3>
+      <div className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
+const ConfigCard = ({ title, items }: { title: string, items: { key: string, desc: React.ReactNode }[] }) => (
+  <div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800">
+    <h4 className="font-medium text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+      <Settings className="w-4 h-4 text-zinc-400" />
+      {title}
+    </h4>
+    <ul className="space-y-4">
+      {items.map((item, idx) => (
+        <li key={idx} className="flex flex-col gap-1 text-sm">
+          <span className="font-mono text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-200 dark:bg-zinc-800 px-2 py-1 rounded w-fit">
+            {item.key}
+          </span>
+          <span className="text-zinc-600 dark:text-zinc-400 pl-1">
+            {item.desc}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+// --- Main Component ---
 
 export default function SetupPage() {
   return (
     <DocLayout
       title="Setup & Configuration"
-      description="Detailed configuration and environment setup for all Askly applications"
+      description="Detailed configuration and environment setup guide for all Askly application services."
     >
-      <div className="space-y-8">
+      <div className="space-y-16">
+        
         {/* Overview */}
         <section>
-          <p className="text-lg">
-            Askly requires environment variables to be configured for each application in the
-            monorepo. This page provides complete configuration details for all services.
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Askly operates as a monorepo requiring specific environment variables for each application. 
+            Ensure these are configured correctly to enable communication between the dashboard, widget, and backend services.
           </p>
         </section>
 
         {/* Web Dashboard */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Web Dashboard Configuration</h2>
-          <p className="mb-4">
-            Create <code className="px-2 py-1 bg-muted rounded text-sm">apps/web/.env.local</code>{" "}
-            with the following variables:
+          <SectionHeading icon={Layout}>Web Dashboard</SectionHeading>
+          <p className="mb-4 text-zinc-600 dark:text-zinc-400">
+            Create <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-sm font-mono">apps/web/.env.local</code> with the following variables:
           </p>
-          <CodeBlock code={envExamples.web} language="bash" filename="apps/web/.env.local" />
+          <EnhancedCodeBlock code={envExamples.web} language="bash" filename="apps/web/.env.local" />
           
-          <div className="mt-4 space-y-3">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Clerk Configuration</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  • <strong>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:</strong> Get from Clerk dashboard →
-                  API Keys
-                </li>
-                <li>
-                  • <strong>CLERK_SECRET_KEY:</strong> Secret key from same page (keep private!)
-                </li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Convex Configuration</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  • <strong>NEXT_PUBLIC_CONVEX_URL:</strong> Get from Convex dashboard after
-                  creating project
-                </li>
-                <li>
-                  • <strong>CONVEX_DEPLOYMENT:</strong> Your deployment name (from Convex setup)
-                </li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">URL Configuration</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  • <strong>NEXT_PUBLIC_WIDGET_URL:</strong> URL where widget app runs (localhost:3001
-                  for development)
-                </li>
-                <li>
-                  • <strong>NEXT_PUBLIC_APP_URL:</strong> URL of main app (localhost:3000 for
-                  development)
-                </li>
-              </ul>
-            </div>
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <ConfigCard 
+              title="Clerk Authentication"
+              items={[
+                { key: "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", desc: "Found in Clerk Dashboard → API Keys." },
+                { key: "CLERK_SECRET_KEY", desc: "Secret key from the same page. Keep this private." },
+              ]}
+            />
+            <ConfigCard 
+              title="Convex Database"
+              items={[
+                { key: "NEXT_PUBLIC_CONVEX_URL", desc: "Your deployment URL from the Convex dashboard." },
+                { key: "CONVEX_DEPLOYMENT", desc: "The deployment name generated during setup." },
+              ]}
+            />
+            <ConfigCard 
+              title="Service URLs"
+              items={[
+                { key: "NEXT_PUBLIC_WIDGET_URL", desc: "Where the widget runs (localhost:3001 for dev)." },
+                { key: "NEXT_PUBLIC_APP_URL", desc: "The main dashboard URL (localhost:3000 for dev)." },
+              ]}
+            />
           </div>
         </section>
 
         {/* Widget */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Widget Configuration</h2>
-          <p className="mb-4">
-            Create <code className="px-2 py-1 bg-muted rounded text-sm">apps/widget/.env.local</code>:
+          <SectionHeading icon={MessageSquare}>Chat Widget</SectionHeading>
+          <p className="mb-4 text-zinc-600 dark:text-zinc-400">
+            Create <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-sm font-mono">apps/widget/.env.local</code>:
           </p>
-          <CodeBlock
-            code={envExamples.widget}
-            language="bash"
-            filename="apps/widget/.env.local"
-          />
+          <EnhancedCodeBlock code={envExamples.widget} language="bash" filename="apps/widget/.env.local" />
           
-          <div className="mt-4 space-y-3">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Vapi Configuration</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  • <strong>NEXT_PUBLIC_VAPI_PUBLIC_KEY:</strong> Public key from Vapi dashboard
-                </li>
-                <li>
-                  • <strong>VAPI_PRIVATE_KEY:</strong> Private key (keep secure!)
-                </li>
-                <li>
-                  • Sign up at{" "}
-                  <a
-                    href="https://vapi.ai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    vapi.ai
-                  </a>{" "}
-                  to get these keys
-                </li>
-              </ul>
-            </div>
+          <div className="mt-6">
+            <ConfigCard 
+              title="Voice Intelligence"
+              items={[
+                { key: "NEXT_PUBLIC_VAPI_PUBLIC_KEY", desc: "Public key available in your Vapi dashboard." },
+                { key: "VAPI_PRIVATE_KEY", desc: "Private key used for server-side signing." },
+              ]}
+            />
+            <p className="mt-4 text-sm text-zinc-500">
+              Don't have keys? Sign up at <a href="https://vapi.ai" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">vapi.ai</a> to get started.
+            </p>
           </div>
         </section>
 
         {/* Embed */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Embed Script Configuration</h2>
-          <p className="mb-4">
-            Create <code className="px-2 py-1 bg-muted rounded text-sm">apps/embed/.env</code>:
+          <SectionHeading icon={Code2}>Embed Script</SectionHeading>
+          <p className="mb-4 text-zinc-600 dark:text-zinc-400">
+            Create <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-sm font-mono">apps/embed/.env</code>:
           </p>
-          <CodeBlock code={envExamples.embed} language="bash" filename="apps/embed/.env" />
+          <EnhancedCodeBlock code={envExamples.embed} language="bash" filename="apps/embed/.env" />
           
-          <div className="mt-4 p-4 border rounded-lg">
-            <h4 className="font-semibold mb-2">Widget URL</h4>
-            <p className="text-sm text-muted-foreground">
-              This should point to where your widget application is hosted. In development, it's
-              localhost:3001. In production, it would be your deployed widget URL (e.g.,
-              https://widget.yourdomain.com).
+          <div className="mt-4 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 flex gap-3">
+            <Globe className="w-5 h-5 text-zinc-400 shrink-0" />
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <strong>Widget URL:</strong> This points to your hosted widget application. In production, this would be <code className="text-xs bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded">https://widget.yourdomain.com</code>.
             </p>
           </div>
         </section>
 
         {/* Backend */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Backend Configuration</h2>
-          <p className="mb-4">
-            Create{" "}
-            <code className="px-2 py-1 bg-muted rounded text-sm">packages/backend/convex/.env</code>:
+          <SectionHeading icon={Server}>Backend & Intelligence</SectionHeading>
+          <p className="mb-4 text-zinc-600 dark:text-zinc-400">
+            Create <code className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-sm font-mono">packages/backend/convex/.env</code>:
           </p>
-          <CodeBlock
-            code={envExamples.backend}
-            language="bash"
-            filename="packages/backend/convex/.env"
-          />
+          <EnhancedCodeBlock code={envExamples.backend} language="bash" filename="packages/backend/convex/.env" />
           
-          <div className="mt-4 space-y-3">
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Google Gemini API</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  • Get API key from{" "}
-                  <a
-                    href="https://aistudio.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Google AI Studio
-                  </a>
-                </li>
-                <li>• Free tier available for development</li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Vapi Server</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Server-side API key from Vapi dashboard</li>
-                <li>• Different from public key used in widget</li>
-              </ul>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Master Key</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Used for encrypting sensitive data</li>
-                <li>• Must be at least 32 characters long</li>
-                <li>• Generate a secure random string (keep it secret!)</li>
-              </ul>
-            </div>
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <ConfigCard 
+              title="AI Providers"
+              items={[
+                { key: "GOOGLE_API_KEY", desc: <span>Get your key from <a href="https://aistudio.google.com" className="text-blue-600 hover:underline">Google AI Studio</a>.</span> },
+                { key: "VAPI_API_KEY", desc: "Server-side API key (different from the public key)." },
+              ]}
+            />
+            <ConfigCard 
+              title="Security"
+              items={[
+                { key: "MASTER_KEY", desc: "32+ char random string used for internal encryption." },
+              ]}
+            />
           </div>
         </section>
 
-        {/* Clerk Setup */}
+        {/* Clerk Setup Guide */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Clerk Setup</h2>
-          <div className="space-y-4">
-            <p>Follow these steps to configure Clerk for authentication:</p>
+          <SectionHeading icon={Lock}>Clerk Authentication Setup</SectionHeading>
+          <div className="mt-8">
+            <StepItem number="01" title="Create Application">
+              Go to <a href="https://clerk.com" className="text-blue-600 hover:underline">clerk.com</a>, create a new application, and select your preferred social login providers.
+            </StepItem>
             
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">1. Create Clerk Application</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Go to clerk.com and sign up/login</li>
-                <li>• Create a new application</li>
-                <li>• Choose your preferred social providers (optional)</li>
-              </ul>
-            </div>
+            <StepItem number="02" title="Enable Organizations">
+              Navigate to the <strong>Organizations</strong> tab in the Clerk sidebar and toggle the feature on. This is required for multi-tenancy support.
+            </StepItem>
 
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">2. Enable Organizations</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• In Clerk dashboard, go to "Organizations"</li>
-                <li>• Enable the Organizations feature</li>
-                <li>• This allows multi-tenancy support</li>
+            <StepItem number="03" title="Configure Callbacks">
+              Add the following URLs to your allowed callback list in the Clerk dashboard:
+              <ul className="mt-2 space-y-1 font-mono text-xs text-zinc-500">
+                <li>http://localhost:3000</li>
+                <li>http://localhost:3001</li>
               </ul>
-            </div>
+            </StepItem>
 
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">3. Configure Callback URLs</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                Add these URLs to allowed callback URLs:
-              </p>
-              <ul className="space-y-1 text-sm text-muted-foreground ml-4">
-                <li>• http://localhost:3000 (development)</li>
-                <li>• http://localhost:3001 (development)</li>
-                <li>• Your production URLs after deployment</li>
-              </ul>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">4. Get API Keys</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Go to API Keys section</li>
-                <li>• Copy Publishable Key and Secret Key</li>
-                <li>• Add them to your .env.local files</li>
-              </ul>
-            </div>
+            <StepItem number="04" title="Retrieve Keys">
+              Copy the <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code> and <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">CLERK_SECRET_KEY</code> into your environment files.
+            </StepItem>
           </div>
         </section>
 
-        {/* Convex Setup */}
+        {/* Convex Setup Guide */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">Convex Setup</h2>
-          <div className="space-y-4">
-            <p>The Convex setup is mostly automated during installation:</p>
-            
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Automated Setup</h4>
-              <CodeBlock code="cd packages/backend\npnpm run setup" language="bash" />
-              <p className="text-sm text-muted-foreground mt-3">
-                This command will guide you through creating a Convex project and automatically
-                configure the schema.
+          <SectionHeading icon={Database}>Convex Setup</SectionHeading>
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="p-6 rounded-2xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800">
+              <div className="flex items-center gap-2 mb-4">
+                <Terminal className="w-5 h-5 text-zinc-900 dark:text-white" />
+                <h3 className="font-medium text-zinc-900 dark:text-white">Automated Setup</h3>
+              </div>
+              <p className="text-sm text-zinc-500 mb-4">
+                Run the setup script to automatically create your project and configure schemas.
               </p>
+              <div className="bg-zinc-950 rounded-lg p-3 border border-zinc-800">
+                <code className="text-xs font-mono text-zinc-300">
+                  cd packages/backend<br/>
+                  pnpm run setup
+                </code>
+              </div>
             </div>
 
-            <div className="p-4 border rounded-lg">
-              <h4 className="font-semibold mb-2">Manual Configuration</h4>
-              <p className="text-sm text-muted-foreground mb-2">
-                If you prefer manual setup:
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                <li>• Create project at convex.dev</li>
-                <li>• Copy deployment URL</li>
-                <li>• Add to NEXT_PUBLIC_CONVEX_URL in all apps</li>
-                <li>• Run <code className="px-1.5 py-0.5 bg-muted rounded">npx convex dev</code> to sync schema</li>
+            <div className="p-6 rounded-2xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800">
+              <div className="flex items-center gap-2 mb-4">
+                <Settings className="w-5 h-5 text-zinc-900 dark:text-white" />
+                <h3 className="font-medium text-zinc-900 dark:text-white">Manual Config</h3>
+              </div>
+              <ul className="space-y-2 text-sm text-zinc-500">
+                <li>1. Create project at <a href="https://convex.dev" className="text-blue-600 hover:underline">convex.dev</a></li>
+                <li>2. Copy Deployment URL to env files</li>
+                <li>3. Run <code className="text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">npx convex dev</code> to sync</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* Important Notes */}
-        <section className="mt-12">
-          <div className="p-6 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 rounded-r-lg">
-            <h3 className="text-lg font-semibold mb-3">⚠️ Important Security Notes</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                • Never commit .env files to version control (they're in .gitignore by default)
-              </li>
-              <li>• Keep secret keys private - don't share them publicly</li>
-              <li>• Use different API keys for development and production</li>
-              <li>• Regenerate keys if they're accidentally exposed</li>
-              <li>• The MASTER_KEY should be a secure random string (min 32 chars)</li>
-            </ul>
-          </div>
+        {/* Security Warning */}
+        <section>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-900/30 p-6"
+          >
+            <div className="flex items-start gap-4">
+              <ShieldAlert className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-200 mb-2">
+                  Security Requirements
+                </h3>
+                <ul className="space-y-2 text-sm text-amber-800 dark:text-amber-400/80">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-amber-500" />
+                    Never commit .env files to version control.
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-amber-500" />
+                    Use distinct API keys for development vs. production environments.
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-amber-500" />
+                    Ensure your <code className="font-mono text-xs">MASTER_KEY</code> is a cryptographically secure random string.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
         </section>
+
       </div>
     </DocLayout>
   );
