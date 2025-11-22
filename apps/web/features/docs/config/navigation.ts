@@ -11,12 +11,13 @@ import {
   Wrench,
   Search,
   Handshake,
+  type LucideIcon,
 } from "lucide-react";
 export interface NavigationSection {
   title: string;
   href: string;
   description: string;
-  icon?: React.ComponentType;
+  icon?: LucideIcon;
 }
 
 export interface NavigationGroup {

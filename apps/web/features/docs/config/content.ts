@@ -35,8 +35,7 @@ MASTER_KEY=your-master-key-min-32-chars`,
 };
 
 export const codeExamples = {
-  embedBasic: `<!-- Add this script tag to your HTML -->
-<script
+  embedBasic: `<script
   src="https://your-domain.com/widget.js"
   data-organization-id="org_xxxxxxxx"
   data-position="bottom-right"
