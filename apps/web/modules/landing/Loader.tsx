@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 // --- Configuration ---
-const DURATION = 3; // seconds
+const DURATION = 4; // seconds
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Clean, technical decryption characters
 
 // --- Sub-component: Scramble Text Effect ---

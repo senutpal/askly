@@ -8,7 +8,7 @@ import LandingPage from "@/modules/landing/LandingPage";
 import Loader from "@/modules/landing/Loader";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 
-const MINIMUM_LOADING_TIME = 3000; // 3 seconds minimum
+const MINIMUM_LOADING_TIME = 1500; // 3 seconds minimum
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
