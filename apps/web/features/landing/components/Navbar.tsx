@@ -18,16 +18,11 @@ const navLinks = [
   { href: "/docs", label: "Docs" },
 ];
 
-/**
- * Navbar - Main navigation bar
- * Refactored into smaller components for better maintainability
- * Optimized with throttled scroll listener for performance
- */
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Throttle scroll handler to reduce calculations (fires max every 100ms)
   const handleScroll = useThrottle(() => {
     setIsScrolled(window.scrollY >= 20);
   }, 100);
@@ -37,7 +32,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Lock body scroll when menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -64,13 +58,11 @@ export default function Navbar() {
     >
       <div className="container relative mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 z-50">
             <Image alt="Logo" height={25} width={25} src="/logo.svg" />
             <span className="text-xl font-bold tracking-tight">Askly</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <DesktopNav links={navLinks} />
 
           {/* Desktop Auth */}

@@ -1,8 +1,23 @@
+import {
+  BookOpen,
+  Sparkles,
+  Rocket,
+  Settings,
+  Globe,
+  Plug,
+  Palette,
+  Layers,
+  BookCopy,
+  Wrench,
+  Search,
+  Handshake,
+  type LucideIcon,
+} from "lucide-react";
 export interface NavigationSection {
   title: string;
   href: string;
   description: string;
-  icon?: string;
+  icon?: LucideIcon;
 }
 
 export interface NavigationGroup {
@@ -18,19 +33,19 @@ export const documentationNavigation: NavigationGroup[] = [
         title: "Introduction",
         href: "/docs/introduction",
         description: "Learn what Askly is and how it can help your campus",
-        icon: "📖",
+        icon: BookOpen,
       },
       {
         title: "Features",
         href: "/docs/features",
         description: "Explore all the features Askly has to offer",
-        icon: "✨",
+        icon: Sparkles,
       },
       {
-        title: "Getting Started",
-        href: "/docs/getting-started",
+        title: "Quick Start",
+        href: "/docs/quick-start",
         description: "Quick start guide to get Askly running",
-        icon: "🚀",
+        icon: Rocket,
       },
     ],
   },
@@ -41,13 +56,13 @@ export const documentationNavigation: NavigationGroup[] = [
         title: "Setup & Installation",
         href: "/docs/setup",
         description: "Detailed configuration and environment setup",
-        icon: "⚙️",
+        icon: Settings,
       },
       {
         title: "Deployment",
         href: "/docs/deployment",
         description: "Deploy Askly to production",
-        icon: "🌐",
+        icon: Globe,
       },
     ],
   },
@@ -58,13 +73,13 @@ export const documentationNavigation: NavigationGroup[] = [
         title: "Widget Integration",
         href: "/docs/integration",
         description: "Embed Askly on your website",
-        icon: "🔌",
+        icon: Plug,
       },
       {
         title: "Customization",
         href: "/docs/customization",
         description: "Customize appearance and behavior",
-        icon: "🎨",
+        icon: Palette,
       },
     ],
   },
@@ -75,19 +90,19 @@ export const documentationNavigation: NavigationGroup[] = [
         title: "Architecture",
         href: "/docs/architecture",
         description: "Understand how Askly works under the hood",
-        icon: "🏗️",
+        icon: Layers,
       },
       {
         title: "Usage Guide",
         href: "/docs/usage-guide",
         description: "Complete guide for administrators",
-        icon: "📚",
+        icon: BookCopy,
       },
       {
         title: "API Reference",
         href: "/docs/api-reference",
         description: "API documentation and endpoints",
-        icon: "🔧",
+        icon: Wrench,
       },
     ],
   },
@@ -98,13 +113,13 @@ export const documentationNavigation: NavigationGroup[] = [
         title: "Troubleshooting",
         href: "/docs/troubleshooting",
         description: "Common issues and solutions",
-        icon: "🔍",
+        icon: Search,
       },
       {
         title: "Contributing",
         href: "/docs/contributing",
         description: "Contribute to Askly open source project",
-        icon: "🤝",
+        icon: Handshake,
       },
     ],
   },
