@@ -23,7 +23,7 @@ import { Button } from "@workspace/ui";
 import { Skeleton } from "@workspace/ui";
 import { SidebarTrigger } from "@workspace/ui";
 import { formatDistanceToNow } from "date-fns";
- 
+
 export default function Page() {
   const conversations = useQuery(api.private.conversations.getMany, {
     paginationOpts: { numItems: 100, cursor: null },
