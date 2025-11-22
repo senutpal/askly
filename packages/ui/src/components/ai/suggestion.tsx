@@ -1,9 +1,9 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { Button } from "@workspace/ui/components/button";
-import { ScrollArea, ScrollBar } from "@workspace/ui/components/scroll-area";
-import { cn } from "@workspace/ui/lib/utils";
+import { Button } from "@workspace/ui";
+import { ScrollArea, ScrollBar } from "@workspace/ui";
+import { cn } from "@workspace/ui";
 
 export type AISuggestionsProps = ComponentProps<typeof ScrollArea>;
 

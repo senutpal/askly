@@ -9,13 +9,13 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
-import { Badge } from "@workspace/ui/components/badge";
+import { Badge } from "@workspace/ui";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@workspace/ui";
+import { cn } from "@workspace/ui";
 
 export type AIToolStatus = "pending" | "running" | "completed" | "error";
 

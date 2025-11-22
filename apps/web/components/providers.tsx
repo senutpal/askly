@@ -5,7 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ThemeProvider, useTheme } from "next-themes";
-import { Toaster } from "@workspace/ui/components/sonner";
+import { Toaster } from "@workspace/ui";
 import { dark, neobrutalism } from "@clerk/themes";
 import * as React from "react";
 

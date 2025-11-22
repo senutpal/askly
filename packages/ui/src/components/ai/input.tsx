@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui";
 
 type UseAutoResizeTextareaProps = {
   minHeight: number;

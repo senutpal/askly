@@ -4,7 +4,7 @@ import { glass } from "@dicebear/collection";
 import { createAvatar } from "@dicebear/core";
 import { Avatar, AvatarImage } from "@workspace/ui/components/avatar";
 import { useMemo } from "react";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui";
 
 interface DicebearAvatarProps {
   seed: string;
@@ -15,7 +15,7 @@ interface DicebearAvatarProps {
   badgeImageUrl?: string;
 }
 
-export const DicebearAvatar = ({
+export const DiceBearAvatar = ({
   seed,
   size = 32,
   className,

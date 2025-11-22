@@ -1,4 +1,4 @@
-import { FilesView } from "@/modules/files/ui/views/files-view";
+import { FilesView } from "@/features/files/components/views/files-view";
 
 export default function Page() {
   return <FilesView />;

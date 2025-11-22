@@ -6,6 +6,7 @@ import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
   FormProvider,
+  useForm,
   useFormContext,
   useFormState,
   type ControllerProps,
@@ -13,7 +14,7 @@ import {
   type FieldValues,
 } from "react-hook-form"
 
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui"
 import { Label } from "@workspace/ui/components/label"
 
 const Form = FormProvider
@@ -164,4 +165,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  useForm,
 }

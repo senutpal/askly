@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui";
 
 type AIBranchContextType = {
   currentBranch: number;
