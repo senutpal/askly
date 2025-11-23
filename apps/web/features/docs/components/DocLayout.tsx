@@ -54,18 +54,18 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 		>
 			<div className="relative flex min-h-screen w-full">
 				{/* Fixed Header at the very top */}
-				<header className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<header className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between gap-4 border-b bg-background/95 px-4 md:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 					<div className="flex items-center gap-3">
 						<Link href="/" className="flex items-center space-x-2">
 							<Image alt="Logo" height={25} width={25} src="/logo.svg" />
-							<span className="text-xl font-bold tracking-tight">Askly</span>
+							<span className="text-xl font-bold tracking-tight hidden md:inline-block">Askly</span>
 						</Link>
-						<SidebarTrigger className="ml-24 h-8 w-8 text-muted-foreground hover:text-foreground" />
+						<SidebarTrigger className="ml-2 md:ml-24 h-8 w-8 text-muted-foreground hover:text-foreground" />
 						<div className="ml-1 mr-2 h-14 w-[1px] border-r bg-transparent" />
 
-						<Breadcrumb>
+						<Breadcrumb className="hidden md:block">
 							<BreadcrumbList>
-								<BreadcrumbItem className="hidden md:block">
+								<BreadcrumbItem>
 									<BreadcrumbLink
 										href="/docs"
 										className="flex items-center gap-1 hover:text-foreground"
@@ -87,7 +87,7 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 									</>
 								)}
 
-								<BreadcrumbSeparator>
+								<BreadcrumbSeparator className="hidden md:block">
 									<ChevronRight className="h-3.5 w-3.5 text-muted-foreground/70" />
 								</BreadcrumbSeparator>
 								<BreadcrumbItem>
@@ -103,10 +103,10 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 						{/* Search Button */}
 						<Button
 							variant="outline"
-							className="relative h-9 w-64 justify-start bg-background/50 text-sm font-normal text-muted-foreground shadow-sm hover:bg-accent/50"
+							className="relative h-9 w-9 md:w-64 justify-center md:justify-start bg-background/50 text-sm font-normal text-muted-foreground shadow-sm hover:bg-accent/50 px-0 md:px-4"
 						>
-							<Search className="mr-2 h-4 w-4" />
-							<span>Search docs...</span>
+							<Search className="h-4 w-4 md:mr-2" />
+							<span className="hidden md:inline-block">Search docs...</span>
 							<kbd className="pointer-events-none absolute right-2 top-1/2 hidden h-5 -translate-y-1/2 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium sm:flex">
 								<span className="text-xs">⌘</span>K
 							</kbd>
@@ -118,12 +118,15 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 
 				<Sidebar className="pt-14">
 					<SidebarContent className="px-2 py-2">
-						{documentationNavigation.map((group, index) => (
-							<Collapsible
-								key={group.group}
-								defaultOpen={index === 0}
-								className="group/collapsible"
-							>
+						{documentationNavigation.map((group, index) => {
+							const isGroupActive = group.group === activeGroup?.group;
+
+							return (
+								<Collapsible
+									key={group.group}
+									defaultOpen={isGroupActive || (index === 0 && !activeGroup)}
+									className="group/collapsible"
+								>
 								<SidebarGroup className="gap-1">
 									<SidebarGroupLabel asChild>
 										<CollapsibleTrigger className="w-full px-2  hover:text-foreground transition-colors">
@@ -180,7 +183,8 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 									</CollapsibleContent>
 								</SidebarGroup>
 							</Collapsible>
-						))}
+						);
+					})}
 					</SidebarContent>
 
 					{/* Bottom Rail for collapse action */}
