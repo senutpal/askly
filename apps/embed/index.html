@@ -124,7 +124,7 @@
         EMBED_CONFIG.DEFAULT_ORG_ID;
       document.getElementById("orgId").value = EMBED_CONFIG.DEFAULT_ORG_ID;
 
-      window.initWidget = function () {
+      window.initWidget = () => {
         const config = {
           organizationId:
             document.getElementById("orgId").value ||
@@ -138,7 +138,7 @@
         }
       };
 
-      window.showWidget = function () {
+      window.showWidget = () => {
         if (window.AsklyWidget) {
           window.AsklyWidget.show();
         } else {
@@ -146,13 +146,13 @@
         }
       };
 
-      window.hideWidget = function () {
+      window.hideWidget = () => {
         if (window.AsklyWidget) {
           window.AsklyWidget.hide();
         }
       };
 
-      window.destroyWidget = function () {
+      window.destroyWidget = () => {
         if (window.AsklyWidget) {
           window.AsklyWidget.destroy();
           console.log("Widget destroyed");

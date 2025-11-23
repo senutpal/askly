@@ -1,24 +1,24 @@
 import {
-  HTML_SCRIPT,
-  JAVASCRIPT_SCRIPT,
-  NEXTJS_SCRIPT,
-  REACT_SCRIPT,
-  type IntegrationId,
+	HTML_SCRIPT,
+	type IntegrationId,
+	JAVASCRIPT_SCRIPT,
+	NEXTJS_SCRIPT,
+	REACT_SCRIPT,
 } from "./constants";
 
 export const createScript = (
-  integrationId: IntegrationId,
-  organizationId: string
+	integrationId: IntegrationId,
+	organizationId: string,
 ): string => {
-  const map = {
-    html: HTML_SCRIPT,
-    react: REACT_SCRIPT,
-    nextjs: NEXTJS_SCRIPT,
-    javascript: JAVASCRIPT_SCRIPT,
-  } as const;
+	const map = {
+		html: HTML_SCRIPT,
+		react: REACT_SCRIPT,
+		nextjs: NEXTJS_SCRIPT,
+		javascript: JAVASCRIPT_SCRIPT,
+	} as const;
 
-  const script = map[integrationId];
-  if (!script) throw new Error(`Unknown integration ID: ${integrationId}`);
+	const script = map[integrationId];
+	if (!script) throw new Error(`Unknown integration ID: ${integrationId}`);
 
-  return script.replace(/{{ORGANIZATION_ID}}/g, organizationId);
+	return script.replace(/{{ORGANIZATION_ID}}/g, organizationId);
 };

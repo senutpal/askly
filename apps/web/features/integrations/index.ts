@@ -4,8 +4,7 @@
  */
 
 // Views
-export * from './components/views/integration-view';
-
+export * from "./components/views/integration-view";
+export * from "./constants";
 // Utils and constants
-export * from './utils';
-export * from './constants';
+export * from "./utils";
