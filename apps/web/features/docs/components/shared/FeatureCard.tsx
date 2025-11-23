@@ -35,9 +35,9 @@ export const FeatureCard = ({
 		</p>
 
 		<ul className="space-y-3">
-			{points.map((point, idx) => (
+			{points.map((point) => (
 				<li
-					key={idx}
+					key={point}
 					className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400"
 				>
 					<div className="mt-1.5 w-1 h-1 rounded-full bg-blue-500 shrink-0" />

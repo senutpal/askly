@@ -11,7 +11,7 @@ import {
 } from "@workspace/ui";
 import { CheckCircle, Copy, Phone, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useVapiPhoneNumbers } from "../../hooks/use-vapi-data";
+import { useVapiPhoneNumbers } from "../hooks/use-vapi-data";
 
 export const VapiPhoneNumbersTab = () => {
 	const { data: phoneNumbers, isLoading } = useVapiPhoneNumbers();

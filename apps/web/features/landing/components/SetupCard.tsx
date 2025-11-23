@@ -5,7 +5,6 @@ import { Upload, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
 
-
 export const SetupCard = React.memo(() => {
 	return (
 		<SpotlightCard className="md:col-span-6 lg:col-span-8 min-h-[350px] relative group">

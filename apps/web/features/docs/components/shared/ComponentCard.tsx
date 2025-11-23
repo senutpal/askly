@@ -22,9 +22,9 @@ export const ComponentCard = ({
 			{desc}
 		</p>
 		<div className="space-y-2">
-			{items.map((item, i) => (
+			{items.map((item) => (
 				<div
-					key={i}
+					key={item}
 					className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 font-mono"
 				>
 					<div className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />

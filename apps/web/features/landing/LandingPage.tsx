@@ -6,7 +6,7 @@ import { useMobileDetect } from "@/hooks/use-mobile-detect";
 const SplashCursor = dynamic(
 	() => import("@workspace/ui/components/splash-cursor"),
 	{
-		ssr: false, 
+		ssr: false,
 		loading: () => null,
 	},
 );

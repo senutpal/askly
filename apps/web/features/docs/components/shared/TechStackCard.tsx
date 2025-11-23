@@ -14,9 +14,9 @@ export const TechStackCard = ({ title, items }: TechStackCardProps) => (
 	>
 		<h4 className="font-medium text-zinc-900 dark:text-white mb-4">{title}</h4>
 		<ul className="space-y-3">
-			{items.map((item, idx) => (
+			{items.map((item) => (
 				<li
-					key={idx}
+					key={item.label}
 					className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400"
 				>
 					<div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 shrink-0" />

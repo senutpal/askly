@@ -25,19 +25,16 @@ const ContainerScroll = React.forwardRef<
 ContainerScroll.displayName = "ContainerScroll";
 
 const CardSticky = React.forwardRef<HTMLDivElement, CardStickyProps>(
-	(
-		{
-			index,
-			incrementY = 40,
-			scale = 0.95,
-			stickyTop = 0,
-			children,
-			className,
-			style,
-			...props
-		},
-		_ref,
-	) => {
+	({
+		index,
+		incrementY = 40,
+		scale = 0.95,
+		stickyTop = 0,
+		children,
+		className,
+		style,
+		...props
+	}) => {
 		const cardRef = React.useRef<HTMLDivElement>(null);
 		const [progress, setProgress] = React.useState(0);
 

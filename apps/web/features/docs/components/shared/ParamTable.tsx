@@ -21,8 +21,8 @@ export const ParamTable = ({ params }: ParamTableProps) => (
 				</tr>
 			</thead>
 			<tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 bg-white dark:bg-zinc-900/20">
-				{params.map((row, i) => (
-					<tr key={i}>
+				{params.map((row) => (
+					<tr key={row.name}>
 						<td className="px-4 py-3 font-mono text-zinc-700 dark:text-zinc-300">
 							{row.name}
 							{row.required && (

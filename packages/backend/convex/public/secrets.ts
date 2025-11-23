@@ -9,7 +9,10 @@ export const getVapiSecrets = action({
 	handler: async (ctx, args) => {
 		const plugin = (await ctx.runAction(
 			internal.system.secrets.getByOrganizationIdAndService,
-			{ organizationId: args.organizationId, service: "vapi" },
+			{
+				organizationId: args.organizationId,
+				service: "vapi",
+			},
 		)) as { privateApiKey: string; publicApiKey: string } | null;
 
 		if (!plugin) {

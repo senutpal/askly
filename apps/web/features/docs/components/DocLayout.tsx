@@ -166,9 +166,7 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
                                   `}
 																	/>
 																	<span
-																		className={`line-clamp-1 ${
-																			isActive ? "font-semibold" : ""
-																		}`}
+																		className={`line-clamp-1 ${isActive ? "font-semibold" : ""}`}
 																	>
 																		{section.title}
 																	</span>

@@ -17,7 +17,9 @@ export const create = action({
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.runQuery(
 			internal.system.contactSessions.getOne,
-			{ contactSessionId: args.contactSessionId },
+			{
+				contactSessionId: args.contactSessionId,
+			},
 		);
 
 		if (!contactSession || contactSession.expiresAt < Date.now()) {
@@ -28,7 +30,9 @@ export const create = action({
 		}
 		const conversation = await ctx.runQuery(
 			internal.system.conversations.getByThreadId,
-			{ threadId: args.threadId },
+			{
+				threadId: args.threadId,
+			},
 		);
 
 		if (!conversation) {

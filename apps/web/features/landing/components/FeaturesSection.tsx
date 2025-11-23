@@ -10,8 +10,8 @@ import {
 	Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { FeatureGrid } from "./features/FeatureGrid";
-import { FeaturesHeader } from "./features/FeaturesHeader";
+import { FeatureGrid } from "./FeatureGrid";
+import { FeaturesHeader } from "./FeaturesHeader";
 
 const features = [
 	{
@@ -20,7 +20,7 @@ const features = [
 		title: "Global Linguistics",
 		description:
 			"Native-level understanding in Hindi, English, and regional dialects powered by adaptive LLMs.",
-		color: "rgba(59, 130, 246, 1)", 
+		color: "rgba(59, 130, 246, 1)",
 	},
 	{
 		id: 2,
@@ -28,7 +28,7 @@ const features = [
 		title: "Neural Knowledge",
 		description:
 			"Ingests circulars and PDFs into a factual RAG pipeline for precise, hallucination-free recall.",
-		color: "rgba(16, 185, 129, 1)", 
+		color: "rgba(16, 185, 129, 1)",
 	},
 	{
 		id: 3,
@@ -36,7 +36,7 @@ const features = [
 		title: "Fluid Widgets",
 		description:
 			"Zero-latency embeddable conversational interfaces that adapt to any host environment.",
-		color: "rgba(249, 115, 22, 1)", 
+		color: "rgba(249, 115, 22, 1)",
 	},
 	{
 		id: 4,
@@ -52,7 +52,7 @@ const features = [
 		title: "Human Handoff",
 		description:
 			"Context-aware escalation protocols ensuring seamless transitions to human operators.",
-		color: "rgba(20, 184, 166, 1)", 
+		color: "rgba(20, 184, 166, 1)",
 	},
 	{
 		id: 6,
@@ -60,10 +60,9 @@ const features = [
 		title: "Infinite Scale",
 		description:
 			"Serverless architecture designed to handle massive concurrent session loads effortlessly.",
-		color: "rgba(234, 179, 8, 1)", 
+		color: "rgba(234, 179, 8, 1)",
 	},
 ];
-
 
 export default function EnterpriseFeatures() {
 	return (

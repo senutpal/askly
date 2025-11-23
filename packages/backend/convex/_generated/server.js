@@ -10,6 +10,7 @@
 
 import {
 	actionGeneric,
+	componentsGeneric,
 	httpActionGeneric,
 	internalActionGeneric,
 	internalMutationGeneric,

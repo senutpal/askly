@@ -22,8 +22,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { type Feature, PluginCard } from "../components/plugins-card";
-import { VapiConnectedView } from "../components/vapi-connected-view";
+import { type Feature, PluginCard } from "../plugins-card";
+import { VapiConnectedView } from "../vapi-connected-view";
 
 const vapiFeatures: Feature[] = [
 	{

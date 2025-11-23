@@ -9,7 +9,7 @@ import {
 	TableRow,
 } from "@workspace/ui";
 import { Bot } from "lucide-react";
-import { useVapiAssistants } from "../../hooks/use-vapi-data";
+import { useVapiAssistants } from "../hooks/use-vapi-data";
 
 export const VapiAssistantsTab = () => {
 	const { data: assistants, isLoading } = useVapiAssistants();

@@ -29,9 +29,7 @@ function formatTimezoneOffset(offsetMinutes: number): string {
 	const absMinutes = Math.abs(offsetMinutes);
 	const hours = Math.floor(absMinutes / 60);
 	const minutes = absMinutes % 60;
-	return `UTC${sign}${hours.toString().padStart(2, "0")}:${minutes
-		.toString()
-		.padStart(2, "0")}`;
+	return `UTC${sign}${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
 
 function formatDate(timestamp?: number) {

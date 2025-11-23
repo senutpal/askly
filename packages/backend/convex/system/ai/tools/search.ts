@@ -22,7 +22,9 @@ export const search = createTool({
 
 		const conversation = await ctx.runQuery(
 			internal.system.conversations.getByThreadId,
-			{ threadId: ctx.threadId },
+			{
+				threadId: ctx.threadId,
+			},
 		);
 
 		if (!conversation) {

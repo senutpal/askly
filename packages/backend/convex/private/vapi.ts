@@ -24,7 +24,10 @@ export const getPhoneNumbers = action({
 
 		const plugin = (await ctx.runAction(
 			internal.system.secrets.getByOrganizationIdAndService,
-			{ organizationId: orgId, service: "vapi" },
+			{
+				organizationId: orgId,
+				service: "vapi",
+			},
 		)) as { privateApiKey: string; publicApiKey: string } | null;
 
 		if (!plugin) {
@@ -67,7 +70,10 @@ export const getAssistants = action({
 
 		const plugin = (await ctx.runAction(
 			internal.system.secrets.getByOrganizationIdAndService,
-			{ organizationId: orgId, service: "vapi" },
+			{
+				organizationId: orgId,
+				service: "vapi",
+			},
 		)) as { privateApiKey: string; publicApiKey: string } | null;
 
 		if (!plugin) {

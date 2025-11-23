@@ -179,9 +179,9 @@ export const IntroductionView = () => {
 								label: "Enterprise Security",
 								desc: "Clerk Auth & Encryption",
 							},
-						].map((feature, idx) => (
+						].map((feature) => (
 							<div
-								key={idx}
+								key={feature.label}
 								className="group p-4 rounded-lg border  bg-white dark:bg-zinc-900/20  flex items-start gap-3"
 							>
 								<feature.icon className="w-5 h-5 text-zinc-400 group-hover:text-blue-500 transition-colors mt-0.5" />

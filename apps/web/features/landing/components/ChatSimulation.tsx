@@ -44,7 +44,12 @@ const messageSets = [
 			lang: "English",
 		},
 		{ id: 2, role: "ai", text: "You must pay by April 10.", lang: "English" },
-		{ id: 3, role: "user", text: "शुल्क कब तक जमा कर सकते हैं?", lang: "Hindi" },
+		{
+			id: 3,
+			role: "user",
+			text: "शुल्क कब तक जमा कर सकते हैं?",
+			lang: "Hindi",
+		},
 		{
 			id: 4,
 			role: "ai",
@@ -62,8 +67,18 @@ const messageSets = [
 			lang: "English",
 		},
 		{ id: 2, role: "ai", text: "Classes begin at 9 AM.", lang: "English" },
-		{ id: 3, role: "user", text: "क्लास कितने बजे से शुरू होती है?", lang: "Hindi" },
-		{ id: 4, role: "ai", text: "क्लास सुबह 9 बजे शुरू होती है।", lang: "Hindi" },
+		{
+			id: 3,
+			role: "user",
+			text: "क्लास कितने बजे से शुरू होती है?",
+			lang: "Hindi",
+		},
+		{
+			id: 4,
+			role: "ai",
+			text: "क्लास सुबह 9 बजे शुरू होती है।",
+			lang: "Hindi",
+		},
 	],
 
 	// 4. Hostel check-in
@@ -76,7 +91,12 @@ const messageSets = [
 		},
 		{ id: 2, role: "ai", text: "Check-in starts on July 15.", lang: "English" },
 		{ id: 3, role: "user", text: "হোস্টেলে কখন উঠতে পারবো?", lang: "Bengali" },
-		{ id: 4, role: "ai", text: "১৫ জুলাই থেকে হোস্টেলে ওঠা যাবে।", lang: "Bengali" },
+		{
+			id: 4,
+			role: "ai",
+			text: "১৫ জুলাই থেকে হোস্টেলে ওঠা যাবে।",
+			lang: "Bengali",
+		},
 	],
 
 	// 5. ID card issue
@@ -116,7 +136,12 @@ const messageSets = [
 			text: "Apply online and collect it at the library desk.",
 			lang: "English",
 		},
-		{ id: 3, role: "user", text: "লাইব্রেরি কার্ড কিভাবে পাবো?", lang: "Bengali" },
+		{
+			id: 3,
+			role: "user",
+			text: "লাইব্রেরি কার্ড কিভাবে পাবো?",
+			lang: "Bengali",
+		},
 		{
 			id: 4,
 			role: "ai",
@@ -180,7 +205,12 @@ const messageSets = [
 			text: "Submit the form on the portal.",
 			lang: "English",
 		},
-		{ id: 3, role: "user", text: "बोनाफाइड सर्टिफिकेट कैसे मिलेगा?", lang: "Hindi" },
+		{
+			id: 3,
+			role: "user",
+			text: "बोनाफाइड सर्टिफिकेट कैसे मिलेगा?",
+			lang: "Hindi",
+		},
 		{
 			id: 4,
 			role: "ai",
@@ -209,7 +239,12 @@ const messageSets = [
 			text: "ক্যাম্পাস ওয়াইফাইতে লগইন কিভাবে করবো?",
 			lang: "Bengali",
 		},
-		{ id: 4, role: "ai", text: "স্টুডেন্ট ইমেইল দিয়ে লগইন করুন।", lang: "Bengali" },
+		{
+			id: 4,
+			role: "ai",
+			text: "স্টুডেন্ট ইমেইল দিয়ে লগইন করুন।",
+			lang: "Bengali",
+		},
 	],
 ];
 

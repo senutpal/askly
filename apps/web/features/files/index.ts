@@ -4,8 +4,8 @@
  */
 
 // Components
-export * from "./components/components/delete-file-dialog";
-export * from "./components/components/upload-dialog";
+export * from "./components/delete-file-dialog";
+export * from "./components/upload-dialog";
 
 // Views
 export * from "./components/views/files-view";

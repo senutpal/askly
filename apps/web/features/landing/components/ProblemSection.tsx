@@ -11,8 +11,8 @@ import {
 import { useScroll } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
-import { ProblemNarrative } from "./problem/ProblemNarrative";
-import { ProblemStack } from "./problem/ProblemStack";
+import { ProblemNarrative } from "./ProblemNarrative";
+import { ProblemStack } from "./ProblemStack";
 
 const problems = [
 	{

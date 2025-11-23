@@ -5,6 +5,7 @@ The main administrative dashboard for the Askly platform.
 ## Overview
 
 This application provides the interface for administrators to:
+
 - Manage organization settings
 - View conversation history and analytics
 - Manage knowledge base documents

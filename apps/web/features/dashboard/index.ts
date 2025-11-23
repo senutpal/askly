@@ -6,10 +6,10 @@
 // State & Constants
 export * from "./atoms";
 // Components
-export * from "./components/components/contact-panel";
-export * from "./components/components/conversation-status-button";
-export * from "./components/components/conversations-panel";
-export * from "./components/components/dashboard-sidebar";
+export * from "./components/contact-panel";
+export * from "./components/conversation-status-button";
+export * from "./components/conversations-panel";
+export * from "./components/dashboard-sidebar";
 // Layouts
 export * from "./components/layouts/conversation-id-layout";
 export * from "./components/layouts/conversations-layout";

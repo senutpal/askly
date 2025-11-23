@@ -283,7 +283,7 @@ export default {
 									desc: "Check your Askly dashboard logs to see the conversation recorded.",
 								},
 							].map((step, idx) => (
-								<div key={idx} className="p-6">
+								<div key={step.title} className="p-6">
 									<div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-4 text-sm font-medium text-zinc-600 dark:text-zinc-300">
 										{idx + 1}
 									</div>
@@ -317,9 +317,9 @@ export default {
 								text: "Monitor analytics for engagement stats",
 								icon: MousePointerClick,
 							},
-						].map((item, i) => (
+						].map((item) => (
 							<div
-								key={i}
+								key={item.text}
 								className="flex items-start gap-3 p-4 rounded-lg border border-green-200/50 bg-green-50/30 dark:border-green-900/30 dark:bg-green-900/10"
 							>
 								<item.icon className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />

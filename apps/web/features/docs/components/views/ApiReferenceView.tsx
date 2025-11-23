@@ -250,8 +250,8 @@ export const ApiReferenceView = () => {
 										code: "500",
 										label: "Internal Server Error - Retry operation",
 									},
-								].map((err, i) => (
-									<li key={i} className="flex items-start gap-3 text-sm">
+								].map((err) => (
+									<li key={err.code} className="flex items-start gap-3 text-sm">
 										<span className="font-mono font-bold text-red-500">
 											{err.code}
 										</span>

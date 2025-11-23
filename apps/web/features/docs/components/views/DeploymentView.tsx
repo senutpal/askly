@@ -251,9 +251,9 @@ export const DeploymentView = () => {
 								desc: "Check Vercel Analytics for errors",
 								icon: Server,
 							},
-						].map((item, i) => (
+						].map((item) => (
 							<div
-								key={i}
+								key={item.title}
 								className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/20"
 							>
 								<item.icon className="w-5 h-5 text-zinc-400 mb-3" />

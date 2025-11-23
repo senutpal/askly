@@ -2,5 +2,5 @@
  * Barrel export for all config
  */
 
-export * from "./languages";
-export * from "./themes";
+export * from "./languages.js";
+export * from "./themes.js";

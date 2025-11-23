@@ -3,11 +3,11 @@
 import { RadialPattern } from "@workspace/ui";
 import { useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
-import { AvailabilityCard } from "./solution/AvailabilityCard";
-import { MultilingualCard } from "./solution/MultilingualCard";
-import { ROICard } from "./solution/ROICard";
-import { SetupCard } from "./solution/SetupCard";
-import { SolutionHeader } from "./solution/SolutionHeader";
+import { AvailabilityCard } from "./AvailabilityCard";
+import { MultilingualCard } from "./MultilingualCard";
+import { ROICard } from "./ROICard";
+import { SetupCard } from "./SetupCard";
+import { SolutionHeader } from "./SolutionHeader";
 
 export default function SolutionRedesign() {
 	const containerRef = useRef<HTMLDivElement>(null);

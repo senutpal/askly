@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { statusFilterAtom } from "../../atoms";
+import { statusFilterAtom } from "../atoms";
 
 export const ConversationsPanel = () => {
 	const statusFilter = useAtomValue(statusFilterAtom);
@@ -182,6 +182,7 @@ export const SkeletonConversations = () => {
 						{Array.from({ length: 8 }).map((_, index) => (
 							<div
 								className="flex items-start gap-3 rounded-lg p-4"
+								// biome-ignore lint/suspicious/noArrayIndexKey:Skeleton loader, index is fine
 								key={index}
 							>
 								<Skeleton className="h-10 w-10 shrink-0 rounded-full" />

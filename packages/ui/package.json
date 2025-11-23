@@ -4,7 +4,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"lint": "eslint . --max-warnings 0"
+		"lint": "biome check .."
 	},
 	"dependencies": {
 		"@dicebear/collection": "^9.2.4",
@@ -64,7 +64,6 @@
 		"@turbo/gen": "^2.5.5",
 		"@types/react": "^19.1.9",
 		"@types/react-dom": "^19.1.7",
-		"@workspace/eslint-config": "workspace:^",
 		"@workspace/typescript-config": "workspace:*",
 		"tailwindcss": "^4.1.11"
 	},

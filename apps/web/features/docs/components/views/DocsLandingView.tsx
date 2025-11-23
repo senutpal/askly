@@ -24,13 +24,13 @@ export const DocsLandingView = () => {
 							Documentation
 						</Link>
 						<Link
-							href="#"
+							href="/docs/api-reference"
 							className="hover:text-zinc-900 transition-colors dark:hover:text-zinc-100"
 						>
 							API
 						</Link>
 						<Link
-							href="#"
+							href="/changelog" // TODO: Add changelog page
 							className="hover:text-zinc-900 transition-colors dark:hover:text-zinc-100"
 						>
 							Changelog
@@ -132,19 +132,19 @@ export const DocsLandingView = () => {
 					</p>
 					<div className="flex gap-6">
 						<a
-							href="#"
+							href="/privacy" // TODO: Add privacy page
 							className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
 						>
 							Privacy
 						</a>
 						<a
-							href="#"
+							href="/terms" // TODO: Add terms page
 							className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
 						>
 							Terms
 						</a>
 						<a
-							href="#"
+							href="https://twitter.com" // TODO: Add twitter link
 							className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
 						>
 							Twitter

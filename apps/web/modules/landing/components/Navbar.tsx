@@ -6,7 +6,7 @@ import { ArrowRight, Menu, Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion, useScroll } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "next-themes"; 
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const navLinks = [
@@ -55,7 +55,6 @@ const DesktopNavLink = ({ href, label }: { href: string; label: string }) => {
 		</Link>
 	);
 };
-
 
 export default function Navbar() {
 	const { scrollY } = useScroll();

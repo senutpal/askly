@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
-const DURATION = 4; 
+const DURATION = 4;
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const ScrambleText = ({
 	text,

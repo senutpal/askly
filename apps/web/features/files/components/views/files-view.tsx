@@ -27,9 +27,9 @@ import {
 	TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { DeleteFileDialog } from "../components/delete-file-dialog";
-import { UploadDialog } from "../components/upload-dialog";
-import { WebCrawlerDialog } from "../components/web-crawler-dialog";
+import { DeleteFileDialog } from "../delete-file-dialog";
+import { UploadDialog } from "../upload-dialog";
+import { WebCrawlerDialog } from "../web-crawler-dialog";
 
 export const FilesView = () => {
 	const files = usePaginatedQuery(

@@ -4,7 +4,11 @@ import { useOrganization } from "@clerk/nextjs";
 import { AuthLayout } from "@/features/auth/components/layouts/auth-layout";
 import { OrgSelectionView } from "@/features/auth/components/views/org-selection-view";
 
-const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
+export const OrganizationGuard = ({
+	children,
+}: {
+	children: React.ReactNode;
+}) => {
 	const { organization, isLoaded } = useOrganization();
 
 	if (!isLoaded) {
@@ -24,5 +28,3 @@ const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
 	}
 	return <AuthLayout>{children}</AuthLayout>;
 };
-
-export default OrganizationGuard;

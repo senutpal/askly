@@ -5,7 +5,6 @@ import { BarChart3 } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
 
-
 export const ROICard = React.memo(() => {
 	return (
 		<SpotlightCard className="md:col-span-3 lg:col-span-4 min-h-[350px]">

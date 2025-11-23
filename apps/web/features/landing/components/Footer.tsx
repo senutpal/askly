@@ -4,10 +4,10 @@ import { CrossDotPattern } from "@workspace/ui";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import React, { useRef } from "react";
-import { FooterBottom } from "./footer/FooterBottom";
-import { FooterBrand } from "./footer/FooterBrand";
-import { FooterNav } from "./footer/FooterNav";
-import { SocialButtons } from "./footer/SocialButtons";
+import { FooterBottom } from "./FooterBottom";
+import { FooterBrand } from "./FooterBrand";
+import { FooterNav } from "./FooterNav";
+import { SocialButtons } from "./SocialButtons";
 
 // --- Data ---
 const productLinks = [

@@ -7,9 +7,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useThrottle } from "@/hooks/use-throttle";
-import { DesktopNav } from "./navbar/DesktopNav";
-import { MobileMenu } from "./navbar/MobileMenu";
-import { NavbarActions } from "./navbar/NavbarActions";
+import { DesktopNav } from "./DesktopNav";
+import { MobileMenu } from "./MobileMenu";
+import { NavbarActions } from "./NavbarActions";
 
 const navLinks = [
 	{ href: "#problem", label: "Problem" },

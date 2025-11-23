@@ -54,11 +54,18 @@ export const ResourceItem = ({
 }: ResourceItemProps) => {
 	return (
 		<div
+			role="button"
+			tabIndex={0}
 			className={cn(
 				"flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors",
 				isSelected ? "bg-muted/50 border-primary" : "hover:bg-muted/30",
 			)}
 			onClick={onToggle}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					onToggle();
+				}
+			}}
 		>
 			<Checkbox
 				checked={isSelected}

@@ -31,7 +31,7 @@ import { MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ConversationStatusButton } from "../components/conversation-status-button";
+import { ConversationStatusButton } from "../conversation-status-button";
 
 const formSchema = z.object({
 	message: z.string().min(1, "Message is required"),
@@ -270,6 +270,7 @@ export const ConversationIdViewLoading = () => {
 									"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
 									isUser ? "is-user" : "is-assistant flex-row-reverse",
 								)}
+								// biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loader, index is fine
 								key={index}
 							>
 								<Skeleton

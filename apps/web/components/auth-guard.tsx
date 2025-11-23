@@ -3,16 +3,14 @@
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { AnimatePresence } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { AuthLayout } from "@/features/auth";
+import { AuthLayout, LandingLayout } from "@/features/auth";
 import LandingPage from "@/features/landing/LandingPage";
 import Loader from "@/features/landing/Loader";
-import LandingLayout from "@/features/auth/components/layouts/landing-layout";
 
 const MINIMUM_LOADING_TIME = 1500;
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 	const [isLoading, setIsLoading] = useState(true);
-	const [_canHide, setCanHide] = useState(false);
 	const startTimeRef = useRef<number>(Date.now());
 
 	useEffect(() => {
@@ -22,15 +20,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 		} else {
 			document.body.style.overflow = "auto";
 		}
-  }, [isLoading]);
-  
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setCanHide(true);
-		}, MINIMUM_LOADING_TIME);
-
-		return () => clearTimeout(timer);
-	}, []);
+	}, [isLoading]);
 
 	const handleLoaderComplete = () => {
 		const elapsed = Date.now() - startTimeRef.current;
@@ -44,7 +34,6 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 			setIsLoading(false);
 		}
 	};
-
 	return (
 		<>
 			<AnimatePresence mode="wait">
@@ -53,12 +42,12 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 
 			<AuthLoading>
 				<div className="hidden" />
-      </AuthLoading>
-      
+			</AuthLoading>
+
 			<Authenticated>
 				<AuthLayout>{children}</AuthLayout>
-      </Authenticated>
-      
+			</Authenticated>
+
 			<Unauthenticated>
 				<LandingLayout>
 					<LandingPage />

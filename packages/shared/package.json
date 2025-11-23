@@ -22,11 +22,10 @@
 		}
 	},
 	"scripts": {
-		"lint": "eslint .",
+		"lint": "biome check .",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@workspace/eslint-config": "workspace:*",
 		"@workspace/typescript-config": "workspace:*",
 		"typescript": "^5.9.2"
 	},
