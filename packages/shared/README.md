@@ -16,16 +16,16 @@ src/
 
 ```typescript
 // Import shared types
-import type { ChatMessage, UserRole } from '@workspace/shared/types'
+import type { ChatMessage, UserRole } from "@workspace/shared/types";
 
 // Import shared utilities
-import { formatDate, validateEmail } from '@workspace/shared/utils'
+import { formatDate, validateEmail } from "@workspace/shared/utils";
 
 // Import shared constants
-import { API_ROUTES, SUPPORTED_LANGUAGES } from '@workspace/shared/constants'
+import { API_ROUTES, SUPPORTED_LANGUAGES } from "@workspace/shared/constants";
 
 // Import shared config
-import { getLanguageConfig } from '@workspace/shared/config'
+import { getLanguageConfig } from "@workspace/shared/config";
 ```
 
 ## Adding New Exports

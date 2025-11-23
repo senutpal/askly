@@ -1,75 +1,58 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { AnimatePresence } from "motion/react";
-import { AuthLayout } from "@/features/auth/components/layouts/auth-layout";
-import LandingLayout from "@/features/auth/components/layouts/landing-layout";
+import { useEffect, useRef, useState } from "react";
+import { AuthLayout, LandingLayout } from "@/features/auth";
 import LandingPage from "@/features/landing/LandingPage";
 import Loader from "@/features/landing/Loader";
-import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 
-const MINIMUM_LOADING_TIME = 1500; // 3 seconds minimum
+const MINIMUM_LOADING_TIME = 1500;
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [canHide, setCanHide] = useState(false);
-  const startTimeRef = useRef<number>(Date.now());
+	const [isLoading, setIsLoading] = useState(true);
+	const startTimeRef = useRef<number>(Date.now());
 
-  // Lock scroll when loading
-  useEffect(() => {
-    if (isLoading) {
-      document.body.style.overflow = "hidden";
-      window.scrollTo(0, 0);
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [isLoading]);
+	useEffect(() => {
+		if (isLoading) {
+			document.body.style.overflow = "hidden";
+			window.scrollTo(0, 0);
+		} else {
+			document.body.style.overflow = "auto";
+		}
+	}, [isLoading]);
 
-  // Ensure minimum loading time
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCanHide(true);
-    }, MINIMUM_LOADING_TIME);
+	const handleLoaderComplete = () => {
+		const elapsed = Date.now() - startTimeRef.current;
+		const remaining = MINIMUM_LOADING_TIME - elapsed;
 
-    return () => clearTimeout(timer);
-  }, []);
+		if (remaining > 0) {
+			setTimeout(() => {
+				setIsLoading(false);
+			}, remaining);
+		} else {
+			setIsLoading(false);
+		}
+	};
+	return (
+		<>
+			<AnimatePresence mode="wait">
+				{isLoading && <Loader onComplete={handleLoaderComplete} />}
+			</AnimatePresence>
 
-  // Handle loader completion
-  const handleLoaderComplete = () => {
-    const elapsed = Date.now() - startTimeRef.current;
-    const remaining = MINIMUM_LOADING_TIME - elapsed;
+			<AuthLoading>
+				<div className="hidden" />
+			</AuthLoading>
 
-    if (remaining > 0) {
-      // Wait for the remaining time before hiding
-      setTimeout(() => {
-        setIsLoading(false);
-      }, remaining);
-    } else {
-      // Time already exceeded, hide immediately
-      setIsLoading(false);
-    }
-  };
+			<Authenticated>
+				<AuthLayout>{children}</AuthLayout>
+			</Authenticated>
 
-  return (
-    <>
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <Loader onComplete={handleLoaderComplete} />
-        )}
-      </AnimatePresence>
-
-      <AuthLoading>
-        {/* Keep empty or minimal during auth check - loader handles the UI */}
-        <div className="hidden" />
-      </AuthLoading>
-      <Authenticated>
-        <AuthLayout>{children}</AuthLayout>
-      </Authenticated>
-      <Unauthenticated>
-        <LandingLayout>
-          <LandingPage />
-        </LandingLayout>
-      </Unauthenticated>
-    </>
-  );
+			<Unauthenticated>
+				<LandingLayout>
+					<LandingPage />
+				</LandingLayout>
+			</Unauthenticated>
+		</>
+	);
 };

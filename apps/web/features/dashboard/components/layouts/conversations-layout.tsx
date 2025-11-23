@@ -1,26 +1,26 @@
 import {
-  ResizableHandle,
-  ResizablePanelGroup,
-  ResizablePanel,
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
 } from "@workspace/ui";
-import { ConversationsPanel } from "../components/conversations-panel";
+import { ConversationsPanel } from "../conversations-panel";
 
 export const ConversationsLayout = ({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) => {
-  return (
-    <ResizablePanelGroup className="h-full flex-1" direction="horizontal">
-      <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
-        <ConversationsPanel />
-      </ResizablePanel>
+	return (
+		<ResizablePanelGroup className="h-full flex-1" direction="horizontal">
+			<ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+				<ConversationsPanel />
+			</ResizablePanel>
 
-      <ResizableHandle />
+			<ResizableHandle />
 
-      <ResizablePanel className="h-full " defaultSize={70}>
-        {children}
-      </ResizablePanel>
-    </ResizablePanelGroup>
-  );
+			<ResizablePanel className="h-full " defaultSize={70}>
+				{children}
+			</ResizablePanel>
+		</ResizablePanelGroup>
+	);
 };

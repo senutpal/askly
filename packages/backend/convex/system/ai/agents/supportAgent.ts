@@ -6,7 +6,7 @@ import { SUPPORT_AGENT_PROMPT } from "../constants";
 const gemini = google("gemini-2.5-flash");
 
 export const supportAgent = new Agent(components.agent, {
-  name: "Askly",
-  languageModel: gemini,
-  instructions: SUPPORT_AGENT_PROMPT,
+	name: "Askly",
+	languageModel: gemini,
+	instructions: SUPPORT_AGENT_PROMPT,
 });

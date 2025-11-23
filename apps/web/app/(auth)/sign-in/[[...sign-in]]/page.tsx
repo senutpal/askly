@@ -1,5 +1,5 @@
 import { SignInView } from "@/features/auth";
 
 export default function Page() {
-  return <SignInView />;
+	return <SignInView />;
 }

@@ -5,6 +5,7 @@ The embeddable chat widget application for Askly.
 ## Overview
 
 This Next.js application renders the actual chat interface that appears within the iframe on client websites. It handles:
+
 - Real-time chat with Convex
 - Voice input/output with Vapi
 - UI rendering

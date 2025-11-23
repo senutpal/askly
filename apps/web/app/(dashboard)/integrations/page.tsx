@@ -1,7 +1,7 @@
-import { IntegrationsView } from '@/features/integrations';
+import { IntegrationsView } from "@/features/integrations";
 
 const page = () => {
-  return <IntegrationsView />;
+	return <IntegrationsView />;
 };
 
 export default page;

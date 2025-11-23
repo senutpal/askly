@@ -4,24 +4,24 @@
  */
 
 :root {
-  /* ========================================
+	/* ========================================
      Animation Durations
      ======================================== */
-  --duration-instant: 0ms;
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 350ms;
-  --duration-slower: 500ms;
-  --duration-extra-slow: 1500ms;
+	--duration-instant: 0ms;
+	--duration-fast: 150ms;
+	--duration-normal: 250ms;
+	--duration-slow: 350ms;
+	--duration-slower: 500ms;
+	--duration-extra-slow: 1500ms;
 
-  /* ========================================
+	/* ========================================
      Easing Functions
      ======================================== */
-  --ease-linear: linear;
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	--ease-linear: linear;
+	--ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--ease-out: cubic-bezier(0, 0, 0.2, 1);
+	--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+	--ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 /* ========================================
@@ -29,96 +29,96 @@
    ======================================== */
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
 @keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }
 
 @keyframes slide-up {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
 
 @keyframes slide-down {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+	from {
+		transform: translateY(-20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
 
 @keyframes slide-in-left {
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+	from {
+		transform: translateX(-20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
 }
 
 @keyframes slide-in-right {
-  from {
-    transform: translateX(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+	from {
+		transform: translateX(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
 }
 
 @keyframes scale-in {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+	from {
+		transform: scale(0.95);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
 
 @keyframes scale-out {
-  from {
-    transform: scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: scale(0.95);
-    opacity: 0;
-  }
+	from {
+		transform: scale(1);
+		opacity: 1;
+	}
+	to {
+		transform: scale(0.95);
+		opacity: 0;
+	}
 }
 
 @keyframes shine {
-  0% {
-    background-position: 100%;
-  }
-  100% {
-    background-position: -100%;
-  }
+	0% {
+		background-position: 100%;
+	}
+	100% {
+		background-position: -100%;
+	}
 }
 
 /* ========================================
@@ -126,193 +126,193 @@
    ======================================== */
 
 @layer utilities {
-  /* Transitions */
-  .transition-colors-smooth {
-    transition-property: color, background-color, border-color;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-in-out);
-  }
+	/* Transitions */
+	.transition-colors-smooth {
+		transition-property: color, background-color, border-color;
+		transition-duration: var(--duration-normal);
+		transition-timing-function: var(--ease-in-out);
+	}
 
-  .transition-transform-smooth {
-    transition-property: transform;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-in-out);
-  }
+	.transition-transform-smooth {
+		transition-property: transform;
+		transition-duration: var(--duration-normal);
+		transition-timing-function: var(--ease-in-out);
+	}
 
-  .transition-opacity-smooth {
-    transition-property: opacity;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-in-out);
-  }
+	.transition-opacity-smooth {
+		transition-property: opacity;
+		transition-duration: var(--duration-normal);
+		transition-timing-function: var(--ease-in-out);
+	}
 
-  .transition-all-smooth {
-    transition-property: all;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-in-out);
-  }
+	.transition-all-smooth {
+		transition-property: all;
+		transition-duration: var(--duration-normal);
+		transition-timing-function: var(--ease-in-out);
+	}
 
-  /* Animation classes */
-  .animate-fade-in {
-    animation: fade-in var(--duration-normal) var(--ease-out);
-  }
+	/* Animation classes */
+	.animate-fade-in {
+		animation: fade-in var(--duration-normal) var(--ease-out);
+	}
 
-  .animate-fade-out {
-    animation: fade-out var(--duration-normal) var(--ease-in);
-  }
+	.animate-fade-out {
+		animation: fade-out var(--duration-normal) var(--ease-in);
+	}
 
-  .animate-slide-up {
-    animation: slide-up var(--duration-extra-slow) var(--ease-out);
-  }
+	.animate-slide-up {
+		animation: slide-up var(--duration-extra-slow) var(--ease-out);
+	}
 
-  .animate-slide-down {
-    animation: slide-down var(--duration-extra-slow) var(--ease-out);
-  }
+	.animate-slide-down {
+		animation: slide-down var(--duration-extra-slow) var(--ease-out);
+	}
 
-  .animate-slide-in-left {
-    animation: slide-in-left var(--duration-extra-slow) var(--ease-out);
-  }
+	.animate-slide-in-left {
+		animation: slide-in-left var(--duration-extra-slow) var(--ease-out);
+	}
 
-  .animate-slide-in-right {
-    animation: slide-in-right var(--duration-extra-slow) var(--ease-out);
-  }
+	.animate-slide-in-right {
+		animation: slide-in-right var(--duration-extra-slow) var(--ease-out);
+	}
 
-  .animate-scale-in {
-    animation: scale-in var(--duration-normal) var(--ease-out);
-  }
+	.animate-scale-in {
+		animation: scale-in var(--duration-normal) var(--ease-out);
+	}
 
-  .animate-scale-out {
-    animation: scale-out var(--duration-normal) var(--ease-in);
-  }
-  .animate-shine {
-    animation: shine 5s var(--ease-linear) infinite;
-  }
+	.animate-scale-out {
+		animation: scale-out var(--duration-normal) var(--ease-in);
+	}
+	.animate-shine {
+		animation: shine 5s var(--ease-linear) infinite;
+	}
 }
 
 /* Add to your animation tokens CSS */
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
 }
 
 @layer utilities {
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
+	.animate-float {
+		animation: float 3s ease-in-out infinite;
+	}
 
-  .shadow-3xl {
-    box-shadow:
-      0px 1px 2px 0px hsl(0 0% 0% / 0.18),
-      0px 12px 16px -1px hsl(0 0% 0% / 0.18);
-  }
+	.shadow-3xl {
+		box-shadow:
+			0px 1px 2px 0px hsl(0 0% 0% / 0.18),
+			0px 12px 16px -1px hsl(0 0% 0% / 0.18);
+	}
 
-  .dark .shadow-3xl {
-    box-shadow:
-      0px 1px 2px 0px hsl(0 0% 0% / 0.25),
-      0px 12px 16px -1px hsl(0 0% 0% / 0.25);
-  }
+	.dark .shadow-3xl {
+		box-shadow:
+			0px 1px 2px 0px hsl(0 0% 0% / 0.25),
+			0px 12px 16px -1px hsl(0 0% 0% / 0.25);
+	}
 }
 
 /* Add to your animation tokens CSS */
 
 @keyframes blob {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(20px, -50px) scale(1.1);
-  }
-  50% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  75% {
-    transform: translate(50px, 50px) scale(1.05);
-  }
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	25% {
+		transform: translate(20px, -50px) scale(1.1);
+	}
+	50% {
+		transform: translate(-20px, 20px) scale(0.9);
+	}
+	75% {
+		transform: translate(50px, 50px) scale(1.05);
+	}
 }
 
 @keyframes float-random {
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate(30px, -30px) rotate(5deg);
-  }
-  50% {
-    transform: translate(-20px, 20px) rotate(-5deg);
-  }
-  75% {
-    transform: translate(40px, 10px) rotate(3deg);
-  }
+	0%,
+	100% {
+		transform: translate(0, 0) rotate(0deg);
+	}
+	25% {
+		transform: translate(30px, -30px) rotate(5deg);
+	}
+	50% {
+		transform: translate(-20px, 20px) rotate(-5deg);
+	}
+	75% {
+		transform: translate(40px, 10px) rotate(3deg);
+	}
 }
 
 @keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 
 @keyframes progress {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(0);
+	}
 }
 
 @layer utilities {
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
+	.animate-blob {
+		animation: blob 7s infinite;
+	}
 
-  .animate-float-random {
-    animation: float-random 20s ease-in-out infinite;
-  }
+	.animate-float-random {
+		animation: float-random 20s ease-in-out infinite;
+	}
 
-  .animate-gradient {
-    animation: gradient 8s ease infinite;
-    background-size: 200% 200%;
-  }
+	.animate-gradient {
+		animation: gradient 8s ease infinite;
+		background-size: 200% 200%;
+	}
 
-  .animate-progress {
-    animation: progress 1.5s ease-out;
-  }
+	.animate-progress {
+		animation: progress 1.5s ease-out;
+	}
 
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
+	.animation-delay-2000 {
+		animation-delay: 2s;
+	}
 
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
+	.animation-delay-4000 {
+		animation-delay: 4s;
+	}
 
-  /* Perspective utilities */
-  .perspective-1000 {
-    perspective: 1000px;
-  }
+	/* Perspective utilities */
+	.perspective-1000 {
+		perspective: 1000px;
+	}
 
-  /* Backdrop blur enhancement */
-  .backdrop-blur-xl {
-    backdrop-filter: blur(24px);
-  }
+	/* Backdrop blur enhancement */
+	.backdrop-blur-xl {
+		backdrop-filter: blur(24px);
+	}
 
-  /* Enhanced shadows for dark mode */
-  .dark .shadow-2xl {
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
+	/* Enhanced shadows for dark mode */
+	.dark .shadow-2xl {
+		box-shadow:
+			0 25px 50px -12px rgba(0, 0, 0, 0.5),
+			0 0 0 1px rgba(255, 255, 255, 0.05);
+	}
 }

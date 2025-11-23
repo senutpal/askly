@@ -5,82 +5,82 @@
 
 /* Enable content-visibility for better rendering performance */
 @media (max-width: 768px) {
-  /* Optimize off-screen rendering */
-  section {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
-  }
+	/* Optimize off-screen rendering */
+	section {
+		content-visibility: auto;
+		contain-intrinsic-size: auto 500px;
+	}
 
-  /* Reduce blur effects on mobile - they're expensive */
-  .backdrop-blur-md,
-  .backdrop-blur-lg,
-  .backdrop-blur-xl {
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
-  }
+	/* Reduce blur effects on mobile - they're expensive */
+	.backdrop-blur-md,
+	.backdrop-blur-lg,
+	.backdrop-blur-xl {
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+	}
 
-  /* Optimize transforms with GPU acceleration */
-  [class*="transform"],
-  [class*="translate"],
-  [class*="scale"],
-  [class*="rotate"] {
-    will-change: transform;
-    transform: translateZ(0);
-  }
+	/* Optimize transforms with GPU acceleration */
+	[class*="transform"],
+	[class*="translate"],
+	[class*="scale"],
+	[class*="rotate"] {
+		will-change: transform;
+		transform: translateZ(0);
+	}
 
-  /* Reduce expensive animations */
-  .blur-\[100px\],
-  .blur-\[120px\],
-  .blur-\[150px\] {
-    filter: blur(40px) !important;
-  }
+	/* Reduce expensive animations */
+	.blur-\[100px\],
+	.blur-\[120px\],
+	.blur-\[150px\] {
+		filter: blur(40px);
+	}
 
-  /* Optimize expensive gradients */
-  [class*="bg-gradient"] {
-    will-change: auto;
-  }
+	/* Optimize expensive gradients */
+	[class*="bg-gradient"] {
+		will-change: auto;
+	}
 
-  /* Disable smooth scrolling on mobile for better performance */
-  html {
-    scroll-behavior: auto !important;
-  }
+	/* Disable smooth scrolling on mobile for better performance */
+	html {
+		scroll-behavior: auto;
+	}
 
-  /* Optimize fixed positioning */
-  .fixed {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
+	/* Optimize fixed positioning */
+	.fixed {
+		transform: translateZ(0);
+		backface-visibility: hidden;
+	}
 }
 
 /* Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+		scroll-behavior: auto;
+	}
 }
 
 /* Optimize for high-DPI displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  /* Reduce expensive effects on retina displays */
-  .blur-\[100px\],
-  .blur-\[120px\] {
-    filter: blur(60px) !important;
-  }
+	/* Reduce expensive effects on retina displays */
+	.blur-\[100px\],
+	.blur-\[120px\] {
+		filter: blur(60px);
+	}
 }
 
 /* Optimize canvas/WebGL elements */
 canvas {
-  will-change: transform;
-  transform: translateZ(0);
+	will-change: transform;
+	transform: translateZ(0);
 }
 
 /* GPU acceleration hints for motion elements */
 [data-motion-element] {
-  will-change: transform, opacity;
-  transform: translateZ(0);
+	will-change: transform, opacity;
+	transform: translateZ(0);
 }
