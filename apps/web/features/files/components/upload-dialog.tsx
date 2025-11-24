@@ -16,6 +16,7 @@ import {
 	Label,
 } from "@workspace/ui";
 import { useAction } from "convex/react";
+import { CloudUpload, FileText, Tag } from "lucide-react";
 import { useState } from "react";
 
 interface UploadDialogProps {
@@ -91,19 +92,25 @@ export const UploadDialog = ({
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
-			<DialogContent className="sm:max-w-lg">
+			<DialogContent className="border-border/50 bg-background/80 dark:bg-zinc-800 backdrop-blur-xl sm:max-w-lg sm:rounded-3xl">
 				<DialogHeader>
-					<DialogTitle>Upload Files</DialogTitle>
+					<DialogTitle className="flex items-center gap-2 text-2xl">
+						<CloudUpload className="h-6 w-6 text-primary" />
+						Upload Files
+					</DialogTitle>
 					<DialogDescription>
 						Upload documents to your knowledge base for AI-Powered search and
 						retrieval
 					</DialogDescription>
 				</DialogHeader>
-				<div className="space-y-4">
+				<div className="space-y-6 py-4">
 					<div className="space-y-2">
-						<Label htmlFor="category">Category</Label>
+						<Label htmlFor="category" className="flex items-center gap-2">
+							<Tag className="h-4 w-4 text-muted-foreground" />
+							Category
+						</Label>
 						<Input
-							className="w-full"
+							className="h-12 rounded-xl bg-muted/50"
 							id="category"
 							onChange={(e) =>
 								setUploadForm((prev) => ({
@@ -117,12 +124,13 @@ export const UploadDialog = ({
 						/>
 					</div>
 					<div className="space-y-2">
-						<Label htmlFor="filename">
+						<Label htmlFor="filename" className="flex items-center gap-2">
+							<FileText className="h-4 w-4 text-muted-foreground" />
 							Filename{" "}
-							<span className="text-muted-foreground text-xs">(optional)</span>
+							<span className="text-xs text-muted-foreground">(optional)</span>
 						</Label>
 						<Input
-							className="w-full"
+							className="h-12 rounded-xl bg-muted/50"
 							id="filename"
 							onChange={(e) =>
 								setUploadForm((prev) => ({
@@ -135,35 +143,39 @@ export const UploadDialog = ({
 							value={uploadForm.filename}
 						/>
 					</div>
-					<Dropzone
-						accept={{
-							"application/pdf": [".pdf"],
-							"text/csv": [".csv"],
-							"text/plain": [".txt"],
-							"application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-								[".docx"],
-							"image/jpeg": [".jpg", ".jpeg"],
-							"image/png": [".png"],
-							"image/webp": [".webp"],
-							"image/gif": [".gif"],
-						}}
-						disabled={isUploading}
-						maxFiles={1}
-						onDrop={handleFileDrop}
-						src={uploadedFiles}
-					>
-						<DropzoneEmptyState />
-						<DropzoneContent />
-					</Dropzone>
+					<div className="overflow-hidden rounded-2xl border border-dashed border-border/50 bg-muted/30">
+						<Dropzone
+							accept={{
+								"application/pdf": [".pdf"],
+								"text/csv": [".csv"],
+								"text/plain": [".txt"],
+								"application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+									[".docx"],
+								"image/jpeg": [".jpg", ".jpeg"],
+								"image/png": [".png"],
+								"image/webp": [".webp"],
+								"image/gif": [".gif"],
+							}}
+							disabled={isUploading}
+							maxFiles={1}
+							onDrop={handleFileDrop}
+							src={uploadedFiles}
+							className="transition-colors hover:bg-muted/50"
+						>
+							<DropzoneEmptyState />
+							<DropzoneContent />
+						</Dropzone>
+					</div>
 				</div>
 				{uploadError && (
-					<p className="text-right text-destructive text-sm">{uploadError}</p>
+					<p className="text-right text-sm text-destructive">{uploadError}</p>
 				)}
-				<DialogFooter>
+				<DialogFooter className="gap-2">
 					<Button
 						disabled={isUploading}
 						onClick={handleCancel}
 						variant="outline"
+						className="h-11 rounded-xl"
 					>
 						Cancel
 					</Button>
@@ -172,8 +184,9 @@ export const UploadDialog = ({
 						disabled={
 							uploadedFiles.length === 0 || isUploading || !uploadForm.category
 						}
+						className="h-11 rounded-xl shadow-lg shadow-primary/20"
 					>
-						{isUploading ? "Uploading..." : "Upload"}
+						{isUploading ? "Uploading..." : "Upload File"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

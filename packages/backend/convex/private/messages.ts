@@ -8,7 +8,7 @@ import { action, mutation, query } from "../_generated/server";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
 
-const gemini = google("gemini-2.5-flash-lite");
+const gemini = google("gemini-2.5-pro");
 
 export const enhanceResponse = action({
 	args: { prompt: v.string() },

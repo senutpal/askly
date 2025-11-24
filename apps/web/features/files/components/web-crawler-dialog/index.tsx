@@ -235,7 +235,7 @@ export const WebCrawlerDialog = ({
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
-			<DialogContent className="w-full max-w-3xl sm:min-w-2xl md:min-w-3xl">
+			<DialogContent className="w-full bg-background/80 dark:bg-zinc-800 backdrop-blur-xl sm:rounded-3xl max-w-3xl sm:min-w-2xl md:min-w-3xl">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
 						<GlobeIcon className="size-5" />

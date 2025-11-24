@@ -3,7 +3,7 @@ import { Agent } from "@convex-dev/agent";
 import { components } from "../../../_generated/api";
 import { SUPPORT_AGENT_PROMPT } from "../constants";
 
-const gemini = google("gemini-2.5-flash");
+const gemini = google("gemini-3-pro-preview");
 
 export const supportAgent = new Agent(components.agent, {
 	name: "Askly",

@@ -83,63 +83,68 @@ export default function WidgetAuthScreen() {
 	};
 
 	return (
-		<div>
+		<div className="flex h-full flex-col bg-white">
 			<WidgetHeader
 				title="Welcome to Askly"
-				subtitle="Let’s get you started"
-				className="text-center"
+				subtitle="Please enter your details to continue"
 			/>
-			<Form {...form}>
-				<form
-					className="flex flex-1 flex-col gap-y-6 p-4 animate-fade-in"
-					onSubmit={form.handleSubmit(onSubmit)}
-				>
-					<FormField
-						control={form.control}
-						name="name"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Name</FormLabel>
-								<FormControl>
-									<Input
-										className="h-12 rounded-md border border-gray-300 px-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-										placeholder="Enter your name"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Email</FormLabel>
-								<FormControl>
-									<Input
-										className="h-12 rounded-md border border-gray-300 px-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-										placeholder="Enter your email"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<Button
-						type="submit"
-						size="lg"
-						disabled={form.formState.isSubmitting}
-						className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all"
+			<div className="flex-1 overflow-y-auto p-6">
+				<Form {...form}>
+					<form
+						className="flex flex-col gap-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700"
+						onSubmit={form.handleSubmit(onSubmit)}
 					>
-						Continue
-					</Button>
-				</form>
-			</Form>
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem className="space-y-1.5">
+									<FormLabel className="text-xs font-medium text-gray-500 ml-1">
+										Name
+									</FormLabel>
+									<FormControl>
+										<Input
+											className="h-11 rounded-2xl border-gray-200 bg-gray-50 px-4 text-sm transition-all focus:border-black/10 focus:bg-white focus:ring-4 focus:ring-black/[0.03]"
+											placeholder="John Doe"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem className="space-y-1.5">
+									<FormLabel className="text-xs font-medium text-gray-500 ml-1">
+										Email
+									</FormLabel>
+									<FormControl>
+										<Input
+											className="h-11 rounded-2xl border-gray-200 bg-gray-50 px-4 text-sm transition-all focus:border-black/10 focus:bg-white focus:ring-4 focus:ring-black/[0.03]"
+											placeholder="john@example.com"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<Button
+							type="submit"
+							size="lg"
+							disabled={form.formState.isSubmitting}
+							className="mt-4 h-11 w-full rounded-2xl bg-black text-sm font-medium text-white shadow-lg shadow-black/5 hover:bg-gray-900 hover:shadow-xl hover:shadow-black/10 active:scale-[0.98] transition-all"
+						>
+							{form.formState.isSubmitting ? "Connecting..." : "Continue"}
+						</Button>
+					</form>
+				</Form>
+			</div>
 		</div>
 	);
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import { api } from "@workspace/backend/_generated/api";
+import { Separator } from "@workspace/ui";
 import { useQuery } from "convex/react";
-import { Loader2Icon } from "lucide-react";
+import { motion } from "motion/react";
+import { Loader2Icon, Palette } from "lucide-react";
 
 import { CustomizationForm } from "../customization-form";
 
@@ -14,29 +16,40 @@ export const CustomizationView = () => {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen flex flex-col items-center justify-center gap-y-2 bg-muted p-8 ">
-				<Loader2Icon className="text-muted-foreground animate-spin" />
-				<p className="text-muted-foreground text-sm ">Loading Settings...</p>
+			<div className="flex min-h-screen flex-col items-center justify-center gap-y-2 bg-background p-8">
+				<Loader2Icon className="animate-spin text-muted-foreground" />
+				<p className="text-sm text-muted-foreground">Loading Settings...</p>
 			</div>
 		);
 	}
 	return (
-		<div className="flex min-h-screen flex-col bg-muted p-8">
-			<div className="max-w-screen-md mx-auto w-full ">
-				<div className="space-y-2">
-					<h1 className="text-2xl md:text-4xl font-medium">
-						Widget Customization
+		<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
+			<div className="mx-auto w-full max-w-6xl space-y-12">
+				{/* Header Section */}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5 }}
+					className="space-y-4"
+				>
+					<h1 className="text-4xl font-bold tracking-tight md:text-6xl mx-6">
+						Make it <br />
+						<span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+							yours
+						</span>
 					</h1>
-					<p className="text-muted-foreground">
-						Customise how your chat widget looks and behaves for your students
+					<p className="max-w-md text-lg text-muted-foreground mx-6">
+						Customize how your chat widget looks and behaves to match your brand
+						perfectly.
 					</p>
-				</div>
-				<div className="mt-8">
-					<CustomizationForm
-						initialData={widgetSettings}
-						hasVapiPlugin={!!vapiPlugin}
-					/>
-				</div>
+				</motion.div>
+
+				<Separator className="bg-border/50" />
+
+				<CustomizationForm
+					initialData={widgetSettings}
+					hasVapiPlugin={!!vapiPlugin}
+				/>
 			</div>
 		</div>
 	);
