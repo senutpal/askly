@@ -5,7 +5,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Button, DiceBearAvatar, SidebarTrigger } from "@workspace/ui";
 import { useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import {
 	ArrowUpRight,
 	AudioWaveform,
@@ -44,7 +44,7 @@ const itemVariants = {
 		y: 0,
 		filter: "blur(0px)",
 		transition: {
-			type: "spring",
+			type: "spring" as const,
 			stiffness: 100,
 			damping: 20,
 		},
@@ -53,7 +53,7 @@ const itemVariants = {
 
 const hoverScale = {
 	scale: 1.02,
-	transition: { type: "spring", stiffness: 400, damping: 25 },
+	transition: { type: "spring" as const, stiffness: 400, damping: 25 },
 };
 
 export default function Page() {
