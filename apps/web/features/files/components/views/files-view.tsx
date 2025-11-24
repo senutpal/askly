@@ -87,7 +87,7 @@ export const FilesView = () => {
           onOpenChange={setCrawlerDialogOpen}
           open={crawlerDialogOpen}
         />
-        <div className="min-h-screen   py-6 md:py-12">
+        <div className="min-h-screen  p-6 md:p-12">
           <div className=" space-y-12">
             {/* Header Section */}
             <motion.div
