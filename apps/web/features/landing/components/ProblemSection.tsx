@@ -45,7 +45,7 @@ const problems = [
     title: "Signal Lost",
     subtitle: "Communication Breakdown",
     description:
-      "Critical updates die in email chains. When information doesn't flow, opportunities are missed and confusion becomes the default campus culture.",
+      "Critical updates die in email chains. When information doesn't flow, opportunities are missed and confusion becomes culture.",
     stat: "60%",
     statLabel: "Missed updates",
     accent: "from-amber-500 to-yellow-500",

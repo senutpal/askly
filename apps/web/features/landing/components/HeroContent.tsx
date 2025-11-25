@@ -6,28 +6,45 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 
 /**
  * HeroContent - Left side text content of hero section
  * Includes heading, description, and CTA buttons
+ * Optimized for fast initial render and reduced motion support
  */
 export const HeroContent = React.memo(() => {
 	const { theme } = useTheme();
+	const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
 	const badgeColor = useMemo(
 		() => (theme === "dark" ? "#20a7db" : "#2d62ef"),
 		[theme],
 	);
+
+	// Detect reduced motion preference
+	useEffect(() => {
+		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+		setPrefersReducedMotion(mediaQuery.matches);
+
+		const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+		mediaQuery.addEventListener("change", handler);
+		return () => mediaQuery.removeEventListener("change", handler);
+	}, []);
+
+	// Optimize animation durations based on motion preference
+	const animationDuration = prefersReducedMotion ? 0.3 : 0.6;
 
 	return (
 		<div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 max-w-2xl mx-auto lg:mx-0">
 			<AnimatedBadge text="Community-Driven • Free" color={badgeColor} />
 
 			<motion.h1
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.1 }}
+				transition={{ duration: animationDuration, delay: 0.05 }}
 				className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1]"
+				style={{ willChange: "opacity, transform" }}
 			>
 				<span className="text-transparent bg-clip-text bg-gradient-to-b from-black/40 to-black dark:from-white dark:to-gray-300 ">
 					Campus Communication
@@ -39,25 +56,27 @@ export const HeroContent = React.memo(() => {
 			</motion.h1>
 
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.2 }}
+				transition={{ duration: animationDuration, delay: 0.1 }}
 				className=" max-w-[90%] md:max-w-xl leading-relaxed"
+				style={{ willChange: "opacity, transform" }}
 			>
 				<ShinyText
 					text="The AI-first communication layer for modern institutions.
                 Multilingual answers for students, zero overhead for staff."
-					disabled={false}
+					disabled={prefersReducedMotion}
 					speed={5}
 					className="text-lg md:text-xl leading-relaxed"
 				/>
 			</motion.div>
 
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.6, delay: 0.3 }}
+				transition={{ duration: animationDuration, delay: 0.15 }}
 				className="flex md:mt-3 flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+				style={{ willChange: "opacity, transform" }}
 			>
 				<SignUpButton mode="modal">
 					<SpotlightButton className="w-full sm:w-auto shadow-lg shadow-blue-500/20">
@@ -67,9 +86,10 @@ export const HeroContent = React.memo(() => {
 
 				<Link href="#features" className="w-full sm:w-auto">
 					<motion.button
-						whileHover={{ scale: 1.02 }}
-						whileTap={{ scale: 0.98 }}
+						whileHover={{ scale: prefersReducedMotion ? 1 : 1.02 }}
+						whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
 						className="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-8 font-medium text-neutral-900 dark:text-white transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
+						type="button"
 					>
 						View Demo
 					</motion.button>

@@ -34,7 +34,7 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 		const activeProblem = problems[activeCard] || problems[0];
 
 		return (
-			<div className="w-full lg:w-1/2 h-full flex flex-col justify-center z-10 mb-12 lg:mb-0 relative">
+			<div className="w-full lg:w-1/2 h-full flex flex-col justify-start md:justify-center z-10 mb-12 lg:mb-0 relative">
 				{/* Progress Bar */}
 				<div className="absolute top-1/4 left-0 w-1 h-1/2 bg-neutral-200 dark:bg-neutral-800 rounded-full hidden lg:block">
 					<motion.div

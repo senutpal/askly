@@ -93,7 +93,7 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 							}
 				}
 				className={cn(
-					"absolute inset-0 rounded-3xl p-1",
+					"absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full",
 					"bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5",
 					"border border-white/20 dark:border-white/10",
 					// Reduce blur on mobile

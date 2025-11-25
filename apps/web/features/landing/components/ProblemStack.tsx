@@ -27,7 +27,7 @@ interface ProblemStackProps {
 export const ProblemStack = React.memo<ProblemStackProps>(
 	({ problems, activeCard }) => {
 		return (
-			<div className="w-full lg:w-1/2 h-[30vh] md:h-[50vh] lg:h-full flex items-center justify-center lg:justify-end perspective-1000">
+			<div className="w-full lg:w-1/2 h-[20vh] md:h-[50vh] lg:h-full flex items-center justify-end lg:justify-end perspective-1000">
 				<div className="relative w-full max-w-md aspect-square">
 					{problems.map((card, index) => (
 						<ProblemCard

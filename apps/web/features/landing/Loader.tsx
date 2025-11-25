@@ -1,10 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const DURATION = 4;
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+/**
+ * ScrambleText - Optimized text scramble animation using requestAnimationFrame
+ */
 const ScrambleText = ({
 	text,
 	className,
@@ -13,31 +17,48 @@ const ScrambleText = ({
 	className?: string;
 }) => {
 	const [displayText, setDisplayText] = useState(text);
+	const animationRef = useRef<number | undefined>(undefined);
+	const iterationRef = useRef(0);
 
 	useEffect(() => {
-		let interval: NodeJS.Timeout;
-		let iteration = 0;
+		let lastTime = 0;
+		const frameTime = 40; // ~25 fps for scramble effect
 
-		interval = setInterval(() => {
-			setDisplayText((_prev) =>
-				text
-					.split("")
-					.map((_char, index) => {
-						if (index < iteration) {
-							return text[index];
-						}
-						return CHARS[Math.floor(Math.random() * CHARS.length)];
-					})
-					.join(""),
-			);
+		const animate = (currentTime: number) => {
+			if (currentTime - lastTime >= frameTime) {
+				lastTime = currentTime;
 
-			if (iteration >= text.length) {
-				clearInterval(interval);
+				setDisplayText(
+					text
+						.split("")
+						.map((char, index) => {
+							if (index < iterationRef.current) {
+								return text[index];
+							}
+							return CHARS[Math.floor(Math.random() * CHARS.length)];
+						})
+						.join(""),
+				);
+
+				if (iterationRef.current >= text.length) {
+					if (animationRef.current) {
+						cancelAnimationFrame(animationRef.current);
+					}
+					return;
+				}
+				iterationRef.current += 1 / 3;
 			}
-			iteration += 1 / 3;
-		}, 40);
 
-		return () => clearInterval(interval);
+			animationRef.current = requestAnimationFrame(animate);
+		};
+
+		animationRef.current = requestAnimationFrame(animate);
+
+		return () => {
+			if (animationRef.current) {
+				cancelAnimationFrame(animationRef.current);
+			}
+		};
 	}, [text]);
 
 	return <span className={className}>{displayText}</span>;
@@ -45,24 +66,35 @@ const ScrambleText = ({
 
 export default function Loader({ onComplete }: { onComplete?: () => void }) {
 	const [progress, setProgress] = useState(0);
+	const animationRef = useRef<number | undefined>(undefined);
+	const startTimeRef = useRef<number>(Date.now());
 
 	useEffect(() => {
-		const start = Date.now();
-		const interval = setInterval(() => {
-			const elapsed = Date.now() - start;
+		const updateProgress = () => {
+			const elapsed = Date.now() - startTimeRef.current;
 			const newProgress = Math.min((elapsed / (DURATION * 1000)) * 100, 100);
 
 			setProgress(newProgress);
 
 			if (newProgress >= 100) {
-				clearInterval(interval);
+				if (animationRef.current) {
+					cancelAnimationFrame(animationRef.current);
+				}
 				setTimeout(() => {
 					onComplete?.();
 				}, 500);
+			} else {
+				animationRef.current = requestAnimationFrame(updateProgress);
 			}
-		}, 30);
+		};
 
-		return () => clearInterval(interval);
+		animationRef.current = requestAnimationFrame(updateProgress);
+
+		return () => {
+			if (animationRef.current) {
+				cancelAnimationFrame(animationRef.current);
+			}
+		};
 	}, [onComplete]);
 
 	return (
@@ -73,6 +105,7 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
 				y: "-100%",
 				transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
 			}}
+			style={{ willChange: "transform" }}
 		>
 			<div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-difference" />
 			<div className="relative z-10 flex flex-col items-center justify-center gap-10 w-full max-w-md px-6">
@@ -82,6 +115,7 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
 						animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
 						transition={{ duration: 0.8, ease: "easeOut" }}
 						className="text-6xl md:text-7xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-neutral-900 to-neutral-500 dark:from-white dark:to-white/60"
+						style={{ willChange: "opacity, transform, filter" }}
 					>
 						<ScrambleText text="Askly" />
 					</motion.div>
@@ -96,14 +130,15 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
 								opacity: [0, 0.5, 0],
 							}}
 							transition={{
-								repeat: Infinity,
+								repeat: Number.POSITIVE_INFINITY,
 								duration: 1.5,
 								ease: "linear",
 							}}
+							style={{ contain: "layout style paint" }}
 						/>
 						<motion.div
 							className="h-full bg-neutral-900 dark:bg-white origin-left relative z-10"
-							style={{ width: `${progress}%` }}
+							style={{ width: `${progress}%`, contain: "layout style paint" }}
 							transition={{ ease: "linear" }}
 						/>
 					</div>
