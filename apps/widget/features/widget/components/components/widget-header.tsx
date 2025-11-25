@@ -17,19 +17,21 @@ export const WidgetHeader: React.FC<WidgetHeaderProps> = ({
 	return (
 		<header
 			className={cn(
-				"bg-gradient-to-r from-blue-600 to-blue-500 p-6 rounded-t-xl text-white shadow-md",
+				"relative z-10 flex flex-col border-b border-black/5 bg-white/80 px-6 py-5 backdrop-blur-xl transition-all",
 				className,
 			)}
 		>
 			{children ? (
 				<div>{children}</div>
 			) : (
-				<div className="flex flex-col gap-1">
+				<div className="flex flex-col gap-0.5">
 					{title && (
-						<h1 className="text-2xl font-bold font-sans-alt">{title}</h1>
+						<h1 className="text-lg font-semibold tracking-tight text-gray-900">
+							{title}
+						</h1>
 					)}
 					{subtitle && (
-						<p className="text-sm opacity-80 font-sans-alt">{subtitle}</p>
+						<p className="text-xs font-medium text-gray-500">{subtitle}</p>
 					)}
 				</div>
 			)}

@@ -4,9 +4,8 @@ import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
-import { useThrottle } from "@/hooks/use-throttle";
 import { DesktopNav } from "./DesktopNav";
 import { MobileMenu } from "./MobileMenu";
 import { NavbarActions } from "./NavbarActions";
@@ -18,25 +17,53 @@ const navLinks = [
 	{ href: "/docs", label: "Docs" },
 ];
 
+// Logo component - memoized to prevent re-renders
+const Logo = () => (
+	<Link href="/" className="flex items-center space-x-2 z-50">
+		<Image
+			alt="Logo"
+			height={25}
+			width={25}
+			src="/logo.svg"
+			priority
+			loading="eager"
+		/>
+		<span className="text-xl font-bold tracking-tight">Askly</span>
+	</Link>
+);
+
 export default function Navbar() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-	const handleScroll = useThrottle(() => {
-		setIsScrolled(window.scrollY >= 20);
-	}, 100);
-
+	// Optimized scroll handler - inline to avoid throttle hook overhead
 	useEffect(() => {
+		let ticking = false;
+		let lastScrollY = 0;
+
+		const handleScroll = () => {
+			lastScrollY = window.scrollY;
+
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					setIsScrolled(lastScrollY >= 20);
+					ticking = false;
+				});
+				ticking = true;
+			}
+		};
+
+		// Passive listener for better scroll performance
 		window.addEventListener("scroll", handleScroll, { passive: true });
 		return () => window.removeEventListener("scroll", handleScroll);
-	}, [handleScroll]);
+	}, []);
 
+	// Body overflow management
 	useEffect(() => {
-		if (isMobileMenuOpen) {
-			document.body.style.overflow = "hidden";
-		} else {
+		document.body.style.overflow = isMobileMenuOpen ? "hidden" : "unset";
+		return () => {
 			document.body.style.overflow = "unset";
-		}
+		};
 	}, [isMobileMenuOpen]);
 
 	const toggleMobileMenu = useCallback(() => {
@@ -47,20 +74,22 @@ export default function Navbar() {
 		setIsMobileMenuOpen(false);
 	}, []);
 
-	return (
-		<nav
-			className={`fixed w-full z-50 transition-all duration-300 ${
+	// Memoize navbar classes
+	const navbarClasses = useMemo(
+		() =>
+			`fixed w-full z-50 transition-all duration-300 ${
 				isScrolled || isMobileMenuOpen
-					? " bg-background/80 backdrop-blur-md border-b border-border/40"
-					: "bg-transparent "
-			}`}
-		>
+					? "bg-background/80 backdrop-blur-md border-b border-border/40"
+					: "bg-transparent"
+			}`,
+		[isScrolled, isMobileMenuOpen],
+	);
+
+	return (
+		<nav className={navbarClasses} style={{ willChange: "transform" }}>
 			<div className="container relative mx-auto px-4 sm:px-6">
 				<div className="flex justify-between items-center h-16">
-					<Link href="/" className="flex items-center space-x-2 z-50">
-						<Image alt="Logo" height={25} width={25} src="/logo.svg" />
-						<span className="text-xl font-bold tracking-tight">Askly</span>
-					</Link>
+					<Logo />
 
 					<DesktopNav links={navLinks} />
 
@@ -72,6 +101,7 @@ export default function Navbar() {
 							className="p-2 rounded-full hover:bg-secondary transition-colors"
 							onClick={toggleMobileMenu}
 							aria-label="Toggle mobile menu"
+							type="button"
 						>
 							<AnimatePresence mode="wait" initial={false}>
 								{isMobileMenuOpen ? (
@@ -81,6 +111,7 @@ export default function Navbar() {
 										animate={{ rotate: 0, opacity: 1 }}
 										exit={{ rotate: 90, opacity: 0 }}
 										transition={{ duration: 0.2 }}
+										style={{ willChange: "transform, opacity" }}
 									>
 										<X className="w-6 h-6" />
 									</motion.div>
@@ -91,6 +122,7 @@ export default function Navbar() {
 										animate={{ rotate: 0, opacity: 1 }}
 										exit={{ rotate: -90, opacity: 0 }}
 										transition={{ duration: 0.2 }}
+										style={{ willChange: "transform, opacity" }}
 									>
 										<Menu className="w-6 h-6" />
 									</motion.div>

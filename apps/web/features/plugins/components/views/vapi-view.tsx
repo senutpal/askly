@@ -15,9 +15,11 @@ import {
 	FormItem,
 	Input,
 	Label,
+	Separator,
 } from "@workspace/ui";
 import { useMutation, useQuery } from "convex/react";
-import { Globe2, Phone, PhoneCall, Workflow } from "lucide-react";
+import { motion } from "motion/react";
+import { Globe2, Phone, PhoneCall, Sparkles, Workflow } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -86,16 +88,16 @@ const VapiPluginForm = ({
 	};
 	return (
 		<Dialog onOpenChange={setOpen} open={open}>
-			<DialogContent>
+			<DialogContent className="border-border/50 bg-background/80 backdrop-blur-xl sm:rounded-3xl">
 				<DialogHeader>
-					<DialogTitle>Enable Vapi</DialogTitle>
+					<DialogTitle className="text-2xl">Enable Vapi</DialogTitle>
+					<DialogDescription>
+						Your API keys are safely encrypted and stored.
+					</DialogDescription>
 				</DialogHeader>
-				<DialogDescription>
-					Your API keys are safely encrypted and stored.
-				</DialogDescription>
 				<Form {...form}>
 					<form
-						className="flex flex-col gap-y-4"
+						className="flex flex-col gap-y-6 mt-4"
 						onSubmit={form.handleSubmit(onSubmit)}
 					>
 						<FormField
@@ -109,6 +111,7 @@ const VapiPluginForm = ({
 											{...field}
 											placeholder="Your Public API Key"
 											type="password"
+											className="h-12 rounded-xl bg-muted/50"
 										/>
 									</FormControl>
 								</FormItem>
@@ -125,14 +128,20 @@ const VapiPluginForm = ({
 											{...field}
 											placeholder="Your Private API Key"
 											type="password"
+											className="h-12 rounded-xl bg-muted/50"
 										/>
 									</FormControl>
 								</FormItem>
 							)}
 						/>
 						<DialogFooter>
-							<Button disabled={form.formState.isSubmitting} type="submit">
-								{form.formState.isSubmitting ? "Connecting..." : "Connect"}
+							<Button
+								disabled={form.formState.isSubmitting}
+								type="submit"
+								size="lg"
+								className="w-full rounded-xl text-base"
+							>
+								{form.formState.isSubmitting ? "Connecting..." : "Connect Vapi"}
 							</Button>
 						</DialogFooter>
 					</form>
@@ -169,18 +178,27 @@ const VapiPluginRemoveForm = ({
 	};
 	return (
 		<Dialog onOpenChange={setOpen} open={open}>
-			<DialogContent>
+			<DialogContent className="border-border/50 bg-background/80 dark:bg-neutral-900 backdrop-blur-xl sm:rounded-3xl">
 				<DialogHeader>
-					<DialogTitle>Disable Vapi</DialogTitle>
+					<DialogTitle className="text-2xl">Disable Vapi</DialogTitle>
+					<DialogDescription>
+						Are you sure you want to disconnect the Vapi plugin? This will stop
+						all voice capabilities.
+					</DialogDescription>
 				</DialogHeader>
-				<DialogDescription>
-					Are you sure you want to disconnect the Vapi plugin ?
-				</DialogDescription>
-				<DialogFooter>
+				<DialogFooter className="mt-4">
+					<Button
+						variant="outline"
+						onClick={() => setOpen(false)}
+						className="rounded-xl"
+					>
+						Cancel
+					</Button>
 					<Button
 						onClick={onSubmit}
 						variant="destructive"
 						disabled={isSubmitting}
+						className="rounded-xl"
 					>
 						{isSubmitting ? "Disconnecting..." : "Disconnect"}
 					</Button>
@@ -189,6 +207,7 @@ const VapiPluginRemoveForm = ({
 		</Dialog>
 	);
 };
+
 export const VapiView = () => {
 	const vapiPlugin = useQuery(api.private.plugins.getOne, {
 		service: "vapi",
@@ -208,13 +227,35 @@ export const VapiView = () => {
 		<>
 			<VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
 			<VapiPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
-			<div className="flex flex-col  min-h-screen bg-muted p-8">
-				<div className="mx-auto w-full max-w-screen-md">
-					<div className="space-y-2">
-						<h1 className="text-2xl md:text-4xl font-semibold">Vapi Plugin</h1>
-						<p>Connect Vapi to enable AI voice calls and phone</p>
-					</div>
-					<div className="mt-8">
+
+			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
+				<div className="mx-auto w-full max-w-6xl space-y-12">
+					{/* Header Section */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+						className="space-y-4"
+					>
+						<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
+							Extend your <br />
+							<span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+								capabilities
+							</span>
+						</h1>
+						<p className="max-w-md text-lg text-muted-foreground">
+							Connect powerful third-party services to enhance your agent's
+							functionality.
+						</p>
+					</motion.div>
+
+					<Separator className="bg-border/50" />
+
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5, delay: 0.2 }}
+					>
 						{vapiPlugin ? (
 							<VapiConnectedView onDisconnect={handleSubmit} />
 						) : (
@@ -226,7 +267,7 @@ export const VapiView = () => {
 								serviceImage="/vapi.jpg"
 							/>
 						)}
-					</div>
+					</motion.div>
 				</div>
 			</div>
 		</>

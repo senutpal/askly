@@ -88,7 +88,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
       max-width: calc(100vw - 40px);
       max-height: calc(100vh - 110px);
       z-index: 999998;
-      border-radius: 16px;
+      border-radius: 32px;
       overflow: hidden;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
       display: none;

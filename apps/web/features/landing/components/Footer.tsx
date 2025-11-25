@@ -4,6 +4,7 @@ import { CrossDotPattern } from "@workspace/ui";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 import React, { useRef } from "react";
+import { useMobileDetect } from "@/hooks/use-mobile-detect";
 import { FooterBottom } from "./FooterBottom";
 import { FooterBrand } from "./FooterBrand";
 import { FooterNav } from "./FooterNav";
@@ -25,15 +26,27 @@ const socialLinks = [
 		href: "https://linkedin.com/company/askly",
 		label: "LinkedIn",
 	},
-	{ icon: Mail, href: "mailto:hello@ask ly.ai", label: "Email" },
+	{ icon: Mail, href: "mailto:hello@askly.ai", label: "Email" },
 ];
 
-// Ambient Background Component
+// Ambient Background Component - Optimized for mobile
 const AmbientBackground = React.memo(() => {
+	const { isMobile } = useMobileDetect();
+
+	// Reduce blur on mobile for better performance
+	const blurClass = isMobile ? "blur-[60px]" : "blur-[120px]";
+
 	return (
-		<div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-			<div className="absolute -bottom-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-blue-500/5 blur-[120px] animate-pulse-slow" />
-			<div className="absolute -bottom-[20%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-purple-500/5 blur-[120px] animate-pulse-slow delay-700" />
+		<div
+			className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+			style={{ contain: "layout style paint" }}
+		>
+			<div
+				className={`absolute -bottom-[20%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-blue-500/5 ${blurClass} animate-pulse-slow`}
+			/>
+			<div
+				className={`absolute -bottom-[20%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-purple-500/5 ${blurClass} animate-pulse-slow delay-700`}
+			/>
 		</div>
 	);
 });
@@ -42,6 +55,7 @@ AmbientBackground.displayName = "AmbientBackground";
 /**
  * Footer - Main footer section
  * Refactored into smaller components for better maintainability
+ * Optimized with reduced blur effects on mobile
  */
 export default function Footer() {
 	// Scroll parallax effect for the container
@@ -57,13 +71,13 @@ export default function Footer() {
 	return (
 		<footer
 			ref={containerRef}
-			className="relative w-full overflow-hidden  text-gray-900 dark:text-white pt-24 pb-12"
+			className="relative w-full overflow-hidden text-gray-900 dark:text-white pt-24 pb-12"
 		>
 			<CrossDotPattern />
 			<AmbientBackground />
 
 			<motion.div
-				style={{ y, opacity }}
+				style={{ y, opacity, willChange: "transform, opacity" }}
 				className="max-w-[1232px] mx-auto xl:px-0 md:px-12 px-6 lg:px-24 sm:px-12"
 			>
 				{/* Top Section: Brand & Navigation */}

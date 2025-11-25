@@ -165,17 +165,15 @@ export const WidgetLoadingScreen = ({
 		setScreen(hasValidSession ? "selection" : "auth");
 	}, [step, contactSessionId, sessionValid, setScreen]);
 	return (
-		<>
-			<WidgetHeader>
-				<div className="flex flex-col justify-between gap-y-2 px-2 py-6 font-semibold">
-					<p className=" text-3xl">Hi there</p>
-					<p className="text-lg">Lets&apos;s get you started</p>
-				</div>
-			</WidgetHeader>
-			<div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
-				<LoaderIcon className="animate-spin" />
-				<p className="text-sm">{loadingMessage || "Loading !!!"}</p>
+		<div className="flex h-full w-full flex-col items-center justify-center gap-y-6 bg-white p-6 text-center animate-in fade-in duration-700">
+			<div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-black/[0.03] shadow-sm ring-1 ring-black/[0.05]">
+				<LoaderIcon className="h-6 w-6 animate-spin text-black/70" strokeWidth={2} />
 			</div>
-		</>
+			<div className="space-y-2">
+				<p className="text-sm font-medium text-black/50 animate-pulse tracking-wide">
+					{loadingMessage || "Initializing..."}
+				</p>
+			</div>
+		</div>
 	);
 };

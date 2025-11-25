@@ -27,90 +27,78 @@ interface ProblemCardProps {
 
 /**
  * ProblemCard - Individual problem card in the stack
- * Animates based on scroll position with spring physics
- * Heavily optimized for mobile devices
+ * Heavily optimized for mobile - no 3D transforms, no blur, simplified animations
  */
 export const ProblemCard = React.memo<ProblemCardProps>(
 	({ card, index, activeCard, total }) => {
 		const { isMobile } = useMobileDetect();
 
-		// Physics-based springing for interactions
 		const isActive = index === activeCard;
 		const isPast = index < activeCard;
 
-		// Calculate visual state based on active index
-		// Simplified calculations for mobile
+		// Optimized animation state - minimal calculations
 		const animationState = useMemo(
-			() => ({
-				y: isActive
-					? 0
-					: isPast
-						? -50 * (activeCard - index)
-						: 20 * (index - activeCard),
-				scale: isActive
-					? 1
-					: isPast
-						? 1 - (activeCard - index) * 0.05
-						: 0.9 - (index - activeCard) * 0.05,
-				opacity: isActive
-					? 1
-					: isPast
-						? isMobile
-							? index === activeCard - 1
-								? 0.8
-								: 0
-							: Math.max(0, 1 - (activeCard - index) * 0.3)
-						: Math.max(0, 0.4 - (index - activeCard) * 0.1),
-				// Disable 3D transforms on mobile for performance
-				rotateX: isMobile ? 0 : isActive ? 0 : isPast ? 10 : -10,
-				z: isMobile ? 0 : isActive ? 0 : -100,
-				// Reduce blur on mobile
-				filter: isMobile ? "blur(0px)" : isActive ? "blur(0px)" : "blur(8px)",
-			}),
+			() => {
+				if (isMobile) {
+					// Ultra-simplified mobile animations - only y and opacity
+					return {
+						y: isActive ? 0 : isPast ? -40 * (activeCard - index) : 15 * (index - activeCard),
+						opacity: isActive ? 1 : isPast ? (index === activeCard - 1 ? 0.6 : 0) : 0.3,
+						scale: 1, // Fixed scale on mobile
+					};
+				}
+
+				// Desktop animations
+				return {
+					y: isActive ? 0 : isPast ? -50 * (activeCard - index) : 20 * (index - activeCard),
+					scale: isActive ? 1 : isPast ? 1 - (activeCard - index) * 0.05 : 0.9 - (index - activeCard) * 0.05,
+					opacity: isActive ? 1 : isPast ? Math.max(0, 1 - (activeCard - index) * 0.3) : Math.max(0, 0.4 - (index - activeCard) * 0.1),
+					rotateX: isActive ? 0 : isPast ? 10 : -10,
+					z: isActive ? 0 : -100,
+				};
+			},
 			[isActive, isPast, index, activeCard, isMobile],
 		);
 
 		return (
 			<motion.div
-				// Disable layout animations on mobile (very expensive)
-				layout={!isMobile}
+				layout={false} // Disable layout animations completely
 				initial={false}
 				animate={animationState}
 				transition={
 					isMobile
 						? {
-								// Faster, simpler transitions on mobile
+								// Instant transitions on mobile
 								type: "tween",
-								duration: 0.3,
+								duration: 0.25,
 								ease: "easeOut",
 							}
 						: {
-								// Spring physics on desktop only
+								// Smooth spring on desktop
 								type: "spring",
-								stiffness: 120,
-								damping: 20,
-								mass: 1,
+								stiffness: 140,
+								damping: 22,
+								mass: 0.8,
 							}
 				}
 				className={cn(
-					"absolute inset-0 rounded-3xl p-1",
+					"absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full",
 					"bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5",
 					"border border-white/20 dark:border-white/10",
-					// Reduce blur on mobile
-					isMobile
-						? "backdrop-blur-sm shadow-lg"
-						: "backdrop-blur-2xl shadow-2xl",
+					// Minimal backdrop blur on mobile
+					isMobile ? "backdrop-blur-[2px] shadow-lg" : "backdrop-blur-2xl shadow-2xl",
 					isActive ? "z-30" : "z-0",
-					// Dynamic shadow based on card color when active
 					isActive && card.shadow,
 				)}
 				style={{
 					transformStyle: isMobile ? "flat" : "preserve-3d",
 					willChange: "transform, opacity",
+					transform: isMobile ? "translate3d(0, 0, 0)" : undefined, // Force GPU on mobile
+					contain: "layout style paint",
 				}}
 			>
 				<div className="relative h-full w-full rounded-[20px] bg-white/50 dark:bg-neutral-900/80 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-white/40 dark:border-white/5">
-					{/* Abstract Geometric Background decoration - Hidden on mobile */}
+					{/* Abstract Geometric Background - Desktop only */}
 					{!isMobile && (
 						<div
 							className={cn(
@@ -150,32 +138,23 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 							</h3>
 						</div>
 
-						{/* Visualization Bar (Dummy data for visual aesthetics) */}
+						{/* Impact Bar - CSS only on mobile for better performance */}
 						<div className="space-y-2">
 							<div className="flex justify-between text-[10px] uppercase font-medium text-neutral-400">
 								<span>Impact Level</span>
 							</div>
 							<div className="h-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-								{/* Use CSS transition on mobile instead of motion */}
-								{isMobile ? (
-									<div
-										className={cn(
-											"h-full rounded-full bg-gradient-to-r transition-all duration-700",
-											card.accent,
-										)}
-										style={{ width: isActive ? "85%" : "0%" }}
-									/>
-								) : (
-									<motion.div
-										initial={{ width: 0 }}
-										animate={{ width: isActive ? "85%" : "0%" }}
-										transition={{ delay: 0.2, duration: 1, ease: "circOut" }}
-										className={cn(
-											"h-full rounded-full bg-gradient-to-r",
-											card.accent,
-										)}
-									/>
-								)}
+								<div
+									className={cn(
+										"h-full rounded-full bg-gradient-to-r transition-all",
+										card.accent,
+									)}
+									style={{
+										width: isActive ? "85%" : "0%",
+										transitionDuration: isActive ? "0.7s" : "0.3s",
+										transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+									}}
+								/>
 							</div>
 						</div>
 					</div>

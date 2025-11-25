@@ -65,18 +65,23 @@ export const WidgetSelectionScreen = () => {
 				subtitle="Let’s get you started"
 				className="px-5"
 			/>
-			<div className="flex flex-1 flex-col gap-y-6 mt-4 p-4 overflow-y-auto">
+			<div className="flex flex-1 flex-col gap-8 pt-5 px-6 overflow-y-auto bg-gray-50/50">
 				<Button
 					onClick={handleNewConversation}
 					disabled={isPending}
-					className="h-16 w-full justify-between"
-					variant="outline"
+					className="group relative flex h-auto w-full items-start gap-3 rounded-3xl border border-white bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md hover:shadow-black/5 active:scale-[0.98]"
+					variant="ghost"
 				>
-					<div className="flex items-center gap-x-2">
-						<MessageSquareText className="size-4" />
-						<span>Start Chat</span>
+					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
+						<MessageSquareText className="size-5" strokeWidth={2.5} />
 					</div>
-					<ChevronRightIcon />
+					<div className="flex w-full items-center justify-between">
+						<div className="flex flex-col items-start gap-0.5">
+							<span className="text-base font-semibold text-gray-900">Start Chat</span>
+							<span className="text-xs font-medium text-gray-400">Chat with our AI assistant</span>
+						</div>
+						<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
+					</div>
 				</Button>
 
 				{hasVapiSecrets && widgetSettings?.vapiSettings?.assistantId && (
@@ -85,14 +90,19 @@ export const WidgetSelectionScreen = () => {
 							setScreen("voice");
 						}}
 						disabled={isPending}
-						className="h-16 w-full justify-between"
-						variant="outline"
+						className="group relative flex h-auto w-full  items-start gap-3 rounded-3xl border border-white bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md hover:shadow-black/5 active:scale-[0.98]"
+						variant="ghost"
 					>
-						<div className="flex items-center gap-x-2">
-							<Mic className="size-4" />
-							<span>Start Voice Call</span>
+						<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 transition-colors group-hover:bg-purple-100">
+							<Mic className="size-5" strokeWidth={2.5} />
 						</div>
-						<ChevronRightIcon />
+						<div className="flex w-full items-center justify-between">
+							<div className="flex flex-col items-start gap-0.5">
+								<span className="text-base font-semibold text-gray-900">Voice Call</span>
+								<span className="text-xs font-medium text-gray-400">Talk to us directly</span>
+							</div>
+							<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
+						</div>
 					</Button>
 				)}
 				{hasVapiSecrets && widgetSettings?.vapiSettings?.phoneNumber && (
@@ -101,14 +111,19 @@ export const WidgetSelectionScreen = () => {
 							setScreen("contact");
 						}}
 						disabled={isPending}
-						className="h-16 w-full justify-between"
-						variant="outline"
+						className="group relative flex h-auto w-full items-start gap-3 rounded-3xl border border-white bg-white p-5 shadow-sm transition-all hover:scale-[1.02] hover:shadow-md hover:shadow-black/5 active:scale-[0.98]"
+						variant="ghost"
 					>
-						<div className="flex items-center gap-x-2">
-							<Phone className="size-4" />
-							<span>Call Us</span>
+						<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-600 transition-colors group-hover:bg-green-100">
+							<Phone className="size-5" strokeWidth={2.5} />
 						</div>
-						<ChevronRightIcon />
+						<div className="flex w-full items-center justify-between">
+							<div className="flex flex-col items-start gap-0.5">
+								<span className="text-base font-semibold text-gray-900">Call Us</span>
+								<span className="text-xs font-medium text-gray-400">Reach our support team</span>
+							</div>
+							<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
+						</div>
 					</Button>
 				)}
 			</div>

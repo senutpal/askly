@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 
 type AnimatedBadgeProps = {
 	text?: string;
@@ -25,11 +26,27 @@ function hexToRgba(hexColor: string, alpha: number): string {
 	return hexColor;
 }
 
+/**
+ * AnimatedBadge - Optimized animated badge component
+ * Disables heavy SVG path animation on mobile for better performance
+ */
 export const AnimatedBadge = ({
 	text = "Introducing Eldoraui",
 	color = "#22d3ee",
 	href,
 }: AnimatedBadgeProps) => {
+	const [isMobile, setIsMobile] = useState(false);
+
+	// Detect mobile on client side
+	useEffect(() => {
+		const checkMobile = () => {
+			setIsMobile(window.innerWidth < 768);
+		};
+		checkMobile();
+		window.addEventListener("resize", checkMobile);
+		return () => window.removeEventListener("resize", checkMobile);
+	}, []);
+
 	const content = (
 		<motion.div
 			initial={false}
@@ -45,76 +62,85 @@ export const AnimatedBadge = ({
 			}}
 			viewport={{ once: true }}
 			className="group relative flex max-w-fit items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-neutral-700 transition-colors dark:border-neutral-700/80 dark:bg-black dark:text-zinc-300"
+			style={{ willChange: "opacity, transform" }}
 		>
-			<div className="pointer-events-none absolute inset-x-0 bottom-full h-20 w-[165px]">
-				<svg
-					className="h-full w-full"
-					width="100%"
-					height="100%"
-					viewBox="0 0 50 50"
-					fill="none"
-				>
-					{/* <g stroke="#fff" strokeWidth="0.4">
-              <path d="M 69 49.8 h -30 q -3 0 -3 -3 v -15 q 0 -3 -3 -3 h -23 q -3 0 -3 -3 v -15 q 0 -3 -3 -3 h -30" />
-            </g> */}
-					<g mask="url(#ml-mask-1)">
-						<circle
-							className="multiline ml-light-1"
-							cx="0"
-							cy="0"
-							r="20"
-							fill="url(#ml-white-grad)"
-						/>
-					</g>
-					<defs>
-						<mask id="ml-mask-1">
-							<path
-								d="M 69 49.8 h -30 q -3 0 -3 -3 v -13 q 0 -3 -3 -3 h -23 q -3 0 -3 -3 v -13 q 0 -3 -3 -3 h -30"
-								strokeWidth="1"
-								stroke="white"
+			{/* SVG Path Animation - Only on desktop */}
+			{!isMobile && (
+				<div className="pointer-events-none absolute inset-x-0 bottom-full h-20 w-[165px]">
+					<svg
+						className="h-full w-full"
+						width="100%"
+						height="100%"
+						viewBox="0 0 50 50"
+						fill="none"
+					>
+						<g mask="url(#ml-mask-1)">
+							<circle
+								className="multiline ml-light-1"
+								cx="0"
+								cy="0"
+								r="20"
+								fill="url(#ml-white-grad)"
 							/>
-						</mask>
-						<radialGradient id="ml-white-grad" fx="1">
-							<stop offset="0%" stopColor={color} />
-							<stop offset="20%" stopColor={color} />
-							<stop offset="100%" stopColor="transparent" />
-						</radialGradient>
-					</defs>
-				</svg>
-			</div>
+						</g>
+						<defs>
+							<mask id="ml-mask-1">
+								<path
+									d="M 69 49.8 h -30 q -3 0 -3 -3 v -13 q 0 -3 -3 -3 h -23 q -3 0 -3 -3 v -13 q 0 -3 -3 -3 h -30"
+									strokeWidth="1"
+									stroke="white"
+								/>
+							</mask>
+							<radialGradient id="ml-white-grad" fx="1">
+								<stop offset="0%" stopColor={color} />
+								<stop offset="20%" stopColor={color} />
+								<stop offset="100%" stopColor="transparent" />
+							</radialGradient>
+						</defs>
+					</svg>
+				</div>
+			)}
+
+			{/* Pulse indicator - Optimized */}
 			<div
 				className="relative flex h-1 w-1 items-center justify-center rounded-full"
-				style={{ backgroundColor: hexToRgba(color, 0.4) }}
+				style={{
+					backgroundColor: hexToRgba(color, 0.4),
+					contain: "layout style paint",
+				}}
 			>
+				{/* Single ping animation - reduced from double for mobile performance */}
 				<div
 					className="flex h-2 w-2 animate-ping items-center justify-center rounded-full"
-					style={{ backgroundColor: color }}
-				>
-					<div
-						className="flex h-2 w-2 animate-ping items-center justify-center rounded-full"
-						style={{ backgroundColor: color }}
-					></div>
-				</div>
+					style={{
+						backgroundColor: color,
+						animationDuration: isMobile ? "2s" : "1s", // Slower on mobile
+					}}
+				/>
 				<div
 					className="absolute top-1/2 left-1/2 flex h-1 w-1 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
 					style={{ backgroundColor: hexToRgba(color, 0.8) }}
-				></div>
+				/>
 			</div>
+
 			<div className="mx-2 h-4 w-px bg-neutral-300 dark:bg-neutral-600/80" />
 			<span className="bg-clip-text text-xs font-medium">{text}</span>
 		</motion.div>
 	);
+
 	return (
 		<>
 			{href ? <div className="inline-block">{content}</div> : content}
-			<style>
-				{`    
+			{!isMobile && (
+				<style>
+					{`    
 .multiline {
   offset-anchor: 10px 0px;
   animation: multiline-animation-path;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-duration: 3s;
+  will-change: offset-distance;
 }
 
 .ml-light-1 {
@@ -134,7 +160,8 @@ export const AnimatedBadge = ({
     offset-distance: 100%;
   }
 }`}
-			</style>
+				</style>
+			)}
 		</>
 	);
 };

@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 // Message data sets for chat simulation
@@ -251,10 +251,12 @@ const messageSets = [
 /**
  * ChatSimulation - Animated chat interface with cycling multilingual messages
  * Demonstrates the multilingual capabilities of the platform
- * Optimized for mobile with longer intervals and reduced layout animations
+ * Optimized with requestAnimationFrame and reduced layout thrashing
  */
 export const ChatSimulation = React.memo(() => {
 	const { isMobile } = useMobileDetect();
+	const animationRef = useRef<number | undefined>(undefined);
+	const lastUpdateRef = useRef<number>(0);
 
 	const getRandomSet = useMemo(
 		() => () => messageSets[Math.floor(Math.random() * messageSets.length)],
@@ -267,29 +269,42 @@ export const ChatSimulation = React.memo(() => {
 	useEffect(() => {
 		if (!currentSet) return;
 
-		// Increase interval on mobile to reduce animation overhead
-		const interval = setInterval(
-			() => {
+		// Optimized interval for mobile devices
+		const interval = isMobile ? 3500 : 2500;
+		let startTime = performance.now();
+
+		const animate = (currentTime: number) => {
+			const elapsed = currentTime - lastUpdateRef.current;
+
+			if (elapsed >= interval) {
+				lastUpdateRef.current = currentTime;
+
 				setVisibleIndex((prev) => {
 					if (prev < currentSet.length - 1) {
-						// show next message inside same set
 						return prev + 1;
 					}
 
-					// when last message finished -> switch to next random set
+					// Switch to next random set
 					const nextSet = getRandomSet();
 					setCurrentSet(nextSet);
-					return -1; // restart index
+					return -1;
 				});
-			},
-			isMobile ? 3500 : 2500,
-		); // Slower on mobile for performance
+			}
 
-		return () => clearInterval(interval);
+			animationRef.current = requestAnimationFrame(animate);
+		};
+
+		animationRef.current = requestAnimationFrame(animate);
+
+		return () => {
+			if (animationRef.current) {
+				cancelAnimationFrame(animationRef.current);
+			}
+		};
 	}, [currentSet, getRandomSet, isMobile]);
 
 	return (
-		<div className="p-6 space-y-4 font-sans">
+		<div className="p-6 space-y-4 font-sans" style={{ contain: "layout style paint" }}>
 			<div className="flex items-center justify-between pb-4 border-b border-black/5 dark:border-white/5">
 				<div className="flex items-center gap-3">
 					<div className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -297,18 +312,23 @@ export const ChatSimulation = React.memo(() => {
 					<div className="w-3 h-3 rounded-full bg-green-500/80" />
 				</div>
 			</div>
-			<div className="space-y-4 min-h-[280px] sm:h-[240px] md:h-[220px] overflow-hidden relative">
-				<AnimatePresence mode="popLayout">
+			<div
+				className="space-y-4 min-h-[280px] sm:h-[240px] md:h-[220px] overflow-hidden relative"
+				style={{ contain: "layout" }}
+			>
+				<AnimatePresence mode="sync">
 					{currentSet?.slice(0, visibleIndex + 1).map((msg) => (
 						<motion.div
-							key={msg.id}
+							key={`${msg.id}-${msg.text}`}
 							initial={{ opacity: 0, x: msg.role === "user" ? 20 : -20, y: 10 }}
 							animate={{ opacity: 1, x: 0, y: 0 }}
-							layout
+							exit={{ opacity: 0, scale: 0.95 }}
+							transition={{ duration: 0.3, ease: "easeOut" }}
 							className={cn(
 								"flex w-full",
 								msg.role === "user" ? "justify-end" : "justify-start",
 							)}
+							style={{ willChange: "opacity, transform" }}
 						>
 							<div
 								className={cn(
@@ -323,8 +343,6 @@ export const ChatSimulation = React.memo(() => {
 						</motion.div>
 					))}
 				</AnimatePresence>
-				{/* Fade gradient at bottom */}
-				<div className="absolute bottom-0 left-0 right-0 h-12 " />
 			</div>
 		</div>
 	);
