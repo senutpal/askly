@@ -2,8 +2,8 @@
 
 import { AlertBadge, cn } from "@workspace/ui";
 import { AlertCircle } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import React from "react";
+import { AnimatePresence, motion, MotionValue } from "motion/react";
+import React, { useMemo } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 interface Problem {
@@ -21,39 +21,50 @@ interface Problem {
 interface ProblemNarrativeProps {
 	activeCard: number;
 	problems: Problem[];
-	scrollYProgress: any;
+	scrollYProgress: MotionValue<number>;
 }
 
 /**
  * ProblemNarrative - Left side narrative content
  * Displays the current problem description with animations
+ * Optimized with faster transitions and GPU acceleration
  */
 export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 	({ activeCard, problems, scrollYProgress }) => {
 		const { isMobile } = useMobileDetect();
 		const activeProblem = problems[activeCard] || problems[0];
 
+		// Memoize progress bar height calculation
+		const progressHeight = useMemo(() => {
+			try {
+				const value = scrollYProgress.get();
+				return `${value * 100}%`;
+			} catch {
+				return "0%";
+			}
+		}, [scrollYProgress, activeCard]); // Update when activeCard changes
+
 		return (
-			<div className="w-full lg:w-1/2 h-full flex flex-col justify-start md:justify-center z-10 mb-12 lg:mb-0 relative">
-				{/* Progress Bar */}
-				<div className="absolute top-1/4 left-0 w-1 h-1/2 bg-neutral-200 dark:bg-neutral-800 rounded-full hidden lg:block">
-					<motion.div
-						className="w-full bg-red-500 rounded-full"
-						style={{
-							height: scrollYProgress
-								? scrollYProgress.get
-									? `${scrollYProgress.get() * 100}%`
-									: "0%"
-								: "0%",
-						}}
-					/>
-				</div>
+			<div
+				className="w-full lg:w-1/2 h-full flex flex-col justify-start md:justify-center z-10 mb-12 lg:mb-0 relative"
+				style={{ contain: "layout style" }}
+			>
+				{/* Progress Bar - Desktop only */}
+				{!isMobile && (
+					<div className="absolute top-1/4 left-0 w-1 h-1/2 bg-neutral-200 dark:bg-neutral-800 rounded-full hidden lg:block">
+						<div
+							className="w-full bg-red-500 rounded-full transition-all duration-300 ease-out"
+							style={{ height: progressHeight }}
+						/>
+					</div>
+				)}
 
 				<div className="lg:pl-12 space-y-8 max-w-lg">
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+						viewport={{ once: true }}
 					>
 						<div className="hidden md:block">
 							<AlertBadge
@@ -70,6 +81,7 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 						</h2>
 					</motion.div>
 
+					{/* Content transitions */}
 					<div className="relative min-h-[180px]">
 						<AnimatePresence mode="wait">
 							<motion.div
@@ -77,8 +89,12 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 								initial={{ opacity: 0, y: 10 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -10 }}
-								transition={{ duration: 0.4, ease: "easeInOut" }}
+								transition={{
+									duration: isMobile ? 0.25 : 0.35,
+									ease: "easeInOut",
+								}}
 								className="absolute top-0 left-0"
+								style={{ willChange: "opacity, transform" }}
 							>
 								<h3
 									className={cn(
@@ -95,6 +111,7 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 						</AnimatePresence>
 					</div>
 
+					{/* Progress indicator - Desktop only */}
 					{!isMobile && (
 						<div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-500">
 							<span>0{activeCard + 1}</span>

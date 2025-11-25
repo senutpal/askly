@@ -77,6 +77,10 @@ const problems = [
   },
 ];
 
+/**
+ * ProblemSection - Scroll-based card stack section
+ * Optimized with requestAnimationFrame for smooth mobile performance
+ */
 export default function ProblemSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeCard, setActiveCard] = useState(0);
@@ -87,32 +91,59 @@ export default function ProblemSection() {
     offset: ["start start", "end end"],
   });
 
+  // Optimized scroll handler with requestAnimationFrame
   useEffect(() => {
-    let lastUpdate = 0;
-    const throttleDelay = isMobile ? 50 : 16;
+    let rafId: number | null = null;
+    let lastProgress = -1;
 
-    const unsubscribe = scrollYProgress.on("change", (latest) => {
-      const now = Date.now();
-      if (now - lastUpdate < throttleDelay) return;
-      lastUpdate = now;
+    const updateActiveCard = () => {
+      const progress = scrollYProgress.get();
+      
+      // Only update if progress changed significantly (reduce state updates)
+      if (Math.abs(progress - lastProgress) > 0.001) {
+        lastProgress = progress;
+        
+        const cardCount = problems.length;
+        const step = 1 / cardCount;
+        const index = Math.min(Math.floor(progress / step), cardCount - 1);
+        setActiveCard(index);
+      }
+    };
 
-      const cardCount = problems.length;
-      const step = 1 / cardCount;
-      const index = Math.min(Math.floor(latest / step), cardCount - 1);
-      setActiveCard(index);
+    const unsubscribe = scrollYProgress.on("change", () => {
+      // Cancel previous frame if still pending
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      
+      // Schedule update for next frame
+      rafId = requestAnimationFrame(updateActiveCard);
     });
-    return () => unsubscribe();
-  }, [scrollYProgress, isMobile]);
+
+    return () => {
+      unsubscribe();
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, [scrollYProgress]);
 
   return (
-    <section id="problem" className="relative text-neutral-900 dark:text-white">
+    <section
+      id="problem"
+      className="relative text-neutral-900 dark:text-white"
+      style={{ contain: "layout style" }}
+    >
       <TopographyPattern />
 
       <div
         ref={containerRef}
         className={isMobile ? "relative h-[200vh]" : "relative h-[300vh]"}
       >
-        <div className="sticky top-0 h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden px-6 md:px-12 lg:px-24 py-12">
+        <div
+          className="sticky top-0 h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden px-6 md:px-12 lg:px-24 py-12"
+          style={{ willChange: "contents" }}
+        >
           <ProblemNarrative
             activeCard={activeCard}
             problems={problems}
