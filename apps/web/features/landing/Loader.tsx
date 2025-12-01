@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DURATION = 4;
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -31,7 +31,7 @@ const ScrambleText = ({
 				setDisplayText(
 					text
 						.split("")
-						.map((char, index) => {
+						.map((_char, index) => {
 							if (index < iterationRef.current) {
 								return text[index];
 							}

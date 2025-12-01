@@ -1,7 +1,6 @@
 import { Button } from "@workspace/ui";
-import { cn } from "@workspace/ui/lib/utils";
+import { ArrowRight, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { ArrowRight, Check, type LucideIcon, Plug, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 export interface Feature {
@@ -43,9 +42,6 @@ export const PluginCard = ({
 								width={48}
 								src="/logo.svg"
 							/>
-							<div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
-								<Sparkles className="h-4 w-4" />
-							</div>
 						</div>
 
 						{/* Animated Connection Line */}

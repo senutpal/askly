@@ -49,14 +49,13 @@ export const MobileMenu = React.memo<MobileMenuProps>(
 							className="container mx-auto px-6 pt-28 pb-10 flex flex-col h-full justify-between"
 							style={{ contain: "layout style paint" }}
 						>
-							{/* Navigation Links - No staggered animation for faster open */}
 							<div className="flex flex-col space-y-6">
 								{links.map((link) => (
 									<div key={link.href}>
 										<Link
 											href={link.href}
 											onClick={handleLinkClick}
-											className="group flex items-center justify-between text-3xl font-semibold text-foreground/80 hover:text-primary transition-colors active:scale-98"
+											className="group flex items-center justify-between text-3xl font-semibold text-foreground/80 hover:text-primary transition-colors `"
 											style={{ WebkitTapHighlightColor: "transparent" }}
 										>
 											<span>{link.label}</span>
@@ -85,7 +84,7 @@ export const MobileMenu = React.memo<MobileMenuProps>(
 								</SignInButton>
 
 								<p className="text-center text-xs text-muted-foreground pt-4">
-									© 2024 Askly Inc. All rights reserved.
+									© {new Date().getFullYear()} Askly Inc. All rights reserved.
 								</p>
 							</div>
 						</div>

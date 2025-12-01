@@ -35,10 +35,9 @@ export const IntegrationCard = ({
 				className={cn(
 					"relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-neutral-100 p-6 text-left transition-all duration-300",
 					"hover:border-white/20 hover:bg-neutral-200 hover:shadow-2xl hover:shadow-primary/5",
-					"dark:bg-black/20 dark:hover:bg-white/5"
+					"dark:bg-black/20 dark:hover:bg-white/5",
 				)}
 			>
-
 				<div className="relative z-10 flex w-full items-start justify-between">
 					<div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 backdrop-blur-md transition-transform duration-300 group-hover:scale-110 dark:bg-black/40">
 						<Image

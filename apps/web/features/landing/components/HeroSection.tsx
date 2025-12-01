@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { HeroBackground } from "./HeroBackground";
 import { HeroContent } from "./HeroContent";
 import { HeroVisual } from "./HeroVisual";

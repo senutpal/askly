@@ -3,7 +3,10 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components, internal } from "../_generated/api";
 import { action, query } from "../_generated/server";
-import { supportAgent } from "../system/ai/agents/supportAgent";
+import {
+	createSupportAgent,
+	supportAgent,
+} from "../system/ai/agents/supportAgent";
 import { escalateConversation } from "../system/ai/tools/escalateConversation";
 import { resolveConversation } from "../system/ai/tools/resolveConversation";
 import { search } from "../system/ai/tools/search";
@@ -21,7 +24,6 @@ export const create = action({
 				contactSessionId: args.contactSessionId,
 			},
 		);
-
 		if (!contactSession || contactSession.expiresAt < Date.now()) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
@@ -34,31 +36,28 @@ export const create = action({
 				threadId: args.threadId,
 			},
 		);
-
 		if (!conversation) {
 			throw new ConvexError({
 				code: "NOT FOUND",
 				message: "Conversation not found",
 			});
 		}
-
 		if (conversation.contactSessionId !== contactSession._id) {
 			throw new ConvexError({
 				code: "FORBIDDEN",
 				message: "Conversation does not belong to this session",
 			});
 		}
-
 		if (conversation.status === "resolved") {
 			throw new ConvexError({
 				code: "BAD REQUEST",
 				message: "Conversation resolved",
 			});
 		}
-
 		const shouldTriggerAgent = conversation.status === "unresolved";
 		if (shouldTriggerAgent) {
-			await supportAgent.generateText(
+			const agent = await createSupportAgent(ctx, conversation.organizationId);
+			await agent.generateText(
 				ctx,
 				{
 					threadId: args.threadId,
@@ -80,7 +79,6 @@ export const create = action({
 		}
 	},
 });
-
 export const getMany = query({
 	args: {
 		threadId: v.string(),
@@ -89,19 +87,16 @@ export const getMany = query({
 	},
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.db.get(args.contactSessionId);
-
 		if (!contactSession || contactSession.expiresAt < Date.now()) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Session",
 			});
 		}
-
 		const conversation = await ctx.db
 			.query("conversations")
 			.withIndex("by_thread_id", (q) => q.eq("threadId", args.threadId))
 			.unique();
-
 		if (
 			!conversation ||
 			conversation.contactSessionId !== args.contactSessionId
@@ -111,7 +106,6 @@ export const getMany = query({
 				message: "Conversation not found for this session",
 			});
 		}
-
 		const paginated = await supportAgent.listMessages(ctx, {
 			threadId: args.threadId,
 			paginationOpts: args.paginationOpts,

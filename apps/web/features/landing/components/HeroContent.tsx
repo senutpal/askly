@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 /**
  * HeroContent - Left side text content of hero section
@@ -27,7 +27,8 @@ export const HeroContent = React.memo(() => {
 		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 		setPrefersReducedMotion(mediaQuery.matches);
 
-		const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+		const handler = (e: MediaQueryListEvent) =>
+			setPrefersReducedMotion(e.matches);
 		mediaQuery.addEventListener("change", handler);
 		return () => mediaQuery.removeEventListener("change", handler);
 	}, []);

@@ -25,12 +25,14 @@ function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
 	);
 
 	return (
-		<ClerkProvider appearance={appearance}>
-			<ConvexProviderWithClerk useAuth={useAuth} client={convex}>
-				<Toaster />
-				{children}
-			</ConvexProviderWithClerk>
-		</ClerkProvider>
+		<>
+			<Toaster />
+			<ClerkProvider appearance={appearance}>
+				<ConvexProviderWithClerk useAuth={useAuth} client={convex}>
+					{children}
+				</ConvexProviderWithClerk>
+			</ClerkProvider>
+		</>
 	);
 }
 

@@ -5,7 +5,6 @@ import {
 	AIMessage,
 	AIMessageContent,
 	Button,
-	cn,
 } from "@workspace/ui";
 import { useSetAtom } from "jotai";
 import { ArrowLeftIcon, Mic, MicOff } from "lucide-react";
@@ -36,7 +35,9 @@ export const WidgetVoiceScreen = () => {
 					>
 						<ArrowLeftIcon className="size-4 text-gray-600" />
 					</Button>
-					<span className="text-base font-semibold text-gray-900">Voice Call</span>
+					<span className="text-base font-semibold text-gray-900">
+						Voice Call
+					</span>
 				</div>
 			</WidgetHeader>
 			{transcript.length > 0 ? (
@@ -57,7 +58,6 @@ export const WidgetVoiceScreen = () => {
 								>
 									{message.text}
 								</AIMessageContent>
-                
 							</AIMessage>
 						))}
 					</AIConversationContent>
@@ -72,7 +72,10 @@ export const WidgetVoiceScreen = () => {
 						{isSpeaking && (
 							<div className="absolute inset-0 rounded-full bg-purple-200/50 animate-ping duration-[1.5s]" />
 						)}
-						<Mic className="size-12 text-purple-600 relative z-10" strokeWidth={1.5} />
+						<Mic
+							className="size-12 text-purple-600 relative z-10"
+							strokeWidth={1.5}
+						/>
 					</div>
 					<div className="text-center space-y-1">
 						<p className="text-lg font-semibold text-gray-900">

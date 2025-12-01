@@ -14,7 +14,7 @@ import {
 } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
 import { crawlWebsite } from "../lib/webCrawler";
-import rag from "../system/ai/rag";
+import { createRAG } from "../system/ai/rag";
 
 type StartCrawlArgs = {
 	url: string;
@@ -233,7 +233,6 @@ export const addSelectedResources = action({
 				message: "Identity Not Found",
 			});
 		}
-
 		const orgId = identity.orgId as string | undefined;
 		if (!orgId) {
 			throw new ConvexError({
@@ -241,22 +240,20 @@ export const addSelectedResources = action({
 				message: "Organization Not Found",
 			});
 		}
-
 		const job = await ctx.runQuery(internal.private.webCrawl.getJobDocument, {
 			jobId: args.jobId,
 		});
-
 		if (!job || job.organizationId !== orgId) {
 			throw new ConvexError({ code: "NOT_FOUND", message: "Job not found" });
 		}
-
 		const results: Array<{
 			resourceId: Id<"crawlResults">;
 			success: boolean;
 			entryId?: string;
 			error?: string;
 		}> = [];
-
+		// Use organization-specific RAG instance
+		const orgRag = await createRAG(ctx, orgId);
 		for (const resourceId of args.selectedResourceIds) {
 			try {
 				const resource = await ctx.runQuery(
@@ -265,7 +262,6 @@ export const addSelectedResources = action({
 						resourceId,
 					},
 				);
-
 				if (!resource) {
 					results.push({
 						resourceId,
@@ -274,7 +270,6 @@ export const addSelectedResources = action({
 					});
 					continue;
 				}
-
 				if (resource.jobId !== args.jobId) {
 					results.push({
 						resourceId,
@@ -283,7 +278,6 @@ export const addSelectedResources = action({
 					});
 					continue;
 				}
-
 				if (resource.addedToKnowledgeBase) {
 					results.push({
 						resourceId,
@@ -292,11 +286,9 @@ export const addSelectedResources = action({
 					});
 					continue;
 				}
-
 				let bytes: ArrayBuffer;
 				let mimeType: string;
 				const filename = resource.title ?? "file";
-
 				if (resource.type === "text") {
 					const response = await axios.get(resource.url, { timeout: 15000 });
 					const { document } = parseHTML(response.data);
@@ -317,18 +309,16 @@ export const addSelectedResources = action({
 						(response.headers["content-type"] as string | undefined) ||
 						guessMimeType(filename);
 				}
-
 				const blob = new Blob([bytes], { type: mimeType });
 				const storageId = await ctx.storage.store(blob);
-
 				const text = await extractTextContent(ctx, {
 					storageId,
 					filename,
 					bytes,
 					mimeType,
+					organizationId: orgId,
 				});
-
-				const { entryId, created } = await rag.add(ctx, {
+				const { entryId, created } = await orgRag.add(ctx, {
 					namespace: orgId,
 					text,
 					key: filename,
@@ -342,15 +332,12 @@ export const addSelectedResources = action({
 					},
 					contentHash: await contentHashFromArrayBuffer(bytes),
 				});
-
 				if (!created) {
 					await ctx.storage.delete(storageId);
 				}
-
 				await ctx.runMutation(internal.private.webCrawl.markAsAdded, {
 					resourceId,
 				});
-
 				results.push({
 					resourceId,
 					success: true,
@@ -365,7 +352,6 @@ export const addSelectedResources = action({
 				});
 			}
 		}
-
 		return {
 			results,
 			successful: results.filter((r) => r.success).length,

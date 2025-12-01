@@ -3,7 +3,7 @@ import { internalMutation, internalQuery } from "../_generated/server";
 
 export const upsert = internalMutation({
 	args: {
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 		organizationId: v.string(),
 		secretContent: v.string(),
 		iv: v.string(),
@@ -37,7 +37,7 @@ export const upsert = internalMutation({
 
 export const getByOrganizationIdAndService = internalQuery({
 	args: {
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 		organizationId: v.string(),
 	},
 	handler: async (ctx, args) => {

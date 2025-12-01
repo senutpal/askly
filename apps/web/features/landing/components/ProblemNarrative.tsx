@@ -2,7 +2,7 @@
 
 import { AlertBadge, cn } from "@workspace/ui";
 import { AlertCircle } from "lucide-react";
-import { AnimatePresence, motion, MotionValue } from "motion/react";
+import { AnimatePresence, type MotionValue, motion } from "motion/react";
 import React, { useMemo } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
@@ -42,7 +42,7 @@ export const ProblemNarrative = React.memo<ProblemNarrativeProps>(
 			} catch {
 				return "0%";
 			}
-		}, [scrollYProgress, activeCard]); // Update when activeCard changes
+		}, [scrollYProgress]); // Update when activeCard changes
 
 		return (
 			<div

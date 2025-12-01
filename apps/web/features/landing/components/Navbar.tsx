@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { DesktopNav } from "./DesktopNav";
 import { MobileMenu } from "./MobileMenu";

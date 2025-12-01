@@ -61,9 +61,14 @@ export const WidgetInboxScreen = () => {
 				{conversations?.results.length === 0 && (
 					<div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center text-muted-foreground animate-in fade-in duration-500">
 						<div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-							<ConversationStatusIcon status="resolved" className="size-6 text-gray-400" />
+							<ConversationStatusIcon
+								status="resolved"
+								className="size-6 text-gray-400"
+							/>
 						</div>
-						<p className="text-sm font-medium text-gray-500">No conversations yet</p>
+						<p className="text-sm font-medium text-gray-500">
+							No conversations yet
+						</p>
 					</div>
 				)}
 				{conversations?.results.length > 0 && (
@@ -80,7 +85,9 @@ export const WidgetInboxScreen = () => {
 							>
 								<div className="flex w-full items-center justify-between">
 									<span className="text-xs font-medium text-gray-500">
-										{formatDistanceToNow(new Date(conversation._creationTime), { addSuffix: true })}
+										{formatDistanceToNow(new Date(conversation._creationTime), {
+											addSuffix: true,
+										})}
 									</span>
 									<ConversationStatusIcon
 										status={conversation.status}

@@ -3,88 +3,87 @@
 import { OrganizationSwitcher } from "@clerk/nextjs";
 import { api } from "@workspace/backend/_generated/api";
 import { Button, DiceBearAvatar, SidebarTrigger } from "@workspace/ui";
+import { cn } from "@workspace/ui/lib/utils";
 import { useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { motion } from "motion/react";
 import {
-	ArrowUpRight,
-	AudioWaveform,
-	ChevronRight,
-	Clock,
-	Command,
-	FileText,
-	HelpCircle,
-	LayoutGrid,
-	MessageSquare,
-	MoreHorizontal,
-	Settings2,
-	Sparkles,
-	Users,
-	Zap,
+  ArrowUpRight,
+  AudioWaveform,
+  ChevronRight,
+  Clock,
+  Command,
+  FileText,
+  HelpCircle,
+  LayoutGrid,
+  MessageSquare,
+  MoreHorizontal,
+  Settings2,
+  Sparkles,
+  Users,
+  Zap,
 } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
-import { cn } from "@workspace/ui/lib/utils";
 
 const containerVariants = {
-	hidden: { opacity: 0 },
-	show: {
-		opacity: 1,
-		transition: {
-			staggerChildren: 0.08,
-		},
-	},
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
 };
 
 const itemVariants = {
-	hidden: { opacity: 0, y: 20, filter: "blur(5px)" },
-	show: {
-		opacity: 1,
-		y: 0,
-		filter: "blur(0px)",
-		transition: {
-			type: "spring" as const,
-			stiffness: 100,
-			damping: 20,
-		},
-	},
+  hidden: { opacity: 0, y: 20, filter: "blur(5px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 20,
+    },
+  },
 };
 
-
 export default function Page() {
-	const conversations = useQuery(api.private.conversations.getMany, {
-		paginationOpts: { numItems: 100, cursor: null },
-	});
-	const files = useQuery(api.private.files.list, {
-		paginationOpts: { numItems: 3, cursor: null },
-	});
-	const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
-	const widgetSettings = useQuery(api.private.widgetSettings.getOne);
+  const conversations = useQuery(api.private.conversations.getMany, {
+    paginationOpts: { numItems: 100, cursor: null },
+  });
+  const files = useQuery(api.private.files.list, {
+    paginationOpts: { numItems: 3, cursor: null },
+  });
+  const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
+  const widgetSettings = useQuery(api.private.widgetSettings.getOne);
 
-	const isLoading =
-		conversations === undefined ||
-		files === undefined ||
-		vapiPlugin === undefined ||
-		widgetSettings === undefined;
+  const isLoading =
+    conversations === undefined ||
+    files === undefined ||
+    vapiPlugin === undefined ||
+    widgetSettings === undefined;
 
-	const conversationStats = conversations?.page.reduce(
-		(acc, conv) => {
-			if (conv.status === "resolved") acc.resolved++;
-			else if (conv.status === "escalated") acc.escalated++;
-			else acc.active++;
-			return acc;
-		},
-		{ active: 0, resolved: 0, escalated: 0 },
-	) || { active: 0, resolved: 0, escalated: 0 };
+  const conversationStats = conversations?.page.reduce(
+    (acc, conv) => {
+      if (conv.status === "resolved") acc.resolved++;
+      else if (conv.status === "escalated") acc.escalated++;
+      else acc.active++;
+      return acc;
+    },
+    { active: 0, resolved: 0, escalated: 0 }
+  ) || { active: 0, resolved: 0, escalated: 0 };
 
-	
-	const total =
-		conversationStats.active +
-		conversationStats.resolved +
-		conversationStats.escalated;
-	const efficiency = total > 0 ? Math.round((conversationStats.resolved / total) * 100) : 0;
+  const total =
+    conversationStats.active +
+    conversationStats.resolved +
+    conversationStats.escalated;
+  const efficiency =
+    total > 0 ? Math.round((conversationStats.resolved / total) * 100) : 0;
 
-	return (
+  return (
     <div className="min-h-screen w-full bg-background dark:bg-neutral-900 text-foreground selection:bg-primary/10 selection:text-primary">
       <div className="mx-auto max-w-[1400px] p-6 sm:p-8 lg:p-12">
         <header className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -326,148 +325,151 @@ export default function Page() {
 // --- Sub Components ---
 
 function StatCard({
-	label,
-	value,
-	trend,
-	trendUp,
-	icon,
-	isNegativeStat = false,
+  label,
+  value,
+  icon,
 }: {
-	label: string;
-	value: string | number;
-	trend: string;
-	trendUp: boolean;
-	icon: React.ReactNode;
-	isNegativeStat?: boolean;
+  label: string;
+  value: string | number;
+  trend: string;
+  trendUp: boolean;
+  icon: React.ReactNode;
+  isNegativeStat?: boolean;
 }) {
-	return (
-		<div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 p-6 transition-all hover:bg-card hover:shadow-lg">
-			<div className="flex items-start justify-between">
-				<div className="space-y-4">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						{icon}
-						<span className="text-sm font-medium">{label}</span>
-					</div>
-					<div className="flex items-baseline gap-2">
-						<span className="text-4xl font-semibold tracking-tighter text-foreground">
-							{value}
-						</span>
-					</div>
-				</div>
-			</div>
-            {/* Decorative background element */}
-            <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-tr from-primary/10 to-transparent blur-2xl transition-all group-hover:from-primary/20" />
-		</div>
-	);
+  return (
+    <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 p-6 transition-all hover:bg-card hover:shadow-lg">
+      <div className="flex items-start justify-between">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            {icon}
+            <span className="text-sm font-medium">{label}</span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-semibold tracking-tighter text-foreground">
+              {value}
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Decorative background element */}
+      <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-tr from-primary/10 to-transparent blur-2xl transition-all group-hover:from-primary/20" />
+    </div>
+  );
 }
 
 function ConversationRow({ data }: { data: any }) {
-	const statusColors = {
-		resolved: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-		escalated: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-		active: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
-	};
+  const statusColors = {
+    resolved: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    escalated: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+    active: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  };
 
-	// Determine status key safely
-	const statusKey = (
-		["resolved", "escalated"].includes(data.status) ? data.status : "active"
-	) as keyof typeof statusColors;
+  // Determine status key safely
+  const statusKey = (
+    ["resolved", "escalated"].includes(data.status) ? data.status : "active"
+  ) as keyof typeof statusColors;
 
-	return (
-		<Link href={`/conversations/${data._id}`}>
-			<motion.div
-				whileHover={{ scale: 1.01, x: 4 }}
-				className="group flex items-center justify-between rounded-xl p-3 transition-all hover:bg-accent/50"
-			>
-				<div className="flex items-center gap-4">
-					<div className="relative h-10 w-10 overflow-hidden rounded-full border border-border/50 bg-muted flex items-center justify-center">
+  return (
+    <Link href={`/conversations/${data._id}`}>
+      <motion.div
+        whileHover={{ scale: 1.01, x: 4 }}
+        className="group flex items-center justify-between rounded-xl p-3 transition-all hover:bg-accent/50"
+      >
+        <div className="flex items-center gap-4">
+          <div className="relative h-10 w-10 overflow-hidden rounded-full border border-border/50 bg-muted flex items-center justify-center">
             <DiceBearAvatar seed={data._id} size={42} />
-            
-					</div>
-					<div>
-						<p className="font-medium text-foreground text-sm">{data.contactSession?.name || "Anonymous Visitor"}</p>
-						<div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-							<span>{formatDistanceToNow(data._creationTime)} ago</span>
-						</div>
-					</div>
-				</div>
-				
-                <div className="flex items-center gap-4">
-                    <span
-                        className={cn(
-                            "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-                            statusColors[statusKey]
-                        )}
-                    >
-                        {statusKey}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-foreground transition-colors" />
-                </div>
-			</motion.div>
-		</Link>
-	);
+          </div>
+          <div>
+            <p className="font-medium text-foreground text-sm">
+              {data.contactSession?.name || "Anonymous Visitor"}
+            </p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>{formatDistanceToNow(data._creationTime)} ago</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
+              statusColors[statusKey]
+            )}
+          >
+            {statusKey}
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-foreground transition-colors" />
+        </div>
+      </motion.div>
+    </Link>
+  );
 }
 
 function ActionTile({
-	icon: Icon,
-	title,
-	subtitle,
-	href,
-	status,
+  icon: Icon,
+  title,
+  subtitle,
+  href,
+  status,
 }: {
-	icon: React.ElementType;
-	title: string;
-	subtitle: string;
-	href: string;
-	status: "active" | "inactive" | "pending" | "neutral";
+  icon: React.ElementType;
+  title: string;
+  subtitle: string;
+  href: string;
+  status: "active" | "inactive" | "pending" | "neutral";
 }) {
-    const statusColor = {
-        active: "bg-emerald-500",
-        inactive: "bg-destructive",
-        pending: "bg-amber-500",
-        neutral: "bg-muted-foreground"
-    }
+  const statusColor = {
+    active: "bg-emerald-500",
+    inactive: "bg-destructive",
+    pending: "bg-amber-500",
+    neutral: "bg-muted-foreground",
+  };
 
-	return (
-		<Link href={href} className="block h-full">
-			<motion.div
-				whileHover={{ scale: 1.02 }}
-				whileTap={{ scale: 0.98 }}
-				className="group flex h-full items-center gap-4 rounded-2xl border border-border/50 bg-background/50 p-4 transition-all hover:bg-accent hover:border-border/80"
-			>
-				<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground transition-colors group-hover:bg-background group-hover:shadow-sm">
-					<Icon className="h-5 w-5" />
-				</div>
-				<div className="min-w-0 flex-1">
-					<h4 className="text-sm font-medium leading-none text-foreground">
-						{title}
-					</h4>
-					<p className="mt-1 text-xs text-muted-foreground truncate">{subtitle}</p>
-				</div>
-                {status !== "neutral" && (
-                    <div className={cn("h-2 w-2 rounded-full", statusColor[status])} />
-                )}
-                {status === "neutral" && (
-                    <MoreHorizontal className="h-4 w-4 text-muted-foreground/50" />
-                )}
-			</motion.div>
-		</Link>
-	);
+  return (
+    <Link href={href} className="block h-full">
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="group flex h-full items-center gap-4 rounded-2xl border border-border/50 bg-background/50 p-4 transition-all hover:bg-accent hover:border-border/80"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground transition-colors group-hover:bg-background group-hover:shadow-sm">
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-medium leading-none text-foreground">
+            {title}
+          </h4>
+          <p className="mt-1 text-xs text-muted-foreground truncate">
+            {subtitle}
+          </p>
+        </div>
+        {status !== "neutral" && (
+          <div className={cn("h-2 w-2 rounded-full", statusColor[status])} />
+        )}
+        {status === "neutral" && (
+          <MoreHorizontal className="h-4 w-4 text-muted-foreground/50" />
+        )}
+      </motion.div>
+    </Link>
+  );
 }
 
 // --- Skeleton Loader ---
 function DashboardSkeleton() {
-	return (
-		<div className="grid gap-6 md:grid-cols-12 lg:gap-8">
-			{[1, 2, 3].map((i) => (
-				<div key={i} className="h-32 rounded-3xl bg-muted/50 animate-pulse md:col-span-4" />
-			))}
-			<div className="h-[500px] rounded-3xl bg-muted/50 animate-pulse md:col-span-12 lg:col-span-8" />
-			<div className="space-y-6 md:col-span-12 lg:col-span-4">
-                <div className="h-[300px] rounded-3xl bg-muted/50 animate-pulse" />
-                <div className="h-[180px] rounded-3xl bg-muted/50 animate-pulse" />
-            </div>
-		</div>
-	);
+  return (
+    <div className="grid gap-6 md:grid-cols-12 lg:gap-8">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="h-32 rounded-3xl bg-muted/50 animate-pulse md:col-span-4"
+        />
+      ))}
+      <div className="h-[500px] rounded-3xl bg-muted/50 animate-pulse md:col-span-12 lg:col-span-8" />
+      <div className="space-y-6 md:col-span-12 lg:col-span-4">
+        <div className="h-[300px] rounded-3xl bg-muted/50 animate-pulse" />
+        <div className="h-[180px] rounded-3xl bg-muted/50 animate-pulse" />
+      </div>
+    </div>
+  );
 }

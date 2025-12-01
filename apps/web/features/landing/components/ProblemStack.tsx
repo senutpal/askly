@@ -23,22 +23,12 @@ interface ProblemStackProps {
 /**
  * ProblemStack - Right side card stack visualization
  * Displays stacked problem cards with scroll-based animations
- * Optimized with CSS containment
  */
 export const ProblemStack = React.memo<ProblemStackProps>(
 	({ problems, activeCard }) => {
 		return (
-			<div
-				className="w-full lg:w-1/2 h-[20vh] md:h-[50vh] lg:h-full flex items-center justify-end lg:justify-end perspective-1000"
-				style={{ contain: "layout style" }}
-			>
-				<div
-					className="relative w-full max-w-md aspect-square"
-					style={{
-						contain: "layout style paint",
-						willChange: "contents",
-					}}
-				>
+			<div className="w-full lg:w-1/2 h-[20vh] md:h-[50vh] lg:h-full flex items-center justify-center lg:justify-end perspective-1000">
+				<div className="relative w-full max-w-md aspect-square">
 					{problems.map((card, index) => (
 						<ProblemCard
 							key={card.id}

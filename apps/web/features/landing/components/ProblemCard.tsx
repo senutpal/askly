@@ -37,28 +37,47 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 		const isPast = index < activeCard;
 
 		// Optimized animation state - minimal calculations
-		const animationState = useMemo(
-			() => {
-				if (isMobile) {
-					// Ultra-simplified mobile animations - only y and opacity
-					return {
-						y: isActive ? 0 : isPast ? -40 * (activeCard - index) : 15 * (index - activeCard),
-						opacity: isActive ? 1 : isPast ? (index === activeCard - 1 ? 0.6 : 0) : 0.3,
-						scale: 1, // Fixed scale on mobile
-					};
-				}
-
-				// Desktop animations
+		const animationState = useMemo(() => {
+			if (isMobile) {
+				// Ultra-simplified mobile animations - only y and opacity
 				return {
-					y: isActive ? 0 : isPast ? -50 * (activeCard - index) : 20 * (index - activeCard),
-					scale: isActive ? 1 : isPast ? 1 - (activeCard - index) * 0.05 : 0.9 - (index - activeCard) * 0.05,
-					opacity: isActive ? 1 : isPast ? Math.max(0, 1 - (activeCard - index) * 0.3) : Math.max(0, 0.4 - (index - activeCard) * 0.1),
-					rotateX: isActive ? 0 : isPast ? 10 : -10,
-					z: isActive ? 0 : -100,
+					y: isActive
+						? 0
+						: isPast
+							? -40 * (activeCard - index)
+							: 15 * (index - activeCard),
+					opacity: isActive
+						? 1
+						: isPast
+							? index === activeCard - 1
+								? 0.6
+								: 0
+							: 0.3,
+					scale: 1, // Fixed scale on mobile
 				};
-			},
-			[isActive, isPast, index, activeCard, isMobile],
-		);
+			}
+
+			// Desktop animations
+			return {
+				y: isActive
+					? 0
+					: isPast
+						? -50 * (activeCard - index)
+						: 20 * (index - activeCard),
+				scale: isActive
+					? 1
+					: isPast
+						? 1 - (activeCard - index) * 0.05
+						: 0.9 - (index - activeCard) * 0.05,
+				opacity: isActive
+					? 1
+					: isPast
+						? Math.max(0, 1 - (activeCard - index) * 0.3)
+						: Math.max(0, 0.4 - (index - activeCard) * 0.1),
+				rotateX: isActive ? 0 : isPast ? 10 : -10,
+				z: isActive ? 0 : -100,
+			};
+		}, [isActive, isPast, index, activeCard, isMobile]);
 
 		return (
 			<motion.div
@@ -86,7 +105,9 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 					"bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5",
 					"border border-white/20 dark:border-white/10",
 					// Minimal backdrop blur on mobile
-					isMobile ? "backdrop-blur-[2px] shadow-lg" : "backdrop-blur-2xl shadow-2xl",
+					isMobile
+						? "backdrop-blur-[2px] shadow-lg"
+						: "backdrop-blur-2xl shadow-2xl",
 					isActive ? "z-30" : "z-0",
 					isActive && card.shadow,
 				)}

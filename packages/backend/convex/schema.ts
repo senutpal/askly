@@ -61,7 +61,7 @@ export default defineSchema({
 
 	plugins: defineTable({
 		organizationId: v.string(),
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 		secretContent: v.string(),
 		iv: v.string(),
 		authTag: v.string(),

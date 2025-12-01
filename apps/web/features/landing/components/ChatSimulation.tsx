@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 // Message data sets for chat simulation
@@ -271,7 +271,7 @@ export const ChatSimulation = React.memo(() => {
 
 		// Optimized interval for mobile devices
 		const interval = isMobile ? 3500 : 2500;
-		let startTime = performance.now();
+		const _startTime = performance.now();
 
 		const animate = (currentTime: number) => {
 			const elapsed = currentTime - lastUpdateRef.current;
@@ -283,8 +283,6 @@ export const ChatSimulation = React.memo(() => {
 					if (prev < currentSet.length - 1) {
 						return prev + 1;
 					}
-
-					// Switch to next random set
 					const nextSet = getRandomSet();
 					setCurrentSet(nextSet);
 					return -1;
@@ -304,7 +302,10 @@ export const ChatSimulation = React.memo(() => {
 	}, [currentSet, getRandomSet, isMobile]);
 
 	return (
-		<div className="p-6 space-y-4 font-sans" style={{ contain: "layout style paint" }}>
+		<div
+			className="p-6 space-y-4 font-sans"
+			style={{ contain: "layout style paint" }}
+		>
 			<div className="flex items-center justify-between pb-4 border-b border-black/5 dark:border-white/5">
 				<div className="flex items-center gap-3">
 					<div className="w-3 h-3 rounded-full bg-red-500/80" />

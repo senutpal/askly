@@ -1,4 +1,3 @@
-import { google } from "@ai-sdk/google";
 import { saveMessage } from "@convex-dev/agent";
 import { generateText } from "ai";
 import { paginationOptsValidator } from "convex/server";
@@ -7,8 +6,7 @@ import { components } from "../_generated/api";
 import { action, mutation, query } from "../_generated/server";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
-
-const gemini = google("gemini-2.5-pro");
+import { createGoogleAI } from "../system/ai/helpers";
 
 export const enhanceResponse = action({
 	args: { prompt: v.string() },
@@ -28,6 +26,8 @@ export const enhanceResponse = action({
 				message: "organization Not Found",
 			});
 		}
+
+		const gemini = await createGoogleAI(ctx, orgId, "gemini-2.5-flash");
 
 		const response = await generateText({
 			model: gemini,
