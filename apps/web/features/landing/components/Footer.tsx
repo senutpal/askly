@@ -12,10 +12,9 @@ import { SocialButtons } from "./SocialButtons";
 
 // --- Data ---
 const productLinks = [
+	{ label: "Problem", href: "#problem" },
 	{ label: "Features", href: "#features" },
-	{ label: "How It Works", href: "#how-it-works" },
-	{ label: "Technology", href: "#tech-stack" },
-	{ label: "Pricing", href: "#pricing" },
+	{ label: "How It Works", href: "/docs" },
 ];
 
 const socialLinks = [

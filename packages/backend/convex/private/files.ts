@@ -11,7 +11,7 @@ import { ConvexError, v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { action, mutation, type QueryCtx, query } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
-import rag from "../system/ai/rag";
+import rag, { createRAG } from "../system/ai/rag";
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
 	return (
@@ -117,9 +117,13 @@ export const addFile = action({
 			filename,
 			bytes,
 			mimeType,
+			organizationId: orgId,
 		});
 
-		const { entryId, created } = await rag.add(ctx, {
+		// Use organization-specific RAG instance
+		const orgRag = await createRAG(ctx, orgId);
+
+		const { entryId, created } = await orgRag.add(ctx, {
 			namespace: orgId,
 			text,
 			key: filename,
@@ -138,7 +142,7 @@ export const addFile = action({
 			console.debug("Entry already exists, skipping upload metadata");
 			await ctx.storage.delete(storageId);
 
-			const existingEntry = await rag.getEntry(ctx, { entryId });
+			const existingEntry = await orgRag.getEntry(ctx, { entryId });
 			const existingStorageId = (
 				existingEntry?.metadata as EntryMetadata | undefined
 			)?.storageId;

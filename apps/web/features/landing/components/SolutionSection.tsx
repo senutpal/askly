@@ -1,7 +1,6 @@
 "use client";
 
 import { RadialPattern } from "@workspace/ui";
-import React from "react";
 import { AvailabilityCard } from "./AvailabilityCard";
 import { MultilingualCard } from "./MultilingualCard";
 import { ROICard } from "./ROICard";

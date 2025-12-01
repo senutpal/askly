@@ -4,7 +4,7 @@ import { mutation } from "../_generated/server";
 
 export const upsert = mutation({
 	args: {
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 		value: v.any(),
 	},
 	handler: async (ctx, args) => {

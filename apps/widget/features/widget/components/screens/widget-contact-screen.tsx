@@ -46,13 +46,18 @@ export const WidgetContactScreen = () => {
 					>
 						<ArrowLeftIcon className="size-4 text-gray-600" />
 					</Button>
-					<span className="text-base font-semibold text-gray-900">Contact Us</span>
+					<span className="text-base font-semibold text-gray-900">
+						Contact Us
+					</span>
 				</div>
 			</WidgetHeader>
 			<div className="flex flex-1 flex-col items-center justify-center gap-y-6 p-6 animate-in fade-in zoom-in-95 duration-500">
 				<div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-green-50 shadow-sm ring-1 ring-green-100">
 					<div className="absolute inset-0 rounded-full bg-green-100/50 animate-ping duration-[3s]" />
-					<PhoneIcon className="size-10 text-green-600 relative z-10" strokeWidth={1.5} />
+					<PhoneIcon
+						className="size-10 text-green-600 relative z-10"
+						strokeWidth={1.5}
+					/>
 				</div>
 				<div className="text-center space-y-1">
 					<p className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full inline-block">
@@ -61,7 +66,9 @@ export const WidgetContactScreen = () => {
 					<p className="text-3xl font-bold text-gray-900 tracking-tight pt-2">
 						{phoneNumber}
 					</p>
-					<p className="text-sm text-gray-500">Call us directly for immediate support</p>
+					<p className="text-sm text-gray-500">
+						Call us directly for immediate support
+					</p>
 				</div>
 			</div>
 			<div className="border-t border-gray-100 bg-white p-6 pb-8">

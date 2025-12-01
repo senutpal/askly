@@ -1,14 +1,9 @@
-import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import type { StorageActionWriter } from "convex/server";
 import { assert } from "convex-helpers";
 import type { Id } from "../_generated/dataModel";
-
-const AI_MODELS = {
-	image: google("gemini-2.5-flash"),
-	pdf: google("gemini-2.5-pro"),
-	html: google("gemini-2.5-flash"),
-} as const;
+import type { ActionCtx } from "../_generated/server";
+import { createGoogleAI } from "../system/ai/helpers";
 
 const SUPPORTED_IMAGE_TYPES = [
 	"image/jpeg",
@@ -29,33 +24,41 @@ export type ExtractTextContentArgs = {
 	filename: string;
 	bytes?: ArrayBuffer;
 	mimeType: string;
+	organizationId: string;
 };
 
 export async function extractTextContent(
-	ctx: { storage: StorageActionWriter },
+	ctx: { storage: StorageActionWriter } & ActionCtx,
 	args: ExtractTextContentArgs,
 ): Promise<string> {
-	const { storageId, filename, bytes, mimeType } = args;
+	const { storageId, filename, bytes, mimeType, organizationId } = args;
 	const url = await ctx.storage.getUrl(storageId);
 	assert(url, "Failed to get storage url");
 
 	if (SUPPORTED_IMAGE_TYPES.some((type) => type === mimeType)) {
-		return extractImageText(url);
+		return extractImageText(ctx, organizationId, url);
 	}
 
 	if (mimeType.toLowerCase().includes("pdf")) {
-		return extractPdfText(url, mimeType, filename);
+		return extractPdfText(ctx, organizationId, url, mimeType, filename);
 	}
 
 	if (mimeType.toLowerCase().includes("text")) {
-		return extractTextFileContent(ctx, storageId, bytes, mimeType);
+		return extractTextFileContent(
+			ctx,
+			organizationId,
+			storageId,
+			bytes,
+			mimeType,
+		);
 	}
 
 	throw new Error(`Unsupported MIME type ${mimeType}`);
 }
 
 async function extractTextFileContent(
-	ctx: { storage: StorageActionWriter },
+	ctx: { storage: StorageActionWriter } & ActionCtx,
+	organizationId: string,
 	storageId: Id<"_storage">,
 	bytes: ArrayBuffer | undefined,
 	mimeType: string,
@@ -70,8 +73,9 @@ async function extractTextFileContent(
 	const text = new TextDecoder().decode(arrayBuffer);
 
 	if (mimeType.toLowerCase() !== "text/plain") {
+		const model = await createGoogleAI(ctx, organizationId, "gemini-2.5-flash");
 		const result = await generateText({
-			model: AI_MODELS.html,
+			model,
 			system: SYSTEM_PROMPTS.html,
 			messages: [
 				{
@@ -97,12 +101,15 @@ async function extractTextFileContent(
 }
 
 async function extractPdfText(
+	ctx: ActionCtx,
+	organizationId: string,
 	url: string,
 	mimeType: string,
 	filename: string,
 ): Promise<string> {
+	const model = await createGoogleAI(ctx, organizationId, "gemini-2.5-pro");
 	const result = await generateText({
-		model: AI_MODELS.pdf,
+		model,
 		system: SYSTEM_PROMPTS.pdf,
 		messages: [
 			{
@@ -127,9 +134,14 @@ async function extractPdfText(
 	return result.text;
 }
 
-async function extractImageText(url: string): Promise<string> {
+async function extractImageText(
+	ctx: ActionCtx,
+	organizationId: string,
+	url: string,
+): Promise<string> {
+	const model = await createGoogleAI(ctx, organizationId, "gemini-2.5-flash");
 	const result = await generateText({
-		model: AI_MODELS.image,
+		model,
 		system: SYSTEM_PROMPTS.images,
 		messages: [
 			{

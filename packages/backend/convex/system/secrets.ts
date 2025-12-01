@@ -8,7 +8,7 @@ import { decrypt, encrypt } from "../userApiKeys/helpers";
 export const upsert = internalAction({
 	args: {
 		organizationId: v.string(),
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 		text: v.any(),
 	},
 	handler: async (ctx, args) => {
@@ -30,7 +30,7 @@ export const upsert = internalAction({
 export const getByOrganizationIdAndService = internalAction({
 	args: {
 		organizationId: v.string(),
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 	},
 	handler: async (ctx, args) => {
 		const encrypted = await ctx.runQuery(

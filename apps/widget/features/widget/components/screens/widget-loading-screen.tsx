@@ -13,7 +13,6 @@ import {
 	screenAtom,
 	vapiSecretsAtom,
 } from "@/features/widget/atoms/widget-atoms";
-import { WidgetHeader } from "@/features/widget/components/components/widget-header";
 import { widgetSettingsAtom } from "../../atoms/widget-atoms";
 
 type InitStep = "storage" | "org" | "session" | "settings" | "vapi" | "done";
@@ -167,7 +166,10 @@ export const WidgetLoadingScreen = ({
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center gap-y-6 bg-white p-6 text-center animate-in fade-in duration-700">
 			<div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-black/[0.03] shadow-sm ring-1 ring-black/[0.05]">
-				<LoaderIcon className="h-6 w-6 animate-spin text-black/70" strokeWidth={2} />
+				<LoaderIcon
+					className="h-6 w-6 animate-spin text-black/70"
+					strokeWidth={2}
+				/>
 			</div>
 			<div className="space-y-2">
 				<p className="text-sm font-medium text-black/50 animate-pulse tracking-wide">

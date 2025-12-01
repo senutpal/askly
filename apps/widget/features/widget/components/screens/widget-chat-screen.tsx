@@ -127,7 +127,9 @@ export default function WidgetChatScreen() {
 							<ArrowLeft className="size-5 text-gray-700" />
 						</Button>
 						<div className="flex items-center">
-							<span className="text-sm font-semibold text-gray-900 mr-2">Askly</span>
+							<span className="text-sm font-semibold text-gray-900 mr-2">
+								Askly
+							</span>
 							<span className="text-[10px] font-medium text-green-500 flex items-center gap-1">
 								<span className="block h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
 								Online
@@ -167,7 +169,6 @@ export default function WidgetChatScreen() {
 								key={message.id}
 								className="gap-3"
 							>
-								
 								<AIMessageContent
 									className={
 										message.role === "user"
@@ -186,8 +187,8 @@ export default function WidgetChatScreen() {
 									) : (
 										<AIResponse>{message.text}</AIResponse>
 									)}
-                </AIMessageContent>
-                {message.role === "assistant" && (
+								</AIMessageContent>
+								{message.role === "assistant" && (
 									<div className="mt-1">
 										<DiceBearAvatar
 											imageUrl="/logo.svg"

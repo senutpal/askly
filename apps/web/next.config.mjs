@@ -24,20 +24,15 @@ const nextConfig = {
 	// Enable experimental features for better performance
 	experimental: {
 		optimizePackageImports: ["@workspace/ui", "motion", "lucide-react"],
-		// Modularize imports for tree-shaking
-		modularizeImports: {
-			"lucide-react": {
-				transform: "lucide-react/dist/esm/icons/{{kebabCase member}}",
-				skipDefaultConversion: true,
-			},
-		},
 	},
 
 	// Production optimizations
 	reactStrictMode: true,
-	
-	// Enable SWC minification for faster builds
-	swcMinify: true,
+
+	// Disable ESLint during builds (using Biome for linting)
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
 
 	// Performance budgets (will log warnings)
 	onDemandEntries: {

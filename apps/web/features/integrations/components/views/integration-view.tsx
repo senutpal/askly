@@ -12,8 +12,8 @@ import {
 	Label,
 	Separator,
 } from "@workspace/ui";
+import { Check, Copy, Search } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check, Copy, Search, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { INTEGRATIONS, type IntegrationId } from "../../constants";
@@ -62,7 +62,7 @@ export const IntegrationsView = () => {
 	};
 
 	const filteredIntegrations = INTEGRATIONS.filter((integration) =>
-		integration.title.toLowerCase().includes(searchQuery.toLowerCase())
+		integration.title.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
 	return (
@@ -86,7 +86,6 @@ export const IntegrationsView = () => {
 						className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
 					>
 						<div className="space-y-4">
-							
 							<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
 								Connect your <br />
 								<span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
@@ -225,7 +224,6 @@ const IntegrationDialog = ({
 											) : (
 												<Copy className="size-3.5" />
 											)}
-										
 										</Button>
 									</div>
 									<pre className="max-h-[300px] overflow-auto p-4 text-xs font-mono text-muted-foreground scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">

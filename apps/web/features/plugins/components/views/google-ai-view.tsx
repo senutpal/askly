@@ -18,44 +18,43 @@ import {
 	Separator,
 } from "@workspace/ui";
 import { useMutation, useQuery } from "convex/react";
-import { Globe2, Phone, PhoneCall, Workflow } from "lucide-react";
+import { Brain, FileText, MessageSquare, Search } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { GoogleAIConnectedView } from "../google-ai-connected-view";
 import { type Feature, PluginCard } from "../plugins-card";
-import { VapiConnectedView } from "../vapi-connected-view";
 
-const vapiFeatures: Feature[] = [
+const googleAIFeatures: Feature[] = [
 	{
-		icon: Globe2,
-		label: "Web Voice Calls",
-		description: "Voice chat directly in your app",
+		icon: Brain,
+		label: "Advanced AI Models",
+		description: "Access to Gemini Pro and Flash models",
 	},
 	{
-		icon: Phone,
-		label: "Phone Numbers",
-		description: "Get dedicated business lines",
+		icon: MessageSquare,
+		label: "Natural Conversations",
+		description: "Intelligent chat and response generation",
 	},
 	{
-		icon: PhoneCall,
-		label: "Outbound Calls",
-		description: "Automated customer outreach",
+		icon: FileText,
+		label: "Document Processing",
+		description: "Extract text from PDFs and images",
 	},
 	{
-		icon: Workflow,
-		label: "Workflows",
-		description: "Custom conversation flows",
+		icon: Search,
+		label: "Knowledge Search",
+		description: "Semantic search with embeddings",
 	},
 ];
 
 const formSchema = z.object({
-	publicApiKey: z.string().min(1, { message: "Public API Key is required" }),
-	privateApiKey: z.string().min(1, { message: "Private API Key is required" }),
+	apiKey: z.string().min(1, { message: "API Key is required" }),
 });
 
-const VapiPluginForm = ({
+const GoogleAIPluginForm = ({
 	open,
 	setOpen,
 }: {
@@ -65,34 +64,31 @@ const VapiPluginForm = ({
 	const upsertSecret = useMutation(api.private.secrets.upsert);
 	const form = useForm<z.infer<typeof formSchema>>({
 		defaultValues: {
-			publicApiKey: "",
-			privateApiKey: "",
+			apiKey: "",
 		},
 	});
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
 			await upsertSecret({
-				service: "vapi",
-				value: {
-					publicApiKey: values.publicApiKey,
-					privateApiKey: values.privateApiKey,
-				},
+				service: "google-ai",
+				value: values.apiKey,
 			});
 			setOpen(false);
-			toast.success("API keys saved successfully!");
+			toast.success("Gemini API key saved successfully!");
 		} catch (err) {
 			console.error(err);
 			toast.error("Something went wrong");
 		}
 	};
+
 	return (
 		<Dialog onOpenChange={setOpen} open={open}>
 			<DialogContent className="border-border/50 bg-background/80 backdrop-blur-xl sm:rounded-3xl">
 				<DialogHeader>
-					<DialogTitle className="text-2xl">Enable Vapi</DialogTitle>
+					<DialogTitle className="text-2xl">Enable Gemini</DialogTitle>
 					<DialogDescription>
-						Your API keys are safely encrypted and stored.
+						Your API key is safely encrypted and stored.
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
@@ -102,14 +98,14 @@ const VapiPluginForm = ({
 					>
 						<FormField
 							control={form.control}
-							name="publicApiKey"
+							name="apiKey"
 							render={({ field }) => (
 								<FormItem>
-									<Label>Public API Key</Label>
+									<Label>Gemini API Key</Label>
 									<FormControl>
 										<Input
 											{...field}
-											placeholder="Your Public API Key"
+											placeholder="Your Gemini API Key"
 											type="password"
 											className="h-12 rounded-xl bg-muted/50"
 										/>
@@ -117,23 +113,25 @@ const VapiPluginForm = ({
 								</FormItem>
 							)}
 						/>
-						<FormField
-							control={form.control}
-							name="privateApiKey"
-							render={({ field }) => (
-								<FormItem>
-									<Label>Private API Key</Label>
-									<FormControl>
-										<Input
-											{...field}
-											placeholder="Your Private API Key"
-											type="password"
-											className="h-12 rounded-xl bg-muted/50"
-										/>
-									</FormControl>
-								</FormItem>
-							)}
-						/>
+						<div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/20 p-4 border border-blue-200/50 dark:border-blue-800/50">
+							<p className="text-sm text-blue-900 dark:text-blue-100">
+								<strong>How to get your API key:</strong>
+								<br />
+								1. Visit{" "}
+								<a
+									href="https://makersuite.google.com/app/apikey"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="underline hover:text-blue-700"
+								>
+									Google AI Studio
+								</a>
+								<br />
+								2. Click "Get API Key" or "Create API Key"
+								<br />
+								3. Copy and paste it above
+							</p>
+						</div>
 						<DialogFooter>
 							<Button
 								disabled={form.formState.isSubmitting}
@@ -141,7 +139,9 @@ const VapiPluginForm = ({
 								size="lg"
 								className="w-full rounded-xl text-base"
 							>
-								{form.formState.isSubmitting ? "Connecting..." : "Connect Vapi"}
+								{form.formState.isSubmitting
+									? "Connecting..."
+									: "Connect Gemini"}
 							</Button>
 						</DialogFooter>
 					</form>
@@ -151,7 +151,7 @@ const VapiPluginForm = ({
 	);
 };
 
-const VapiPluginRemoveForm = ({
+const GoogleAIPluginRemoveForm = ({
 	open,
 	setOpen,
 }: {
@@ -165,10 +165,10 @@ const VapiPluginRemoveForm = ({
 		try {
 			setIsSubmitting(true);
 			await removePlugin({
-				service: "vapi",
+				service: "google-ai",
 			});
 			setOpen(false);
-			toast.success("Vapi Plugin Removed");
+			toast.success("Gemini Plugin Removed");
 		} catch (err) {
 			console.error(err);
 			toast.error("Something went wrong");
@@ -176,14 +176,15 @@ const VapiPluginRemoveForm = ({
 			setIsSubmitting(false);
 		}
 	};
+
 	return (
 		<Dialog onOpenChange={setOpen} open={open}>
-			<DialogContent className="border-border/50 bg-background/80 dark:bg-neutral-900 backdrop-blur-xl sm:rounded-3xl">
+			<DialogContent className="border-border/50 bg-neutral-200 dark:bg-neutral-800 backdrop-blur-xl sm:rounded-3xl">
 				<DialogHeader>
-					<DialogTitle className="text-2xl">Disable Vapi</DialogTitle>
+					<DialogTitle className="text-2xl">Disable Gemini</DialogTitle>
 					<DialogDescription>
-						Are you sure you want to disconnect the Vapi plugin? This will stop
-						all voice capabilities.
+						Are you sure you want to disconnect the Gemini plugin? This will
+						stop all AI capabilities.
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter className="mt-4">
@@ -208,15 +209,15 @@ const VapiPluginRemoveForm = ({
 	);
 };
 
-export const VapiView = () => {
-	const vapiPlugin = useQuery(api.private.plugins.getOne, {
-		service: "vapi",
+export const GoogleAIView = () => {
+	const googleAIPlugin = useQuery(api.private.plugins.getOne, {
+		service: "google-ai",
 	});
 	const [connectOpen, setConnectOpen] = useState(false);
 	const [removeOpen, setRemoveOpen] = useState(false);
 
 	const handleSubmit = () => {
-		if (vapiPlugin) {
+		if (googleAIPlugin) {
 			setRemoveOpen(true);
 		} else {
 			setConnectOpen(true);
@@ -225,8 +226,8 @@ export const VapiView = () => {
 
 	return (
 		<>
-			<VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
-			<VapiPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
+			<GoogleAIPluginForm open={connectOpen} setOpen={setConnectOpen} />
+			<GoogleAIPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
 
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
@@ -238,14 +239,14 @@ export const VapiView = () => {
 						className="space-y-4"
 					>
 						<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-							Extend your <br />
+							Power your <br />
 							<span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
-								capabilities
+								intelligence
 							</span>
 						</h1>
 						<p className="max-w-md text-lg text-muted-foreground">
-							Connect powerful third-party services to enhance your agent's
-							functionality.
+							Connect Gemini to unlock advanced language models and intelligent
+							capabilities.
 						</p>
 					</motion.div>
 
@@ -256,15 +257,15 @@ export const VapiView = () => {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5, delay: 0.2 }}
 					>
-						{vapiPlugin ? (
-							<VapiConnectedView onDisconnect={handleSubmit} />
+						{googleAIPlugin ? (
+							<GoogleAIConnectedView onDisconnect={handleSubmit} />
 						) : (
 							<PluginCard
 								onSubmit={handleSubmit}
-								isDisabled={vapiPlugin === undefined}
-								features={vapiFeatures}
-								serviceName="Vapi"
-								serviceImage="/vapi.jpg"
+								isDisabled={googleAIPlugin === undefined}
+								features={googleAIFeatures}
+								serviceName="Gemini"
+								serviceImage="/gemini.svg"
 							/>
 						)}
 					</motion.div>

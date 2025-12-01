@@ -19,7 +19,8 @@ export const HeroVisual = React.memo(() => {
 		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 		setPrefersReducedMotion(mediaQuery.matches);
 
-		const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+		const handler = (e: MediaQueryListEvent) =>
+			setPrefersReducedMotion(e.matches);
 		mediaQuery.addEventListener("change", handler);
 		return () => mediaQuery.removeEventListener("change", handler);
 	}, []);

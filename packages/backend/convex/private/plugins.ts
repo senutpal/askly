@@ -3,7 +3,7 @@ import { mutation, query } from "../_generated/server";
 
 export const remove = mutation({
 	args: {
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 	},
 	handler: async (ctx, args) => {
 		const identity = await ctx.auth.getUserIdentity();
@@ -42,7 +42,7 @@ export const remove = mutation({
 
 export const getOne = query({
 	args: {
-		service: v.union(v.literal("vapi")),
+		service: v.union(v.literal("vapi"), v.literal("google-ai")),
 	},
 	handler: async (ctx, args) => {
 		const identity = await ctx.auth.getUserIdentity();

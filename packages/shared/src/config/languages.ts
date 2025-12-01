@@ -2,8 +2,10 @@
  * Language configuration
  */
 
-import { LanguageConfig, SupportedLanguage } from "../types/common.types.js";
-
+import type {
+	LanguageConfig,
+	SupportedLanguage,
+} from "../types/common.types.js";
 
 export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
 	en: {

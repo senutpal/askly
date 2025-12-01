@@ -58,7 +58,9 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 					<div className="flex items-center gap-3">
 						<Link href="/" className="flex items-center space-x-2">
 							<Image alt="Logo" height={25} width={25} src="/logo.svg" />
-							<span className="text-xl font-bold tracking-tight hidden md:inline-block">Askly</span>
+							<span className="text-xl font-bold tracking-tight hidden md:inline-block">
+								Askly
+							</span>
 						</Link>
 						<SidebarTrigger className="ml-2 md:ml-24 h-8 w-8 text-muted-foreground hover:text-foreground" />
 						<div className="ml-1 mr-2 h-14 w-[1px] border-r bg-transparent" />
@@ -127,29 +129,29 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 									defaultOpen={isGroupActive || (index === 0 && !activeGroup)}
 									className="group/collapsible"
 								>
-								<SidebarGroup className="gap-1">
-									<SidebarGroupLabel asChild>
-										<CollapsibleTrigger className="w-full px-2  hover:text-foreground transition-colors">
-											<span className="text-base font-semibold">
-												{group.group}
-											</span>
-											<ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
-										</CollapsibleTrigger>
-									</SidebarGroupLabel>
-									<CollapsibleContent className="ml-4">
-										<SidebarGroupContent>
-											<SidebarMenu>
-												{group.sections.map((section) => {
-													const isActive = pathname === section.href;
-													const Icon = section.icon || ChevronRight;
+									<SidebarGroup className="gap-1">
+										<SidebarGroupLabel asChild>
+											<CollapsibleTrigger className="w-full px-2  hover:text-foreground transition-colors">
+												<span className="text-base font-semibold">
+													{group.group}
+												</span>
+												<ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+											</CollapsibleTrigger>
+										</SidebarGroupLabel>
+										<CollapsibleContent className="ml-4">
+											<SidebarGroupContent>
+												<SidebarMenu>
+													{group.sections.map((section) => {
+														const isActive = pathname === section.href;
+														const Icon = section.icon || ChevronRight;
 
-													return (
-														<SidebarMenuItem key={section.href}>
-															<SidebarMenuButton
-																asChild
-																isActive={isActive}
-																tooltip={section.title}
-																className={`
+														return (
+															<SidebarMenuItem key={section.href}>
+																<SidebarMenuButton
+																	asChild
+																	isActive={isActive}
+																	tooltip={section.title}
+																	className={`
                                   group/item relative h-9 px-2.5 text-sm transition-all duration-200 ease-in-out
                                   ${
 																		isActive
@@ -157,34 +159,34 @@ export const DocLayout = ({ children, title, description }: DocLayoutProps) => {
 																			: "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
 																	}
                                 `}
-															>
-																<Link
-																	href={section.href}
-																	className="flex items-center gap-3"
 																>
-																	<Icon
-																		className={`
+																	<Link
+																		href={section.href}
+																		className="flex items-center gap-3"
+																	>
+																		<Icon
+																			className={`
                                     h-4 w-4 shrink-0 transition-transform duration-200
                                     ${isActive ? "text-primary" : "text-muted-foreground/70 group-hover/item:text-foreground"}
                                   `}
-																	/>
-																	<span
-																		className={`line-clamp-1 ${isActive ? "font-semibold" : ""}`}
-																	>
-																		{section.title}
-																	</span>
-																</Link>
-															</SidebarMenuButton>
-														</SidebarMenuItem>
-													);
-												})}
-											</SidebarMenu>
-										</SidebarGroupContent>
-									</CollapsibleContent>
-								</SidebarGroup>
-							</Collapsible>
-						);
-					})}
+																		/>
+																		<span
+																			className={`line-clamp-1 ${isActive ? "font-semibold" : ""}`}
+																		>
+																			{section.title}
+																		</span>
+																	</Link>
+																</SidebarMenuButton>
+															</SidebarMenuItem>
+														);
+													})}
+												</SidebarMenu>
+											</SidebarGroupContent>
+										</CollapsibleContent>
+									</SidebarGroup>
+								</Collapsible>
+							);
+						})}
 					</SidebarContent>
 
 					{/* Bottom Rail for collapse action */}

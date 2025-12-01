@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from "lucide-react";
 import { useMotionValue } from "motion/react";
-import React, { useCallback, useRef, useEffect, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 import { FeatureCard } from "./FeatureCard";
 

@@ -19,7 +19,10 @@ export const WidgetFooter = () => {
 				size="icon"
 				variant="ghost"
 			>
-				<HomeIcon className="size-5" strokeWidth={screen === "selection" ? 2.5 : 2} />
+				<HomeIcon
+					className="size-5"
+					strokeWidth={screen === "selection" ? 2.5 : 2}
+				/>
 			</Button>
 
 			<Button
@@ -33,7 +36,10 @@ export const WidgetFooter = () => {
 				size="icon"
 				variant="ghost"
 			>
-				<InboxIcon className="size-5" strokeWidth={screen === "inbox" ? 2.5 : 2} />
+				<InboxIcon
+					className="size-5"
+					strokeWidth={screen === "inbox" ? 2.5 : 2}
+				/>
 			</Button>
 		</footer>
 	);

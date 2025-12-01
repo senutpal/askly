@@ -3,8 +3,8 @@
 import { api } from "@workspace/backend/_generated/api";
 import { Separator } from "@workspace/ui";
 import { useQuery } from "convex/react";
+import { Loader2Icon } from "lucide-react";
 import { motion } from "motion/react";
-import { Loader2Icon, Palette } from "lucide-react";
 
 import { CustomizationForm } from "../customization-form";
 

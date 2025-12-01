@@ -14,11 +14,6 @@ interface FooterNavProps {
 	links: NavLink[];
 }
 
-/**
- * FooterNav - Navigation links column
- * Right-aligned list with magnetic link effects
- * Hidden on mobile devices for better performance
- */
 export const FooterNav = React.memo<FooterNavProps>(({ links }) => {
 	const { isMobile } = useMobileDetect();
 

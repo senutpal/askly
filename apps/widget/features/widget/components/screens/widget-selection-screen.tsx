@@ -77,8 +77,12 @@ export const WidgetSelectionScreen = () => {
 					</div>
 					<div className="flex w-full items-center justify-between">
 						<div className="flex flex-col items-start gap-0.5">
-							<span className="text-base font-semibold text-gray-900">Start Chat</span>
-							<span className="text-xs font-medium text-gray-400">Chat with our AI assistant</span>
+							<span className="text-base font-semibold text-gray-900">
+								Start Chat
+							</span>
+							<span className="text-xs font-medium text-gray-400">
+								Chat with our AI assistant
+							</span>
 						</div>
 						<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
 					</div>
@@ -98,8 +102,12 @@ export const WidgetSelectionScreen = () => {
 						</div>
 						<div className="flex w-full items-center justify-between">
 							<div className="flex flex-col items-start gap-0.5">
-								<span className="text-base font-semibold text-gray-900">Voice Call</span>
-								<span className="text-xs font-medium text-gray-400">Talk to us directly</span>
+								<span className="text-base font-semibold text-gray-900">
+									Voice Call
+								</span>
+								<span className="text-xs font-medium text-gray-400">
+									Talk to us directly
+								</span>
 							</div>
 							<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
 						</div>
@@ -119,8 +127,12 @@ export const WidgetSelectionScreen = () => {
 						</div>
 						<div className="flex w-full items-center justify-between">
 							<div className="flex flex-col items-start gap-0.5">
-								<span className="text-base font-semibold text-gray-900">Call Us</span>
-								<span className="text-xs font-medium text-gray-400">Reach our support team</span>
+								<span className="text-base font-semibold text-gray-900">
+									Call Us
+								</span>
+								<span className="text-xs font-medium text-gray-400">
+									Reach our support team
+								</span>
 							</div>
 							<ChevronRightIcon className="size-5 text-gray-300 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
 						</div>

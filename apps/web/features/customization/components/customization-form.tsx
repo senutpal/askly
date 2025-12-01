@@ -4,11 +4,6 @@ import { api } from "@workspace/backend/_generated/api";
 import type { Doc } from "@workspace/backend/_generated/dataModel";
 import {
 	Button,
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
 	Form,
 	FormControl,
 	FormDescription,
@@ -17,13 +12,12 @@ import {
 	FormLabel,
 	FormMessage,
 	Input,
-	Separator,
 	Textarea,
 	useForm,
 } from "@workspace/ui";
 import { useMutation } from "convex/react";
-import { motion } from "motion/react";
 import { MessageSquare, Sparkles, Wand2 } from "lucide-react";
+import { motion } from "motion/react";
 import { toast } from "sonner";
 import z from "zod";
 import { VapiFormField } from "./vapi-form-fields";
@@ -119,7 +113,9 @@ export const CustomizationForm = ({
 										<MessageSquare className="h-5 w-5" />
 									</div>
 									<div>
-										<h3 className="font-semibold text-lg">Chat Configuration</h3>
+										<h3 className="font-semibold text-lg">
+											Chat Configuration
+										</h3>
 										<p className="text-sm text-muted-foreground">
 											Customize the welcome experience
 										</p>

@@ -1,13 +1,11 @@
-import { google } from "@ai-sdk/google";
 import { createTool } from "@convex-dev/agent";
 import { generateText } from "ai";
 import z from "zod";
 import { internal } from "../../../_generated/api";
 import { supportAgent } from "../agents/supportAgent";
 import { SEARCH_INTERPRETER_PROMPT } from "../constants";
-import rag from "../rag";
-
-const gemini = google("gemini-2.5-flash");
+import { createGoogleAI } from "../helpers";
+import { createRAG } from "../rag";
 
 export const search = createTool({
 	description:
@@ -32,8 +30,9 @@ export const search = createTool({
 		}
 
 		const orgId = conversation.organizationId;
+		const orgRag = await createRAG(ctx, orgId);
 
-		const searchResult = await rag.search(ctx, {
+		const searchResult = await orgRag.search(ctx, {
 			namespace: orgId,
 			query: args.query,
 			limit: 5,
@@ -53,6 +52,9 @@ export const search = createTool({
 			.map((e) => e.title || null)
 			.filter((t) => t !== null)
 			.join(", ")}. Here is the context:\n\n${searchResult.text}`;
+
+		// Use organization-specific API key
+		const gemini = await createGoogleAI(ctx, orgId, "gemini-2.5-flash");
 
 		const response = await generateText({
 			model: gemini,
