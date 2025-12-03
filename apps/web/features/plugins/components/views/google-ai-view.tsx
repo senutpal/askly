@@ -17,7 +17,8 @@ import {
 	Label,
 	Separator,
 } from "@workspace/ui";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Brain, FileText, MessageSquare, Search } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";

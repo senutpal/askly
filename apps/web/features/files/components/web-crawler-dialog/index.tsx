@@ -11,7 +11,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@workspace/ui";
-import { useAction, useQuery } from "convex/react";
+import { useAction } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { CheckCircleIcon, GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CompleteStep } from "./complete-step";
