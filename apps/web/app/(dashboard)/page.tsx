@@ -4,7 +4,7 @@ import { OrganizationSwitcher } from "@clerk/nextjs";
 import { api } from "@workspace/backend/_generated/api";
 import { Button, DiceBearAvatar, SidebarTrigger } from "@workspace/ui";
 import { cn } from "@workspace/ui/lib/utils";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { formatDistanceToNow } from "date-fns";
 import {
   ArrowUpRight,

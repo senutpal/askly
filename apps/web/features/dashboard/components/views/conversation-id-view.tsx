@@ -1,6 +1,7 @@
 "use client";
 
 import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
+import { useCachedThreadMessages } from "@/hooks/use-cached-thread-messages";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -26,13 +27,13 @@ import {
 	Skeleton,
 	useInfiniteScroll,
 } from "@workspace/ui";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ConversationStatusButton } from "../conversation-status-button";
-
+import { useQuery } from "convex-helpers/react/cache/hooks";
 const formSchema = z.object({
 	message: z.string().min(1, "Message is required"),
 });
@@ -46,13 +47,14 @@ export const ConversationIdView = ({
 		conversationId,
 	});
 
-	const messages = useThreadMessages(
+
+	const messagesArgs = conversation?.threadId
+		? { threadId: conversation.threadId }
+		: "skip";
+
+	const messages = useCachedThreadMessages(
 		api.private.messages.getMany,
-		conversation?.threadId
-			? {
-					threadId: conversation.threadId,
-				}
-			: "skip",
+		messagesArgs,
 		{ initialNumItems: 10 },
 	);
 	const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } =
@@ -270,7 +272,6 @@ export const ConversationIdViewLoading = () => {
 									"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
 									isUser ? "is-user" : "is-assistant flex-row-reverse",
 								)}
-								// biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loader, index is fine
 								key={index}
 							>
 								<Skeleton

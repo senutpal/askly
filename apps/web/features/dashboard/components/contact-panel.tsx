@@ -11,7 +11,7 @@ import {
 	DiceBearAvatar,
 } from "@workspace/ui";
 import Bowser from "bowser";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { ClockIcon, GlobeIcon, MailIcon, MonitorIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
