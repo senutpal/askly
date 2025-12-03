@@ -16,7 +16,7 @@ import {
 	Skeleton,
 	useInfiniteScroll,
 } from "@workspace/ui";
-import { usePaginatedQuery } from "@/components/usePaginatedQuery";
+import { usePaginatedQuery } from "convex-helpers/react/cache/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { useAtomValue, useSetAtom } from "jotai/react";
 import {
@@ -182,7 +182,6 @@ export const SkeletonConversations = () => {
 						{Array.from({ length: 8 }).map((_, index) => (
 							<div
 								className="flex items-start gap-3 rounded-lg p-4"
-								// biome-ignore lint/suspicious/noArrayIndexKey:Skeleton loader, index is fine
 								key={index}
 							>
 								<Skeleton className="h-10 w-10 shrink-0 rounded-full" />
