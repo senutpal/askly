@@ -2,7 +2,7 @@
 
 import { api } from "@workspace/backend/_generated/api";
 import { Separator } from "@workspace/ui";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Loader2Icon } from "lucide-react";
 import { motion } from "motion/react";
 

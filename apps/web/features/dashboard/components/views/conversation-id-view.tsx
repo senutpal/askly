@@ -26,12 +26,13 @@ import {
 	Skeleton,
 	useInfiniteScroll,
 } from "@workspace/ui";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ConversationStatusButton } from "../conversation-status-button";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 
 const formSchema = z.object({
 	message: z.string().min(1, "Message is required"),

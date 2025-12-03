@@ -16,7 +16,7 @@ import {
 	Skeleton,
 	useInfiniteScroll,
 } from "@workspace/ui";
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery } from "@/components/usePaginatedQuery";
 import { formatDistanceToNow } from "date-fns";
 import { useAtomValue, useSetAtom } from "jotai/react";
 import {
