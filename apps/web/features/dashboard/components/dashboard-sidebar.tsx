@@ -28,65 +28,80 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
 
-const navigationGroups = [
-	{
-		label: "Platform",
-		items: [
-			{
-				title: "Dashboard",
-				url: "/",
-				icon: LayoutDashboard,
-			},
-		],
-	},
-	{
-		label: "Customer Support",
-		items: [
-			{
-				title: "Conversations",
-				url: "/conversations",
-				icon: Inbox,
-				badge: "3", // Example of a notification badge
-			},
-			{
-				title: "Knowledge Base",
-				url: "/files",
-				icon: LibraryBig,
-			},
-		],
-	},
-	{
-		label: "Configuration",
-		items: [
-			{
-				title: "Widget Styling",
-				url: "/customization",
-				icon: Palette,
-			},
-			{
-				title: "Integrations",
-				url: "/integrations",
-				icon: Blocks,
-			},
-			{
-				title: "Voice Assistant",
-				url: "/plugins/vapi",
-				icon: Mic,
-			},
-			{
-				title: "Gemini",
-				url: "/plugins/gemini",
-				icon: Brain,
-			},
-		],
-	},
-];
+
 
 export const DashboardSidebar = () => {
 	const pathname = usePathname();
 	const { state } = useSidebar();
-	const isCollapsed = state === "collapsed";
+  const isCollapsed = state === "collapsed";
+  
+  const escalatedConversations = useQuery(api.private.conversations.getMany, {
+    paginationOpts: { numItems: 100, cursor: null },
+    status: "escalated",
+  });
+
+  const escalatedCount = escalatedConversations?.page.length ?? 0;
+
+  const navigationGroups = [
+    {
+      label: "Platform",
+      items: [
+        {
+          title: "Dashboard",
+          url: "/",
+          icon: LayoutDashboard,
+        },
+      ],
+    },
+    {
+      label: "Customer Support",
+      items: [
+        {
+          title: "Conversations",
+          url: "/conversations",
+          icon: Inbox,
+          badge: escalatedConversations === undefined 
+              ? undefined 
+              : escalatedCount > 0 
+                ? String(escalatedCount) 
+                : undefined, 
+        },
+        {
+          title: "Knowledge Base",
+          url: "/files",
+          icon: LibraryBig,
+        },
+      ],
+    },
+    {
+      label: "Configuration",
+      items: [
+        {
+          title: "Widget Styling",
+          url: "/customization",
+          icon: Palette,
+        },
+        {
+          title: "Integrations",
+          url: "/integrations",
+          icon: Blocks,
+        },
+        {
+          title: "Voice Assistant",
+          url: "/plugins/vapi",
+          icon: Mic,
+        },
+        {
+          title: "Gemini",
+          url: "/plugins/gemini",
+          icon: Brain,
+        },
+      ],
+    },
+  ];
 
 	const isActive = (url: string) => {
 		if (url === "/") return pathname === "/";
@@ -180,7 +195,7 @@ export const DashboardSidebar = () => {
 
 													{/* Optional Badge Logic */}
 													{item.badge && !isCollapsed && (
-														<span className="ml-auto flex size-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700 dark:bg-blue-500/20 dark:text-blue-400">
+														<span className="ml-6 flex size-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700 dark:bg-blue-500/20 dark:text-blue-400">
 															{item.badge}
 														</span>
 													)}

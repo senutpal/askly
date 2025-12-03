@@ -28,7 +28,7 @@ export const AIMessageContent = ({
 		className={cn(
 			"break-words",
 			"flex flex-col gap-2 rounded-lg px-3 py-2 text-sm",
-			"bg-background text-foreground",
+			"bg-neutral-200 dark:bg-neutral-700 text-foreground",
 			"group-[.is-user]:bg-gradient-to-b group-[.is-user]:from-blue-500 group-[.is-user]:to-blue-600 group-[.is-user]:text-white",
 			className,
 		)}

@@ -3,12 +3,9 @@
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-const DURATION = 4;
+const DURATION = 2;
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-/**
- * ScrambleText - Optimized text scramble animation using requestAnimationFrame
- */
 const ScrambleText = ({
 	text,
 	className,

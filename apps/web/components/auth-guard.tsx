@@ -7,10 +7,10 @@ import { AuthLayout, LandingLayout } from "@/features/auth";
 import LandingPage from "@/features/landing/LandingPage";
 import Loader from "@/features/landing/Loader";
 
-const MINIMUM_LOADING_TIME = 1500;
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 	const [isLoading, setIsLoading] = useState(true);
+	const [isAuthReady, setIsAuthReady] = useState(false);
 	const startTimeRef = useRef<number>(Date.now());
 
 	useEffect(() => {
@@ -23,17 +23,23 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 	}, [isLoading]);
 
 	const handleLoaderComplete = () => {
-		const elapsed = Date.now() - startTimeRef.current;
-		const remaining = MINIMUM_LOADING_TIME - elapsed;
-
-		if (remaining > 0) {
-			setTimeout(() => {
-				setIsLoading(false);
-			}, remaining);
-		} else {
+		// Only hide loader if auth is ready
+		if (isAuthReady) {
 			setIsLoading(false);
 		}
 	};
+
+	// Hide loader once auth completes
+	useEffect(() => {
+		if (isAuthReady && !isLoading) {
+			// Already hidden
+			return;
+		}
+		if (isAuthReady) {
+			setIsLoading(false);
+		}
+	}, [isAuthReady, isLoading]);
+
 	return (
 		<>
 			<AnimatePresence mode="wait">
@@ -45,14 +51,30 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 			</AuthLoading>
 
 			<Authenticated>
+				{/* Signal that auth is ready */}
+				<AuthReadySignal onReady={() => setIsAuthReady(true)} />
 				<AuthLayout>{children}</AuthLayout>
 			</Authenticated>
 
 			<Unauthenticated>
+				{/* Signal that we're ready (no auth needed) */}
+				<AuthReadySignal onReady={() => setIsAuthReady(true)} />
 				<LandingLayout>
 					<LandingPage />
 				</LandingLayout>
 			</Unauthenticated>
 		</>
 	);
+};
+
+// Helper component to signal when content is ready
+const AuthReadySignal = ({ onReady }: { onReady: () => void }) => {
+	useEffect(() => {
+		// Small delay to ensure components are mounted
+		const timer = setTimeout(() => {
+			onReady();
+		}, 50);
+		return () => clearTimeout(timer);
+	}, [onReady]);
+	return null;
 };

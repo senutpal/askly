@@ -49,7 +49,7 @@ export const GoogleAIConnectedView = ({
 								src="/gemini.svg"
 							/>
 							<div className="space-y-2">
-								<CardTitle>GeminiIntegration</CardTitle>
+								<CardTitle>Gemini Integration</CardTitle>
 								<CardDescription>
 									Your AI capabilities are active and ready
 								</CardDescription>
