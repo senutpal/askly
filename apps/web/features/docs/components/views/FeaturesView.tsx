@@ -20,7 +20,6 @@ import {
 	Smartphone,
 	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { DocLayout } from "../DocLayout";
 import { FeatureCard } from "../shared/FeatureCard";
@@ -195,14 +194,12 @@ export const FeaturesView = () => {
 							</p>
 						</div>
 						<Link href="/docs/quick-start">
-							<motion.button
-								whileHover={{ scale: 1.02 }}
-								whileTap={{ scale: 0.98 }}
+							<button
 								className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium transition-colors hover:bg-zinc-800 dark:hover:bg-zinc-200"
 							>
 								Start Integration
 								<ArrowRight className="w-4 h-4" />
-							</motion.button>
+							</button>
 						</Link>
 					</div>
 				</section>

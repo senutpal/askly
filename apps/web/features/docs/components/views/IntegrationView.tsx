@@ -14,7 +14,6 @@ import {
 	Smartphone,
 	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { codeExamples } from "../../config/content";
 import { DocLayout } from "../DocLayout";
@@ -215,8 +214,7 @@ export default {
 					</p>
 
 					<div className="grid md:grid-cols-2 gap-6">
-						<motion.div
-							whileHover={{ y: -2 }}
+						<div
 							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800"
 						>
 							<div className="flex items-center gap-2 mb-3">
@@ -235,10 +233,9 @@ export default {
 							<code className="text-xs bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded text-zinc-600 dark:text-zinc-400">
 								data-position="bottom-right"
 							</code>
-						</motion.div>
+						</div>
 
-						<motion.div
-							whileHover={{ y: -2 }}
+						<div
 							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800"
 						>
 							<div className="flex items-center gap-2 mb-3">
@@ -254,7 +251,7 @@ export default {
 							<code className="text-xs bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded text-zinc-600 dark:text-zinc-400">
 								data-position="bottom-left"
 							</code>
-						</motion.div>
+						</div>
 					</div>
 				</section>
 

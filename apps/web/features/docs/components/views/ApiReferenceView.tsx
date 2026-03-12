@@ -11,7 +11,6 @@ import {
 	Terminal,
 	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import { DocLayout } from "../DocLayout";
 import { ApiCard } from "../shared/ApiCard";
 import { EnhancedCodeBlock } from "../shared/EnhancedCodeBlock";
@@ -229,8 +228,7 @@ export const ApiReferenceView = () => {
 						Error Handling & Limits
 					</SectionHeading>
 					<div className="grid md:grid-cols-2 gap-6">
-						<motion.div
-							whileHover={{ y: -4 }}
+						<div
 							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
 						>
 							<h4 className="font-medium mb-4 text-zinc-900 dark:text-white">
@@ -261,10 +259,9 @@ export const ApiReferenceView = () => {
 									</li>
 								))}
 							</ul>
-						</motion.div>
+						</div>
 
-						<motion.div
-							whileHover={{ y: -4 }}
+						<div
 							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
 						>
 							<h4 className="font-medium mb-4 text-zinc-900 dark:text-white">
@@ -284,7 +281,7 @@ export const ApiReferenceView = () => {
 									AI Inference: Subject to LLM provider limits
 								</li>
 							</ul>
-						</motion.div>
+						</div>
 					</div>
 				</section>
 			</div>

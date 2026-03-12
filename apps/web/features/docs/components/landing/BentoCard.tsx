@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@workspace/ui";
-import { motion } from "motion/react";
 import Link from "next/link";
 import type React from "react";
 
@@ -16,7 +15,6 @@ export const BentoCard = ({
 	children,
 	className,
 	href,
-	delay = 0,
 }: BentoCardProps) => {
 	const cardContent = (
 		<>
@@ -27,10 +25,7 @@ export const BentoCard = ({
 	);
 
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5, delay, ease: "easeOut" }}
+		<div
 			className={cn("relative group h-full", className)}
 		>
 			{href ? (
@@ -45,6 +40,6 @@ export const BentoCard = ({
 					{cardContent}
 				</div>
 			)}
-		</motion.div>
+		</div>
 	);
 };

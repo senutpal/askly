@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, Command, Github, Rocket } from "lucide-react";
-import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -50,10 +49,7 @@ export const DocsLandingView = () => {
 			<main className="relative z-10 mx-auto max-w-7xl px-6 py-12 md:py-20">
 				{/* Hero Section - Compact & Impactful */}
 				<div className="mb-16 grid gap-8 lg:grid-cols-3">
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.6 }}
+					<div
 						className="lg:col-span-2"
 					>
 						<h1 className="text-5xl font-bold tracking-tight sm:text-6xl mb-6 bg-clip-text text-transparent bg-gradient-to-br from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500">
@@ -79,7 +75,7 @@ export const DocsLandingView = () => {
 								<Github className="h-4 w-4" /> Star on GitHub
 							</Link>
 						</div>
-					</motion.div>
+					</div>
 				</div>
 
 				{/* The Bento Grid Navigation */}

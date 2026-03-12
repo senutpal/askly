@@ -1,7 +1,6 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 
 interface ContributeCardProps {
@@ -37,16 +36,16 @@ export const ContributeCard = ({
 				rel="noopener noreferrer"
 				className="block group h-full"
 			>
-				<motion.div whileHover={{ y: -4 }} className="h-full">
+				<div className="h-full">
 					{Content}
-				</motion.div>
+				</div>
 			</Link>
 		);
 	}
 
 	return (
-		<motion.div whileHover={{ y: -4 }} className="h-full">
+		<div className="h-full">
 			{Content}
-		</motion.div>
+		</div>
 	);
 };

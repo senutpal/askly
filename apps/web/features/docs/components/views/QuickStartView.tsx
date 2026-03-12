@@ -13,7 +13,6 @@ import {
 	Server,
 	Terminal,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { codeExamples } from "../../config/content";
 import { DocLayout } from "../DocLayout";
@@ -31,8 +30,7 @@ const PrerequisiteCard = ({
 	icon: any;
 	items: { label: string; sub?: string; href?: string }[];
 }) => (
-	<motion.div
-		whileHover={{ y: -4 }}
+	<div
 		className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300"
 	>
 		<div className="flex items-center gap-2 mb-4 text-zinc-900 dark:text-white">
@@ -65,7 +63,7 @@ const PrerequisiteCard = ({
 				</li>
 			))}
 		</ul>
-	</motion.div>
+	</div>
 );
 
 export const QuickStartView = () => {

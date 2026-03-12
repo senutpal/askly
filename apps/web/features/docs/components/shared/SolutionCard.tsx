@@ -1,7 +1,6 @@
 "use client";
 
 import { AlertCircle, ShieldAlert } from "lucide-react";
-import { motion } from "motion/react";
 import type React from "react";
 
 interface SolutionCardProps {
@@ -15,8 +14,7 @@ export const SolutionCard = ({
 	children,
 	severity = "default",
 }: SolutionCardProps) => (
-	<motion.div
-		whileHover={{ y: -2 }}
+	<div
 		className={`p-6 rounded-2xl border transition-all duration-300 ${
 			severity === "warning"
 				? "border-orange-200 bg-orange-50/30 dark:border-orange-900/30 dark:bg-orange-900/10"
@@ -34,5 +32,5 @@ export const SolutionCard = ({
 		<div className="text-sm text-zinc-600 dark:text-zinc-400 space-y-3">
 			{children}
 		</div>
-	</motion.div>
+	</div>
 );
