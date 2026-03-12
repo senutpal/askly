@@ -1,9 +1,7 @@
 "use client";
 
-import { MagneticLink } from "@workspace/ui";
-import { motion } from "motion/react";
+import Link from "next/link";
 import React from "react";
-import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 interface NavLink {
 	label: string;
@@ -15,32 +13,21 @@ interface FooterNavProps {
 }
 
 export const FooterNav = React.memo<FooterNavProps>(({ links }) => {
-	const { isMobile } = useMobileDetect();
-
-	// Don't render on mobile
-	if (isMobile) return null;
-
 	return (
-		<div className="lg:col-span-5 flex flex-col lg:items-end lg:text-right justify-end">
-			<motion.div
-				initial={{ opacity: 0 }}
-				whileInView={{ opacity: 1 }}
-				viewport={{ once: true }}
-				className="space-y-1"
-			>
+		<div className="hidden lg:flex lg:col-span-5 flex-col lg:items-end lg:text-right justify-end">
+			<div className="space-y-1">
 				<div className="flex flex-col lg:items-end space-y-3">
-					{links.map((link, idx) => (
-						<motion.div
+					{links.map((link) => (
+						<Link
 							key={link.label}
-							initial={{ opacity: 0, x: 20 }}
-							whileInView={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.1 * idx, duration: 0.5 }}
+							href={link.href}
+							className="text-lg font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
 						>
-							<MagneticLink href={link.href}>{link.label}</MagneticLink>
-						</motion.div>
+							{link.label}
+						</Link>
 					))}
 				</div>
-			</motion.div>
+			</div>
 		</div>
 	);
 });
