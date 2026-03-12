@@ -2,19 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 // Critical above-fold component - load immediately
 import Navbar from "./components/Navbar";
-
-// SplashCursor - client-side only, no SSR
-const SplashCursor = dynamic(
-	() => import("@workspace/ui/components/splash-cursor"),
-	{
-		ssr: false,
-		loading: () => null,
-	},
-);
 
 // Hero - above-fold, high priority
 const HeroSection = dynamic(() => import("./components/HeroSection"), {
@@ -47,21 +37,10 @@ const Footer = dynamic(() => import("./components/Footer"), {
 });
 
 export default function LandingPage() {
-	const { isMobile } = useMobileDetect();
-
 	return (
 		<main className="min-h-screen">
-			{/* Navbar - critical, always rendered */}
 			<Navbar />
 
-			{/* SplashCursor - desktop only, non-critical */}
-			{!isMobile && (
-				<Suspense fallback={null}>
-					<SplashCursor />
-				</Suspense>
-			)}
-
-			{/* Above-fold content - high priority */}
 			<Suspense
 				fallback={
 					<div className="min-h-screen flex items-center justify-center">
@@ -72,7 +51,6 @@ export default function LandingPage() {
 				<HeroSection />
 			</Suspense>
 
-			{/* Below-fold sections - progressive loading */}
 			<Suspense fallback={<div className="min-h-screen" />}>
 				<ProblemSection />
 			</Suspense>
