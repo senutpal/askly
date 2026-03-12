@@ -2,7 +2,6 @@
 
 import { SpotlightCard } from "@workspace/ui";
 import { Globe2 } from "lucide-react";
-import { motion } from "motion/react";
 import React from "react";
 
 export const MultilingualCard = React.memo(() => {
@@ -21,24 +20,16 @@ export const MultilingualCard = React.memo(() => {
 				</p>
 			</div>
 
-			<div className="absolute hidden xl:block right-0 bottom-0 w-full h-1/2 md:w-1/2 md:h-full overflow-hidden ">
-				<motion.div
-					animate={{ y: [0, -5, 0] }}
-					transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-					className="absolute bottom-12 right-12 bg-gradient-to-b from-white to-gray-100 dark:bg-neutral-800 shadow-xl border border-neutral-200 dark:border-neutral-700 p-4 rounded-t-3xl rounded-bl-3xl rounded-br-sm max-w-[200px] z-20"
-				>
+			<div className="absolute hidden xl:block right-0 bottom-0 w-full h-1/2 md:w-1/2 md:h-full overflow-hidden">
+				<div className="absolute bottom-12 right-12 bg-gradient-to-b from-white to-gray-100 dark:bg-neutral-800 shadow-xl border border-neutral-200 dark:border-neutral-700 p-4 rounded-t-3xl rounded-bl-3xl rounded-br-sm max-w-[200px] z-20">
 					<p className="text-sm text-neutral-600 dark:text-black font-medium">
 						Aavedan agle Somvaar se shuru honge !
 					</p>
-				</motion.div>
+				</div>
 
-				<motion.div
-					animate={{ y: [0, 5, 0] }}
-					transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-					className="absolute bottom-36 right-32 bg-green-500 text-white shadow-lg bg-gradient-to-b from-green-400 to-green-600 p-4 rounded-t-3xl rounded-br-3xl rounded-bl-sm max-w-[200px] z-10"
-				>
+				<div className="absolute bottom-36 right-32 bg-green-500 text-white shadow-lg bg-gradient-to-b from-green-400 to-green-600 p-4 rounded-t-3xl rounded-br-3xl rounded-bl-sm max-w-[200px] z-10">
 					<p className="text-sm font-medium">Applications open next Monday !</p>
-				</motion.div>
+				</div>
 			</div>
 		</SpotlightCard>
 	);

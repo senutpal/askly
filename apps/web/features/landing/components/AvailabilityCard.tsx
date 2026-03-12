@@ -6,7 +6,7 @@ import React from "react";
 
 /**
  * AvailabilityCard - Vertical Bento card showing 24/7 availability
- * Features a pulsing online indicator
+ * Removed expensive animate-ping
  */
 export const AvailabilityCard = React.memo(() => {
 	return (
@@ -25,11 +25,9 @@ export const AvailabilityCard = React.memo(() => {
 				</p>
 			</div>
 			<div className="relative h-32 w-full bg-gradient-to-t from-purple-50/50 dark:from-purple-900/10 to-transparent flex items-center justify-center">
-				{/* Pulsing Indicator */}
 				<div className="relative flex items-center justify-center">
-					<div className="absolute w-24 h-24 bg-green-500/20 rounded-full animate-ping" />
 					<div className="relative px-4 py-2 bg-white dark:bg-neutral-800 rounded-full shadow-sm border border-green-200 dark:border-green-900 flex items-center gap-2">
-						<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+						<div className="w-2 h-2 bg-green-500 rounded-full" />
 						<span className="text-xs font-bold text-green-700 dark:text-green-400">
 							ONLINE NOW
 						</span>

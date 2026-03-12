@@ -2,7 +2,6 @@
 
 import { SpotlightCard } from "@workspace/ui";
 import { Upload, Zap } from "lucide-react";
-import { motion } from "motion/react";
 import React from "react";
 
 export const SetupCard = React.memo(() => {
@@ -26,13 +25,8 @@ export const SetupCard = React.memo(() => {
 					</div>
 				</div>
 
-				<div className="w-full md:w-1/2 perspective-1000">
-					<motion.div
-						style={{ rotateY: -0, rotateX: 0 }}
-						whileHover={{ rotateY: 0, rotateX: 10, rotateZ: 0 }}
-						transition={{ type: "spring", stiffness: 100 }}
-						className="relative bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 p-4"
-					>
+				<div className="w-full md:w-1/2">
+					<div className="relative bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 p-4">
 						<div className="flex items-center gap-2 mb-4 border-b border-neutral-100 dark:border-neutral-900 pb-2">
 							<div className="w-2 h-2 rounded-full bg-red-400" />
 							<div className="w-2 h-2 rounded-full bg-yellow-400" />
@@ -52,7 +46,7 @@ export const SetupCard = React.memo(() => {
 								</div>
 							</div>
 						</div>
-					</motion.div>
+					</div>
 				</div>
 			</div>
 		</SpotlightCard>
