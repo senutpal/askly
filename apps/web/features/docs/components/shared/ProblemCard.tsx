@@ -1,7 +1,6 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { motion } from "motion/react";
 
 interface ProblemCardProps {
 	title: string;
@@ -14,8 +13,7 @@ export const ProblemCard = ({
 	description,
 	icon: Icon,
 }: ProblemCardProps) => (
-	<motion.div
-		whileHover={{ y: -2 }}
+	<div
 		className="flex gap-4 p-5 rounded-xl border border-red-100 bg-red-50/30 dark:bg-red-400/10 dark:border-red-900/30 transition-all"
 	>
 		<div className="shrink-0 mt-1">
@@ -29,5 +27,5 @@ export const ProblemCard = ({
 				{description}
 			</p>
 		</div>
-	</motion.div>
+	</div>
 );

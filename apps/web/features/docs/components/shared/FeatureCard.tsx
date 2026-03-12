@@ -1,7 +1,6 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { motion } from "motion/react";
 
 interface FeatureCardProps {
 	title: string;
@@ -16,11 +15,7 @@ export const FeatureCard = ({
 	icon: Icon,
 	points,
 }: FeatureCardProps) => (
-	<motion.div
-		initial={{ opacity: 0, y: 20 }}
-		whileInView={{ opacity: 1, y: 0 }}
-		viewport={{ once: true, margin: "-50px" }}
-		whileHover={{ y: -4 }}
+	<div
 		className="h-full p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300"
 	>
 		<div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mb-5 shadow-sm">
@@ -45,5 +40,5 @@ export const FeatureCard = ({
 				</li>
 			))}
 		</ul>
-	</motion.div>
+	</div>
 );

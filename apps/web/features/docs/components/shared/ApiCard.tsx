@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import type React from "react";
 
 interface ApiCardProps {
@@ -16,10 +15,7 @@ export const ApiCard = ({
 	children,
 	label,
 }: ApiCardProps) => (
-	<motion.div
-		initial={{ opacity: 0, y: 20 }}
-		whileInView={{ opacity: 1, y: 0 }}
-		viewport={{ once: true, margin: "-50px" }}
+	<div
 		className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all duration-300 mb-8"
 	>
 		<div className="flex items-center justify-between mb-4">
@@ -38,5 +34,5 @@ export const ApiCard = ({
 			</p>
 		)}
 		{children}
-	</motion.div>
+	</div>
 );

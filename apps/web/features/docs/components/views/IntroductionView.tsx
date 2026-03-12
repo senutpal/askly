@@ -18,7 +18,6 @@ import {
 	Workflow,
 	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { DocLayout } from "../DocLayout";
 import { InfoCard } from "../shared/InfoCard";
@@ -35,9 +34,7 @@ export const IntroductionView = () => {
 			<div className="space-y-20 pb-10">
 				{/* Hero / Definition */}
 				<section>
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
+					<div
 						className="relative overflow-hidden rounded-2xl border bg-gradient-to-b from-zinc-50 to-white p-8  dark:from-zinc-900/50 dark:to-zinc-950"
 					>
 						<div className="relative z-10">
@@ -61,7 +58,7 @@ export const IntroductionView = () => {
 						</div>
 						{/* Subtle background decoration */}
 						<div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/20" />
-					</motion.div>
+					</div>
 				</section>
 
 				{/* The Problem Section */}
@@ -122,10 +119,7 @@ export const IntroductionView = () => {
 					</div>
 
 					{/* Impact Highlight */}
-					<motion.div
-						initial={{ opacity: 0, scale: 0.98 }}
-						whileInView={{ opacity: 1, scale: 1 }}
-						viewport={{ once: true }}
+					<div
 						className="flex items-center gap-4 p-6 rounded-xl border border-emerald-200 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-900/10"
 					>
 						<div className="shrink-0 p-3 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
@@ -141,7 +135,7 @@ export const IntroductionView = () => {
 								counseling.
 							</p>
 						</div>
-					</motion.div>
+					</div>
 				</section>
 
 				{/* Core Capabilities Grid */}

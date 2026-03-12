@@ -12,7 +12,6 @@ import {
 	ShieldAlert,
 	Terminal,
 } from "lucide-react";
-import { motion } from "motion/react";
 import { envExamples } from "../../config/content";
 import { DocLayout } from "../DocLayout";
 import { ConfigCard } from "../shared/ConfigCard";
@@ -326,9 +325,7 @@ export const SetupView = () => {
 
 				{/* Security Warning */}
 				<section>
-					<motion.div
-						initial={{ opacity: 0, y: 10 }}
-						whileInView={{ opacity: 1, y: 0 }}
+					<div
 						className="rounded-xl border border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-900/30 p-6"
 					>
 						<div className="flex items-start gap-4">
@@ -356,7 +353,7 @@ export const SetupView = () => {
 								</ul>
 							</div>
 						</div>
-					</motion.div>
+					</div>
 				</section>
 			</div>
 		</DocLayout>

@@ -1,7 +1,6 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { motion } from "motion/react";
 
 interface TechSpecItemProps {
 	title: string;
@@ -14,8 +13,7 @@ export const TechSpecItem = ({
 	description,
 	icon: Icon,
 }: TechSpecItemProps) => (
-	<motion.div
-		whileHover={{ x: 4 }}
+	<div
 		className="group flex items-start gap-4 p-4 rounded-xl border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-white dark:hover:bg-zinc-900/50 transition-all duration-200"
 	>
 		<div className="mt-1 text-zinc-400 group-hover:text-blue-500 transition-colors">
@@ -29,5 +27,5 @@ export const TechSpecItem = ({
 				{description}
 			</p>
 		</div>
-	</motion.div>
+	</div>
 );
