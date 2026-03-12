@@ -4,7 +4,6 @@ import { api } from "@workspace/backend/_generated/api";
 import { Separator } from "@workspace/ui";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Loader2Icon } from "lucide-react";
-import { motion } from "motion/react";
 
 import { CustomizationForm } from "../customization-form";
 
@@ -26,10 +25,7 @@ export const CustomizationView = () => {
 		<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 			<div className="mx-auto w-full max-w-6xl space-y-12">
 				{/* Header Section */}
-				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5 }}
+				<div
 					className="space-y-4"
 				>
 					<h1 className="text-4xl font-bold tracking-tight md:text-6xl mx-6">
@@ -42,7 +38,7 @@ export const CustomizationView = () => {
 						Customize how your chat widget looks and behaves to match your brand
 						perfectly.
 					</p>
-				</motion.div>
+				</div>
 
 				<Separator className="bg-border/50" />
 

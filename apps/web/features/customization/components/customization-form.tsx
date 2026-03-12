@@ -17,7 +17,6 @@ import {
 } from "@workspace/ui";
 import { useMutation } from "convex/react";
 import { MessageSquare, Sparkles, Wand2 } from "lucide-react";
-import { motion } from "motion/react";
 import { toast } from "sonner";
 import z from "zod";
 import { VapiFormField } from "./vapi-form-fields";
@@ -97,10 +96,7 @@ export const CustomizationForm = ({
 	return (
 		<div className="grid gap-8 lg:grid-cols-2">
 			{/* Left Column: Form */}
-			<motion.div
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ duration: 0.5 }}
+			<div
 				className="space-y-6"
 			>
 				<Form {...form}>
@@ -223,7 +219,7 @@ export const CustomizationForm = ({
 						</div>
 					</form>
 				</Form>
-			</motion.div>
+			</div>
 
 			{/* Right Column: Preview */}
 			<div className="relative hidden lg:block">
