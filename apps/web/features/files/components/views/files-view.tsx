@@ -28,7 +28,6 @@ import {
 	PlusIcon,
 	TrashIcon,
 } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
 import { DeleteFileDialog } from "../delete-file-dialog";
 import { UploadDialog } from "../upload-dialog";
@@ -86,15 +85,10 @@ export const FilesView = () => {
 					onOpenChange={setCrawlerDialogOpen}
 					open={crawlerDialogOpen}
 				/>
-				<div className="min-h-screen  p-6 md:p-12">
-					<div className=" space-y-12">
+				<div className="min-h-screen p-6 md:p-12">
+					<div className="space-y-12">
 						{/* Header Section */}
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.5 }}
-							className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-						>
+						<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 							<div className="space-y-4">
 								<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
 									Manage your <br />
@@ -112,7 +106,7 @@ export const FilesView = () => {
 								<Button
 									variant="outline"
 									size="lg"
-									className="h-12 rounded-xl border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background"
+									className="h-12 rounded-xl border-border/50 bg-background/50 hover:bg-background"
 									onClick={() => setCrawlerDialogOpen(true)}
 								>
 									<GlobeIcon className="mr-2 h-4 w-4" />
@@ -127,17 +121,12 @@ export const FilesView = () => {
 									Add New File
 								</Button>
 							</div>
-						</motion.div>
+						</div>
 
 						<Separator className="bg-border/50" />
 
 						{/* Files Table */}
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.5, delay: 0.2 }}
-							className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl dark:bg-black/20"
-						>
+						<div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 dark:bg-black/20">
 							<div className="bg-background/50">
 								<Table>
 									<TableHeader>
@@ -250,7 +239,7 @@ export const FilesView = () => {
 									/>
 								</div>
 							)}
-						</motion.div>
+						</div>
 					</div>
 				</div>
 			</div>
