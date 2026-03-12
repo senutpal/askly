@@ -48,7 +48,7 @@ export const ChatSimulation = React.memo(() => {
 
 	const [currentSet, setCurrentSet] = useState(getRandomSet);
 	const [visibleIndex, setVisibleIndex] = useState(0);
-	const intervalRef = useRef<ReturnType<typeof setInterval>>();
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
 	useEffect(() => {
 		intervalRef.current = setInterval(() => {
