@@ -9,7 +9,6 @@ import {
 	Users,
 	Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import { FeatureGrid } from "./FeatureGrid";
 import { FeaturesHeader } from "./FeaturesHeader";
 
@@ -66,32 +65,21 @@ const features = [
 
 export default function EnterpriseFeatures() {
 	return (
-		<section className="relative w-full py-32 overflow-hidden selection:bg-zinc-200 selection:text-zinc-900 dark:selection:bg-zinc-800 dark:selection:text-white">
+		<section className="relative w-full py-32 overflow-hidden">
 			<CrossDotPattern />
-
-			<div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
-
-			<div className="absolute top-20 left-2/3 -translate-x-1/2 w-[1000px] h-[700px] bg-indigo-500/10 dark:bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
 				<FeaturesHeader />
-
 				<FeatureGrid features={features} />
 
-				<motion.div
-					initial={{ opacity: 0 }}
-					whileInView={{ opacity: 1 }}
-					viewport={{ once: true }}
-					transition={{ delay: 0.6, duration: 1 }}
-					className="mt-16 flex items-center justify-between border-t border-border/40 pt-8"
-				>
+				<div className="mt-16 flex items-center justify-between border-t border-border/40 pt-8">
 					<p className="text-sm text-muted-foreground font-mono">
 						0.999% Uptime SLA
 					</p>
 					<p className="text-sm text-muted-foreground font-mono">
 						SOC2 Compliant
 					</p>
-				</motion.div>
+				</div>
 			</div>
 		</section>
 	);
