@@ -1,84 +1,38 @@
 "use client";
 
 import { SignUpButton } from "@clerk/nextjs";
-import { AnimatedBadge, ShinyText, SpotlightButton } from "@workspace/ui";
+import { SpotlightButton } from "@workspace/ui";
 import { ArrowRight } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 
 /**
  * HeroContent - Left side text content of hero section
- * Includes heading, description, and CTA buttons
- * Optimized for fast initial render and reduced motion support
+ * No animations, instant render
  */
 export const HeroContent = React.memo(() => {
-	const { theme } = useTheme();
-	const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-	const badgeColor = useMemo(
-		() => (theme === "dark" ? "#20a7db" : "#2d62ef"),
-		[theme],
-	);
-
-	// Detect reduced motion preference
-	useEffect(() => {
-		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-		setPrefersReducedMotion(mediaQuery.matches);
-
-		const handler = (e: MediaQueryListEvent) =>
-			setPrefersReducedMotion(e.matches);
-		mediaQuery.addEventListener("change", handler);
-		return () => mediaQuery.removeEventListener("change", handler);
-	}, []);
-
-	// Optimize animation durations based on motion preference
-	const animationDuration = prefersReducedMotion ? 0.3 : 0.6;
-
 	return (
 		<div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 max-w-2xl mx-auto lg:mx-0">
-			<AnimatedBadge text="Community-Driven • Free" color={badgeColor} />
+			<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20 text-xs font-semibold text-blue-600 dark:text-blue-400">
+				Community-Driven &bull; Free
+			</div>
 
-			<motion.h1
-				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: animationDuration, delay: 0.05 }}
-				className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1]"
-				style={{ willChange: "opacity, transform" }}
-			>
-				<span className="text-transparent bg-clip-text bg-gradient-to-b from-black/40 to-black dark:from-white dark:to-gray-300 ">
+			<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.1]">
+				<span className="text-transparent bg-clip-text bg-gradient-to-b from-black/40 to-black dark:from-white dark:to-gray-300">
 					Campus Communication
 				</span>
 				<br />
-				<span className="text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-blue-600 dark:from-blue-400 dark:from-blue-100 dark:to-blue-600 tracking-tight ">
+				<span className="text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-blue-600 dark:from-blue-100 dark:to-blue-600 tracking-tight">
 					Revolutionized Effortlessly<span className="hidden md:inline">.</span>
 				</span>
-			</motion.h1>
+			</h1>
 
-			<motion.div
-				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: animationDuration, delay: 0.1 }}
-				className=" max-w-[90%] md:max-w-xl leading-relaxed"
-				style={{ willChange: "opacity, transform" }}
-			>
-				<ShinyText
-					text="The AI-first communication layer for modern institutions.
-                Multilingual answers for students, zero overhead for staff."
-					disabled={prefersReducedMotion}
-					speed={5}
-					className="text-lg md:text-xl leading-relaxed"
-				/>
-			</motion.div>
+			<p className="text-lg md:text-xl leading-relaxed max-w-[90%] md:max-w-xl text-muted-foreground">
+				The AI-first communication layer for modern institutions.
+				Multilingual answers for students, zero overhead for staff.
+			</p>
 
-			<motion.div
-				initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: animationDuration, delay: 0.15 }}
-				className="flex md:mt-3 flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
-				style={{ willChange: "opacity, transform" }}
-			>
+			<div className="flex md:mt-3 flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
 				<SignUpButton mode="modal">
 					<SpotlightButton className="w-full sm:w-auto shadow-lg shadow-blue-500/20">
 						Get Started <ArrowRight className="ml-2 w-4 h-4" />
@@ -86,16 +40,14 @@ export const HeroContent = React.memo(() => {
 				</SignUpButton>
 
 				<Link href="#features" className="w-full sm:w-auto">
-					<motion.button
-						whileHover={{ scale: prefersReducedMotion ? 1 : 1.02 }}
-						whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
+					<button
 						className="w-full sm:w-auto inline-flex h-12 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-8 font-medium text-neutral-900 dark:text-white transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
 						type="button"
 					>
 						View Demo
-					</motion.button>
+					</button>
 				</Link>
-			</motion.div>
+			</div>
 		</div>
 	);
 });

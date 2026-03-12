@@ -12,7 +12,6 @@ export default function HeroSection() {
 	return (
 		<section
 			className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
-			style={{ willChange: "transform" }}
 		>
 			<HeroBackground />
 			<div className="container relative z-10 px-4 md:px-6 pt-32 md:pt-24 pb-20 mx-auto">
