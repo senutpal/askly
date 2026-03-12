@@ -22,33 +22,8 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(5px)" },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 20,
-    },
-  },
-};
 
 export default function Page() {
   const conversations = useQuery(api.private.conversations.getMany, {
@@ -99,8 +74,8 @@ export default function Page() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 rounded-full border border-border/40 bg-background/50 px-3 py-1.5 backdrop-blur-sm">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            <div className="hidden md:flex items-center gap-2 rounded-full border border-border/40 bg-background/50 px-3 py-1.5">
+              <div className="h-2 w-2 rounded-full bg-emerald-500" />
               <span className="text-xs font-medium">System Operational</span>
             </div>
             <ModeToggle />
@@ -120,50 +95,33 @@ export default function Page() {
         {isLoading ? (
           <DashboardSkeleton />
         ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid gap-6 md:grid-cols-12 lg:gap-8"
-          >
-            {/* --- Stats Row (Bento Top) --- */}
-            <motion.div variants={itemVariants} className="md:col-span-4">
+          <div className="grid gap-6 md:grid-cols-12 lg:gap-8">
+            {/* --- Stats Row --- */}
+            <div className="md:col-span-4">
               <StatCard
                 label="Active Inquiries"
                 value={conversationStats.active}
-                trend="+4.5%"
-                trendUp={true}
                 icon={<MessageSquare className="h-4 w-4" />}
               />
-            </motion.div>
-            <motion.div variants={itemVariants} className="md:col-span-4">
+            </div>
+            <div className="md:col-span-4">
               <StatCard
                 label="Resolution Rate"
                 value={`${efficiency}%`}
-                trend="+12% this week"
-                trendUp={true}
                 icon={<Zap className="h-4 w-4" />}
               />
-            </motion.div>
-            <motion.div variants={itemVariants} className="md:col-span-4">
+            </div>
+            <div className="md:col-span-4">
               <StatCard
                 label="Escalations"
                 value={conversationStats.escalated}
-                trend="-2.1%"
-                trendUp={false} // Good that it's down, but functionally a negative number
-                isNegativeStat={true}
                 icon={<Users className="h-4 w-4" />}
               />
-            </motion.div>
+            </div>
 
             {/* --- Main Content Area --- */}
-
-            {/* Left Column: Conversations (Span 8) */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col gap-6 md:col-span-12 lg:col-span-8"
-            >
-              <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+            <div className="flex flex-col gap-6 md:col-span-12 lg:col-span-8">
+              <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
                 <div className="flex items-center justify-between border-b border-border/40 p-6">
                   <div className="flex items-center gap-4">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -202,7 +160,7 @@ export default function Page() {
               </div>
 
               {/* Knowledge Base Section */}
-              <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+              <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
                 <div className="flex items-center justify-between border-b border-border/40 p-6">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
@@ -256,14 +214,11 @@ export default function Page() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            {/* Right Column: Quick Actions (Span 4) */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col gap-6 md:col-span-12 lg:col-span-4"
-            >
-              <div className="rounded-3xl border border-border/40 bg-card/50 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
+            {/* Right Column: Quick Actions */}
+            <div className="flex flex-col gap-6 md:col-span-12 lg:col-span-4">
+              <div className="rounded-3xl border border-border/40 bg-card/50 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <h3 className="mb-6 font-semibold tracking-tight">
                   Quick Actions
                 </h3>
@@ -302,11 +257,10 @@ export default function Page() {
               </div>
 
               <div className="relative overflow-hidden rounded-3xl bg-neutral-100 dark:bg-neutral-800 p-6 text-primary/80 shadow-lg">
-                <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-3xl" />
                 <div className="relative z-10">
-                  <HelpCircle className="mb-4 h-6 w-6 " />
+                  <HelpCircle className="mb-4 h-6 w-6" />
                   <h3 className="mb-1 text-lg font-semibold">Need Help ?</h3>
-                  <p className="mb-4 text-sm ">
+                  <p className="mb-4 text-sm">
                     Check Our Technical Documentation
                   </p>
                   <Button variant="secondary">
@@ -314,8 +268,8 @@ export default function Page() {
                   </Button>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -331,10 +285,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  trend: string;
-  trendUp: boolean;
   icon: React.ReactNode;
-  isNegativeStat?: boolean;
 }) {
   return (
     <div className="group relative overflow-hidden rounded-3xl border border-border/40 bg-card/50 p-6 transition-all hover:bg-card hover:shadow-lg">
@@ -351,8 +302,6 @@ function StatCard({
           </div>
         </div>
       </div>
-      {/* Decorative background element */}
-      <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-tr from-primary/10 to-transparent blur-2xl transition-all group-hover:from-primary/20" />
     </div>
   );
 }
@@ -364,17 +313,13 @@ function ConversationRow({ data }: { data: any }) {
     active: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
   };
 
-  // Determine status key safely
   const statusKey = (
     ["resolved", "escalated"].includes(data.status) ? data.status : "active"
   ) as keyof typeof statusColors;
 
   return (
     <Link href={`/conversations/${data._id}`}>
-      <motion.div
-        whileHover={{ scale: 1.01, x: 4 }}
-        className="group flex items-center justify-between rounded-xl p-3 transition-all hover:bg-accent/50"
-      >
+      <div className="group flex items-center justify-between rounded-xl p-3 transition-all hover:bg-accent/50">
         <div className="flex items-center gap-4">
           <div className="relative h-10 w-10 overflow-hidden rounded-full border border-border/50 bg-muted flex items-center justify-center">
             <DiceBearAvatar seed={data._id} size={42} />
@@ -401,7 +346,7 @@ function ConversationRow({ data }: { data: any }) {
           </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-foreground transition-colors" />
         </div>
-      </motion.div>
+      </div>
     </Link>
   );
 }
@@ -428,11 +373,7 @@ function ActionTile({
 
   return (
     <Link href={href} className="block h-full">
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="group flex h-full items-center gap-4 rounded-2xl border border-border/50 bg-background/50 p-4 transition-all hover:bg-accent hover:border-border/80"
-      >
+      <div className="group flex h-full items-center gap-4 rounded-2xl border border-border/50 bg-background/50 p-4 transition-all hover:bg-accent hover:border-border/80">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground transition-colors group-hover:bg-background group-hover:shadow-sm">
           <Icon className="h-5 w-5" />
         </div>
@@ -450,7 +391,7 @@ function ActionTile({
         {status === "neutral" && (
           <MoreHorizontal className="h-4 w-4 text-muted-foreground/50" />
         )}
-      </motion.div>
+      </div>
     </Link>
   );
 }
