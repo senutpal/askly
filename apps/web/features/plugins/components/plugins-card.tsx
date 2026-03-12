@@ -1,6 +1,5 @@
 import { Button } from "@workspace/ui";
 import { ArrowRight, type LucideIcon } from "lucide-react";
-import { motion } from "motion/react";
 import Image from "next/image";
 
 export interface Feature {
@@ -44,17 +43,10 @@ export const PluginCard = ({
 							/>
 						</div>
 
-						{/* Animated Connection Line */}
+						{/* Connection Line */}
 						<div className="relative flex w-16 items-center justify-center">
 							<div className="h-1 w-full rounded-full bg-border/50" />
-							<motion.div
-								initial={{ x: -20, opacity: 0 }}
-								animate={{ x: 20, opacity: [0, 1, 0] }}
-								transition={{
-									duration: 2,
-									repeat: Infinity,
-									ease: "easeInOut",
-								}}
+							<div
 								className="absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)]"
 							/>
 						</div>
@@ -91,12 +83,9 @@ export const PluginCard = ({
 				{/* Right Side: Features Grid */}
 				<div className="flex-1">
 					<div className="grid gap-4 sm:grid-cols-2">
-						{features.map((feature, idx) => (
-							<motion.div
+						{features.map((feature) => (
+							<div
 								key={feature.label}
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: idx * 0.1 }}
 								className="group flex items-start gap-4 rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors hover:bg-white/10 dark:hover:bg-white/5"
 							>
 								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -110,7 +99,7 @@ export const PluginCard = ({
 										{feature.description}
 									</p>
 								</div>
-							</motion.div>
+							</div>
 						))}
 					</div>
 				</div>
