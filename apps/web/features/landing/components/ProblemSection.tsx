@@ -8,11 +8,7 @@ import {
 	TrendingDown,
 	Users,
 } from "lucide-react";
-import { useScroll } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { useMobileDetect } from "@/hooks/use-mobile-detect";
-import { ProblemNarrative } from "./ProblemNarrative";
-import { ProblemStack } from "./ProblemStack";
 
 const problems = [
 	{
@@ -79,78 +75,122 @@ const problems = [
 
 /**
  * ProblemSection - Scroll-based card stack section
- * Optimized with requestAnimationFrame for smooth mobile performance
+ * Simplified: uses IntersectionObserver instead of framer-motion useScroll
  */
 export default function ProblemSection() {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [activeCard, setActiveCard] = useState(0);
-	const { isMobile } = useMobileDetect();
 
-	const { scrollYProgress } = useScroll({
-		target: containerRef,
-		offset: ["start start", "end end"],
-	});
-
-	// Optimized scroll handler with requestAnimationFrame
 	useEffect(() => {
-		let rafId: number | null = null;
-		let lastProgress = -1;
+		const container = containerRef.current;
+		if (!container) return;
 
-		const updateActiveCard = () => {
-			const progress = scrollYProgress.get();
-
-			// Only update if progress changed significantly (reduce state updates)
-			if (Math.abs(progress - lastProgress) > 0.001) {
-				lastProgress = progress;
-
-				const cardCount = problems.length;
-				const step = 1 / cardCount;
-				const index = Math.min(Math.floor(progress / step), cardCount - 1);
-				setActiveCard(index);
-			}
+		const handleScroll = () => {
+			const rect = container.getBoundingClientRect();
+			const containerHeight = container.offsetHeight;
+			const scrolled = -rect.top;
+			const progress = Math.max(0, Math.min(1, scrolled / (containerHeight - window.innerHeight)));
+			const cardCount = problems.length;
+			const step = 1 / cardCount;
+			const index = Math.min(Math.floor(progress / step), cardCount - 1);
+			setActiveCard(index);
 		};
 
-		const unsubscribe = scrollYProgress.on("change", () => {
-			// Cancel previous frame if still pending
-			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
-			}
+		window.addEventListener("scroll", handleScroll, { passive: true });
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
 
-			// Schedule update for next frame
-			rafId = requestAnimationFrame(updateActiveCard);
-		});
-
-		return () => {
-			unsubscribe();
-			if (rafId !== null) {
-				cancelAnimationFrame(rafId);
-			}
-		};
-	}, [scrollYProgress]);
+	const activeProblem = problems[activeCard] || problems[0];
 
 	return (
 		<section
 			id="problem"
 			className="relative text-neutral-900 dark:text-white"
-			style={{ contain: "layout style" }}
 		>
 			<TopographyPattern />
 
-			<div
-				ref={containerRef}
-				className={isMobile ? "relative h-[200vh]" : "relative h-[300vh]"}
-			>
-				<div
-					className="sticky top-0 h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden px-6 md:px-12 lg:px-24 py-12"
-					style={{ willChange: "contents" }}
-				>
-					<ProblemNarrative
-						activeCard={activeCard}
-						problems={problems}
-						scrollYProgress={scrollYProgress}
-					/>
+			<div ref={containerRef} className="relative h-[250vh]">
+				<div className="sticky top-0 h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden px-6 md:px-12 lg:px-24 py-12">
+					{/* Narrative - Left Side */}
+					<div className="w-full lg:w-1/2 h-full flex flex-col justify-start md:justify-center z-10 mb-12 lg:mb-0 relative">
+						<div className="lg:pl-12 space-y-8 max-w-lg">
+							<div>
+								<h2 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-black/60 to-black dark:from-neutral-400 dark:to-neutral-300">
+									Campus communication <br />
+									<span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-600 to-neutral-800 dark:from-neutral-500 dark:to-neutral-300">
+										is broken.
+									</span>
+								</h2>
+							</div>
 
-					<ProblemStack problems={problems} activeCard={activeCard} />
+							<div className="relative min-h-[180px]">
+								<div className="absolute top-0 left-0 transition-opacity duration-300">
+									<h3 className={`text-2xl font-semibold mb-4 bg-gradient-to-b text-transparent bg-clip-text ${activeProblem?.accent}`}>
+										{activeProblem?.title}
+									</h3>
+									<p className="text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
+										{activeProblem?.description}
+									</p>
+								</div>
+							</div>
+
+							<div className="hidden lg:flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-500">
+								<span>0{activeCard + 1}</span>
+								<div className="w-12 h-[1px] bg-neutral-300 dark:bg-neutral-700" />
+								<span>0{problems.length}</span>
+							</div>
+						</div>
+					</div>
+
+					{/* Card Stack - Right Side */}
+					<div className="w-full lg:w-1/2 h-[20vh] md:h-[50vh] lg:h-full flex items-center justify-center lg:justify-end">
+						<div className="relative w-full max-w-md aspect-square">
+							{problems.map((card, index) => {
+								const isActive = index === activeCard;
+								const isPast = index < activeCard;
+
+								return (
+									<div
+										key={card.id}
+										className={`absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5 border border-white/20 dark:border-white/10 shadow-lg transition-all duration-300 ease-out ${isActive ? "z-30" : "z-0"} ${isActive ? card.shadow : ""}`}
+										style={{
+											transform: `translateY(${isActive ? 0 : isPast ? -40 * (activeCard - index) : 15 * (index - activeCard)}px) scale(${isActive ? 1 : 0.95})`,
+											opacity: isActive ? 1 : isPast ? (index === activeCard - 1 ? 0.6 : 0) : 0.3,
+										}}
+									>
+										<div className="relative h-full w-full rounded-[20px] bg-white/50 dark:bg-neutral-900/80 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-white/40 dark:border-white/5">
+											<div className="relative z-10 flex justify-between items-start">
+												<div className={`p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white ${card.accent}`}>
+													<card.icon className="w-6 h-6" />
+												</div>
+											</div>
+											<div className="relative z-10 mt-auto space-y-6">
+												<div>
+													<h4 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1 uppercase tracking-wider">
+														{card.subtitle}
+													</h4>
+													<h3 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
+														{card.stat}
+														<span className="text-lg md:text-xl text-neutral-500 dark:text-neutral-500 font-medium ml-2">
+															{card.statLabel}
+														</span>
+													</h3>
+												</div>
+												<div className="space-y-2">
+													<div className="h-2 w-full bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+														<div
+															className={`h-full rounded-full bg-gradient-to-r transition-all duration-500 ${card.accent}`}
+															style={{ width: isActive ? "85%" : "0%" }}
+														/>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>

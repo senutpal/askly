@@ -2,7 +2,6 @@
 
 import { cn } from "@workspace/ui";
 import { Zap } from "lucide-react";
-import { motion } from "motion/react";
 import React, { useMemo } from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
@@ -80,26 +79,7 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 		}, [isActive, isPast, index, activeCard, isMobile]);
 
 		return (
-			<motion.div
-				layout={false} // Disable layout animations completely
-				initial={false}
-				animate={animationState}
-				transition={
-					isMobile
-						? {
-								// Instant transitions on mobile
-								type: "tween",
-								duration: 0.25,
-								ease: "easeOut",
-							}
-						: {
-								// Smooth spring on desktop
-								type: "spring",
-								stiffness: 140,
-								damping: 22,
-								mass: 0.8,
-							}
-				}
+			<div
 				className={cn(
 					"absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full",
 					"bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5",
@@ -180,7 +160,7 @@ export const ProblemCard = React.memo<ProblemCardProps>(
 						</div>
 					</div>
 				</div>
-			</motion.div>
+			</div>
 		);
 	},
 );
