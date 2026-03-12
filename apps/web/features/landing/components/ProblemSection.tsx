@@ -152,13 +152,13 @@ export default function ProblemSection() {
 								return (
 									<div
 										key={card.id}
-										className={`absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full bg-gradient-to-b from-white/40 to-white/10 dark:from-white/10 dark:to-white/5 border border-white/20 dark:border-white/10 shadow-lg transition-all duration-300 ease-out ${isActive ? "z-30" : "z-0"} ${isActive ? card.shadow : ""}`}
+										className={`absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full bg-gradient-to-b from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-lg transition-all duration-300 ease-out ${isActive ? "z-30" : "z-0"} ${isActive ? card.shadow : ""}`}
 										style={{
 											transform: `translateY(${isActive ? 0 : isPast ? -40 * (activeCard - index) : 15 * (index - activeCard)}px) scale(${isActive ? 1 : 0.95})`,
 											opacity: isActive ? 1 : isPast ? (index === activeCard - 1 ? 0.6 : 0) : 0.3,
 										}}
 									>
-										<div className="relative h-full w-full rounded-[20px] bg-white/50 dark:bg-neutral-900/80 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-white/40 dark:border-white/5">
+										<div className="relative h-full w-full rounded-[20px] bg-white dark:bg-neutral-900 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-neutral-200 dark:border-neutral-800">
 											<div className="relative z-10 flex justify-between items-start">
 												<div className={`p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white ${card.accent}`}>
 													<card.icon className="w-6 h-6" />
