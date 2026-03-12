@@ -20,7 +20,6 @@ import {
 import { useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Brain, FileText, MessageSquare, Search } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -233,10 +232,7 @@ export const GoogleAIView = () => {
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
 					{/* Header Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5 }}
+					<div
 						className="space-y-4"
 					>
 						<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
@@ -249,15 +245,11 @@ export const GoogleAIView = () => {
 							Connect Gemini to unlock advanced language models and intelligent
 							capabilities.
 						</p>
-					</motion.div>
+					</div>
 
 					<Separator className="bg-border/50" />
 
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5, delay: 0.2 }}
-					>
+					<div>
 						{googleAIPlugin ? (
 							<GoogleAIConnectedView onDisconnect={handleSubmit} />
 						) : (
@@ -269,7 +261,7 @@ export const GoogleAIView = () => {
 								serviceImage="/gemini.svg"
 							/>
 						)}
-					</motion.div>
+					</div>
 				</div>
 			</div>
 		</>

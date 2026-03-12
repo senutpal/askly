@@ -20,7 +20,6 @@ import {
 import { useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Globe2, Phone, PhoneCall, Workflow } from "lucide-react";
-import { motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -232,10 +231,7 @@ export const VapiView = () => {
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
 					{/* Header Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5 }}
+					<div
 						className="space-y-4"
 					>
 						<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
@@ -248,15 +244,11 @@ export const VapiView = () => {
 							Connect powerful third-party services to enhance your agent's
 							functionality.
 						</p>
-					</motion.div>
+					</div>
 
 					<Separator className="bg-border/50" />
 
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5, delay: 0.2 }}
-					>
+					<div>
 						{vapiPlugin ? (
 							<VapiConnectedView onDisconnect={handleSubmit} />
 						) : (
@@ -268,7 +260,7 @@ export const VapiView = () => {
 								serviceImage="/vapi.jpg"
 							/>
 						)}
-					</motion.div>
+					</div>
 				</div>
 			</div>
 		</>
