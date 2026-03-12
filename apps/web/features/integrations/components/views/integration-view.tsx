@@ -13,7 +13,6 @@ import {
 	Separator,
 } from "@workspace/ui";
 import { Check, Copy, Search } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { INTEGRATIONS, type IntegrationId } from "../../constants";
@@ -79,10 +78,7 @@ export const IntegrationsView = () => {
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
 					{/* Header Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.5 }}
+					<div
 						className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
 					>
 						<div className="space-y-4">
@@ -118,7 +114,7 @@ export const IntegrationsView = () => {
 								</Button>
 							</div>
 						</div>
-					</motion.div>
+					</div>
 
 					<Separator className="bg-border/50" />
 
@@ -134,21 +130,18 @@ export const IntegrationsView = () => {
 							/>
 						</div>
 
-						<motion.div
-							layout
+						<div
 							className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
 						>
-							<AnimatePresence>
-								{filteredIntegrations.map((integration, index) => (
-									<IntegrationCard
-										key={integration.id}
-										{...integration}
-										index={index}
-										onClick={() => handleIntegrationClick(integration.id)}
-									/>
-								))}
-							</AnimatePresence>
-						</motion.div>
+							{filteredIntegrations.map((integration, index) => (
+								<IntegrationCard
+									key={integration.id}
+									{...integration}
+									index={index}
+									onClick={() => handleIntegrationClick(integration.id)}
+								/>
+							))}
+						</div>
 
 						{filteredIntegrations.length === 0 && (
 							<div className="flex h-64 flex-col items-center justify-center gap-4 text-center text-muted-foreground">
