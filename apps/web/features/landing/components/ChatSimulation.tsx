@@ -61,7 +61,9 @@ export const ChatSimulation = React.memo(() => {
 			});
 		}, 3000);
 
-		return () => clearInterval(intervalRef.current);
+		return () => {
+			if (intervalRef.current) clearInterval(intervalRef.current);
+		};
 	}, [currentSet, getRandomSet]);
 
 	return (
