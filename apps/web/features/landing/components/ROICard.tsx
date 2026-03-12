@@ -2,10 +2,11 @@
 
 import { SpotlightCard } from "@workspace/ui";
 import { BarChart3 } from "lucide-react";
-import { motion } from "motion/react";
 import React from "react";
 
 export const ROICard = React.memo(() => {
+	const heights = [100, 90, 80, 70, 60, 50, 40];
+
 	return (
 		<SpotlightCard className="md:col-span-3 lg:col-span-4 min-h-[350px]">
 			<div className="p-8">
@@ -26,16 +27,14 @@ export const ROICard = React.memo(() => {
 					</p>
 				</div>
 				<div className="mt-8 h-16 flex items-end gap-1">
-					{[100, 90, 80, 70, 60, 50, 40].map((h, i) => (
-						<motion.div
+					{heights.map((h, i) => (
+						<div
 							key={i}
-							initial={{ height: 0 }}
-							whileInView={{ height: `${h}%` }}
-							transition={{ duration: 0.5, delay: i * 0.1 }}
 							className="flex-1 bg-orange-500/20 rounded-t-sm dark:bg-orange-500/40 relative group hover:bg-orange-500 transition-colors"
+							style={{ height: `${h}%` }}
 						>
 							<div className="absolute bottom-0 w-full h-1 bg-orange-500 rounded-full" />
-						</motion.div>
+						</div>
 					))}
 				</div>
 			</div>
