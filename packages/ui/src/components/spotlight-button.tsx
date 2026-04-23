@@ -1,9 +1,8 @@
-import { motion } from "motion/react";
+import { type HTMLMotionProps, motion } from "motion/react";
 import React from "react";
 import { cn } from "../lib/utils";
 
-interface SpotlightButtonProps
-	extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface SpotlightButtonProps extends HTMLMotionProps<"button"> {
 	children: React.ReactNode;
 	className?: string;
 }
