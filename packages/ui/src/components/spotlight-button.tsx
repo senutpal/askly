@@ -2,21 +2,19 @@ import { motion } from "motion/react";
 import React from "react";
 import { cn } from "../lib/utils";
 
-interface SpotlightButtonProps {
+interface SpotlightButtonProps
+	extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	children: React.ReactNode;
 	className?: string;
 }
 
-/**
- * SpotlightButton - Animated button with spotlight effect on hover
- * Features a sliding gradient animation and scale effects
- */
 export const SpotlightButton = React.memo<SpotlightButtonProps>(
-	({ children, className }) => {
+	({ children, className, ...props }) => {
 		return (
 			<motion.button
 				whileHover={{ scale: 1.02 }}
 				whileTap={{ scale: 0.98 }}
+				{...props}
 				className={cn(
 					"group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-xl bg-neutral-950 dark:bg-white px-8 font-medium text-white dark:text-black transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 focus:ring-offset-neutral-50",
 					className,
