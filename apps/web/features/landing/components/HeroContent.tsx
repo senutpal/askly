@@ -22,7 +22,7 @@ export const HeroContent = React.memo(() => {
 					Campus Communication
 				</span>
 				<br />
-				<span className="text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-blue-600 dark:from-blue-100 dark:to-blue-600 tracking-tight">
+				<span className="text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-blue-600 dark:from-blue-400 dark:to-blue-500 tracking-tight">
 					Revolutionized Effortlessly<span className="hidden md:inline">.</span>
 				</span>
 			</h1>
