@@ -65,7 +65,7 @@ const features = [
 
 export default function EnterpriseFeatures() {
 	return (
-		<section className="relative w-full py-32 overflow-hidden">
+		<section id="features" className="relative w-full py-32 overflow-hidden">
 			<CrossDotPattern />
 
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
