@@ -1,3 +1,22 @@
+/**
+ * Gemini model ID, kept in one place so deprecations are a one-line change.
+ *
+ * As of November 2026 `gemini-2.5-flash` and `gemini-3.5-flash` are deprecated.
+ * Verified against the live API with the project key: `gemini-3.5-flash-lite`
+ * responds reliably (including function calls) while `gemini-3.6-flash` and
+ * `gemini-3.8-flash` intermittently return 503 UNAVAILABLE.
+ */
+export const GEMINI_MODEL = "gemini-3.5-flash-lite";
+
+/**
+ * Embeddings stay on `gemini-embedding-001` for now. `gemini-embedding-2` is
+ * multimodal and would be a better fit for crawled PDFs/images, but changing
+ * the embedding model (or its dimensions) invalidates every vector already
+ * stored by the RAG component, so it needs a planned re-index migration.
+ */
+export const GEMINI_EMBEDDING_MODEL = "gemini-embedding-001";
+export const GEMINI_EMBEDDING_DIMENSION = 3072;
+
 export const SUPPORT_AGENT_PROMPT = `
 # Campus Support Assistant - Student Service AI
 

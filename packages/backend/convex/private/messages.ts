@@ -5,7 +5,10 @@ import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { action, mutation, query } from "../_generated/server";
 import { supportAgent } from "../system/ai/agents/supportAgent";
-import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
+import {
+	GEMINI_MODEL,
+	OPERATOR_MESSAGE_ENHANCEMENT_PROMPT,
+} from "../system/ai/constants";
 import { createGoogleAI } from "../system/ai/helpers";
 
 export const enhanceResponse = action({
@@ -27,7 +30,7 @@ export const enhanceResponse = action({
 			});
 		}
 
-		const gemini = await createGoogleAI(ctx, orgId, "gemini-2.5-flash");
+		const gemini = await createGoogleAI(ctx, orgId, GEMINI_MODEL);
 
 		const response = await generateText({
 			model: gemini,

@@ -3,7 +3,7 @@ import { generateText } from "ai";
 import z from "zod";
 import { internal } from "../../../_generated/api";
 import { supportAgent } from "../agents/supportAgent";
-import { SEARCH_INTERPRETER_PROMPT } from "../constants";
+import { GEMINI_MODEL, SEARCH_INTERPRETER_PROMPT } from "../constants";
 import { createGoogleAI } from "../helpers";
 import { createRAG } from "../rag";
 
@@ -54,7 +54,7 @@ export const search = createTool({
 			.join(", ")}. Here is the context:\n\n${searchResult.text}`;
 
 		// Use organization-specific API key
-		const gemini = await createGoogleAI(ctx, orgId, "gemini-2.5-flash");
+		const gemini = await createGoogleAI(ctx, orgId, GEMINI_MODEL);
 
 		const response = await generateText({
 			model: gemini,

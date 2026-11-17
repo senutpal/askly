@@ -26,16 +26,34 @@ export const create = mutation({
 		),
 	},
 	handler: async (ctx, args) => {
+		const name = args.name.trim();
+		if (!name) {
+			throw new Error("Name is required");
+		}
+
+		const email = args.email.trim().toLowerCase();
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(args.email)) {
+		if (!emailRegex.test(email)) {
 			throw new Error("Invalid email format");
 		}
+
+		const widgetSettings = await ctx.db
+			.query("widgetSettings")
+			.withIndex("by_organization_id", (q) =>
+				q.eq("organizationId", args.organizationId),
+			)
+			.first();
+
+		if (!widgetSettings) {
+			throw new Error("Organization not found");
+		}
+
 		const now = Date.now();
 		const expiresAt = now + SESSION_DURATION;
 
 		const contactSessionId = await ctx.db.insert("contactSessions", {
-			name: args.name,
-			email: args.email,
+			name,
+			email,
 			organizationId: args.organizationId,
 			expiresAt,
 			metadata: args.metadata,
@@ -60,6 +78,13 @@ export const validate = mutation({
 			return { valid: false, reason: "Contact session expired" };
 		}
 
-		return { valid: true, contactSession };
+		return {
+			valid: true,
+			contactSession: {
+				_id: contactSession._id,
+				organizationId: contactSession.organizationId,
+				expiresAt: contactSession.expiresAt,
+			},
+		};
 	},
 });
