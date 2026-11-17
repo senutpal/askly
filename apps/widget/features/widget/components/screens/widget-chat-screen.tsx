@@ -22,6 +22,7 @@ import {
 	useInfiniteScroll,
 } from "@workspace/ui";
 import { useAction, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -38,8 +39,28 @@ import {
 } from "@/features/widget";
 
 const formSchema = z.object({
-	message: z.string().min(1, "Message is required"),
+	message: z
+		.string()
+		.min(1, "Message is required")
+		.max(4000, "Message is too long"),
 });
+
+/** Surface the backend's friendly ConvexError message when there is one. */
+function getErrorMessage(error: unknown, fallback: string): string {
+	if (error instanceof ConvexError) {
+		const data = error.data;
+		if (typeof data === "string") return data;
+		if (
+			data &&
+			typeof data === "object" &&
+			"message" in data &&
+			typeof (data as { message?: unknown }).message === "string"
+		) {
+			return (data as { message: string }).message;
+		}
+	}
+	return fallback;
+}
 
 export default function WidgetChatScreen() {
 	const setScreen = useSetAtom(screenAtom);
@@ -118,8 +139,11 @@ export default function WidgetChatScreen() {
 			// Only clear the draft once the message was accepted, so a failed send
 			// does not silently discard what the user typed.
 			form.reset();
-		} catch {
-			const message = "Your message couldn't be sent. Please try again.";
+		} catch (error) {
+			const message = getErrorMessage(
+				error,
+				"Your message couldn't be sent. Please try again.",
+			);
 			setSendError(message);
 			setErrorMessage(message);
 		}
@@ -263,6 +287,7 @@ export default function WidgetChatScreen() {
 							render={({ field }) => (
 								<AIInputTextarea
 									disabled={conversation?.status === "resolved"}
+									maxLength={4000}
 									onChange={field.onChange}
 									onKeyDown={(e) => {
 										if (e.key === "Enter" && !e.shiftKey) {

@@ -11,7 +11,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@workspace/ui";
-import { useAction } from "convex/react";
+import { useAction, useMutation, usePaginatedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { CheckCircleIcon, GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,6 +23,26 @@ import { ImportProgressStep } from "./import-progress-step";
 import { ResultsSelectionStep } from "./results-selection-step";
 
 type CrawlStep = "input" | "crawling" | "results" | "importing" | "complete";
+
+/** Mirrors MAX_RESOURCES_PER_JOB in the backend crawler. */
+const MAX_IMPORT_RESOURCES = 100;
+
+/** Surface the backend's friendly ConvexError message when there is one. */
+function getErrorMessage(error: unknown, fallback: string): string {
+	if (error instanceof ConvexError) {
+		const data = error.data;
+		if (typeof data === "string") return data;
+		if (
+			data &&
+			typeof data === "object" &&
+			"message" in data &&
+			typeof (data as { message?: unknown }).message === "string"
+		) {
+			return (data as { message: string }).message;
+		}
+	}
+	return error instanceof Error ? error.message : fallback;
+}
 
 interface WebCrawlerDialogProps {
 	open: boolean;
@@ -36,6 +57,7 @@ export const WebCrawlerDialog = ({
 	const addSelectedResources = useAction(
 		api.private.webCrawl.addSelectedResources,
 	);
+	const cancelCrawl = useMutation(api.private.webCrawl.cancelCrawl);
 
 	const [step, setStep] = useState<CrawlStep>("input");
 	const [url, setUrl] = useState("");
@@ -44,6 +66,8 @@ export const WebCrawlerDialog = ({
 	const [includePdfs, setIncludePdfs] = useState(true);
 	const [includeText, setIncludeText] = useState(true);
 	const [crawlError, setCrawlError] = useState<string | null>(null);
+	const [isCancelling, setIsCancelling] = useState(false);
+	const [autoSelected, setAutoSelected] = useState(false);
 
 	const [jobId, setJobId] = useState<Id<"crawlJobs"> | null>(null);
 
@@ -60,29 +84,55 @@ export const WebCrawlerDialog = ({
 
 	const job = useQuery(api.private.webCrawl.getJob, jobId ? { jobId } : "skip");
 
-	const results = useQuery(
+	const results = usePaginatedQuery(
 		api.private.webCrawl.getResults,
 		jobId ? { jobId } : "skip",
+		{ initialNumItems: 50 },
 	);
 
 	useEffect(() => {
-		if (step === "crawling" && job?.status === "completed") {
-			setStep("results");
-			if (results) {
-				setSelectedResourceIds(new Set(results.map((r) => r._id)));
-			}
-		}
-	}, [step, job?.status, results]);
+		if (step !== "crawling") return;
 
-	useEffect(() => {
-		if (step === "crawling" && job?.status === "failed") {
+		if (job?.status === "completed") {
+			setStep("results");
+			return;
+		}
+
+		if (job?.status === "failed") {
 			setCrawlError(job.error || "Crawl failed");
+			setStep("input");
+			return;
+		}
+
+		if (job?.status === "cancelled") {
+			setCrawlError("Crawl cancelled");
 			setStep("input");
 		}
 	}, [step, job?.status, job?.error]);
 
+	useEffect(() => {
+		if (step !== "results" || autoSelected) return;
+		if (results.status === "LoadingFirstPage") return;
+
+		setAutoSelected(true);
+		// Preselect small result sets. Larger crawls start with nothing
+		// selected so one click can never import hundreds of pages by accident.
+		const total = job?.resourcesFound ?? results.results.length;
+		if (total > 0 && total <= 50) {
+			setSelectedResourceIds(new Set(results.results.map((r) => r._id)));
+		}
+	}, [
+		step,
+		autoSelected,
+		results.status,
+		results.results,
+		job?.resourcesFound,
+	]);
+
 	const handleStartCrawl = async () => {
 		setCrawlError(null);
+		setAutoSelected(false);
+		setSelectedResourceIds(new Set());
 
 		try {
 			new URL(url);
@@ -95,7 +145,7 @@ export const WebCrawlerDialog = ({
 
 		try {
 			const result = await startCrawl({
-				url,
+				url: url.trim(),
 				maxDepth: parseInt(maxDepth, 10),
 				options: {
 					includeImages,
@@ -107,16 +157,29 @@ export const WebCrawlerDialog = ({
 			setJobId(result.jobId);
 		} catch (error) {
 			console.error(error);
-			setCrawlError(
-				error instanceof Error ? error.message : "Failed to start crawl",
-			);
+			setCrawlError(getErrorMessage(error, "Failed to start crawl"));
 			setStep("input");
+		}
+	};
+
+	const handleCancelCrawl = async () => {
+		if (!jobId) return;
+
+		setIsCancelling(true);
+		try {
+			await cancelCrawl({ jobId });
+		} catch (error) {
+			console.error(error);
+			setCrawlError(getErrorMessage(error, "Failed to cancel crawl"));
+		} finally {
+			setIsCancelling(false);
 		}
 	};
 
 	const handleImport = async () => {
 		if (selectedResourceIds.size === 0 || !jobId) return;
 
+		setCrawlError(null);
 		setStep("importing");
 		setImportProgress({
 			current: 0,
@@ -148,9 +211,7 @@ export const WebCrawlerDialog = ({
 			}
 		} catch (error) {
 			console.error(error);
-			setCrawlError(
-				error instanceof Error ? error.message : "Failed to import resources",
-			);
+			setCrawlError(getErrorMessage(error, "Failed to import resources"));
 			setStep("results");
 		}
 	};
@@ -165,6 +226,8 @@ export const WebCrawlerDialog = ({
 			setIncludePdfs(true);
 			setIncludeText(true);
 			setCrawlError(null);
+			setIsCancelling(false);
+			setAutoSelected(false);
 			setJobId(null);
 			setSelectedResourceIds(new Set());
 			setImportProgress({ current: 0, total: 0, successful: 0, failed: 0 });
@@ -181,7 +244,7 @@ export const WebCrawlerDialog = ({
 		setSelectedResourceIds(newSelected);
 	};
 
-	const toggleSelectAll = (filteredResults: typeof results = []) => {
+	const toggleSelectAll = (filteredResults: Array<{ _id: string }> = []) => {
 		const filteredIds = new Set(filteredResults.map((r) => r._id));
 		const allFilteredSelected = filteredResults.every((r) =>
 			selectedResourceIds.has(r._id),
@@ -207,8 +270,7 @@ export const WebCrawlerDialog = ({
 	};
 
 	const selectByType = (type: "text" | "image" | "pdf") => {
-		if (!results) return;
-		const resourcesOfType = results.filter((r) => r.type === type);
+		const resourcesOfType = results.results.filter((r) => r.type === type);
 		setSelectedResourceIds(new Set(resourcesOfType.map((r) => r._id)));
 	};
 
@@ -249,6 +311,15 @@ export const WebCrawlerDialog = ({
 					<DialogDescription>{getDialogDescription()}</DialogDescription>
 				</DialogHeader>
 
+				{crawlError && step !== "input" && (
+					<p
+						role="alert"
+						className="rounded-xl bg-destructive/10 px-4 py-2.5 text-sm text-destructive"
+					>
+						{crawlError}
+					</p>
+				)}
+
 				{step === "input" && (
 					<CrawlInputStep
 						url={url}
@@ -266,12 +337,27 @@ export const WebCrawlerDialog = ({
 					/>
 				)}
 
-				{step === "crawling" && <CrawlProgressStep />}
+				{step === "crawling" && (
+					<CrawlProgressStep
+						pagesVisited={job?.pagesVisited}
+						resourcesFound={job?.resourcesFound}
+						onCancel={handleCancelCrawl}
+						isCancelling={isCancelling}
+					/>
+				)}
 
-				{step === "results" && results && (
+				{step === "results" && (
 					<ResultsSelectionStep
-						results={results}
+						results={results.results}
 						selectedResourceIds={selectedResourceIds}
+						totalCount={job?.resourcesFound}
+						importLimit={MAX_IMPORT_RESOURCES}
+						canLoadMore={results.status === "CanLoadMore"}
+						isLoading={
+							results.status === "LoadingFirstPage" ||
+							results.status === "LoadingMore"
+						}
+						onLoadMore={() => results.loadMore(50)}
 						onToggleResource={toggleResource}
 						onToggleSelectAll={toggleSelectAll}
 						onSelectByType={selectByType}
@@ -315,7 +401,10 @@ export const WebCrawlerDialog = ({
 							</Button>
 							<Button
 								onClick={handleImport}
-								disabled={selectedResourceIds.size === 0}
+								disabled={
+									selectedResourceIds.size === 0 ||
+									selectedResourceIds.size > MAX_IMPORT_RESOURCES
+								}
 							>
 								Import {selectedResourceIds.size} Resource
 								{selectedResourceIds.size !== 1 && "s"}
