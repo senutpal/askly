@@ -105,7 +105,7 @@ export default function Page() {
 						<div className="md:col-span-4">
 							<StatCard
 								label="Resolution Rate"
-								value={`${efficiency}%`}
+								value={`${stats.approximate ? "~" : ""}${efficiency}%`}
 								icon={<Zap className="h-4 w-4" />}
 							/>
 						</div>
@@ -308,6 +308,7 @@ type ConversationRowData = {
 	_id: Id<"conversations">;
 	_creationTime: number;
 	status: Doc<"conversations">["status"];
+	lastMessage?: { at: number } | null;
 	contactSession?: { name?: string | null } | null;
 };
 
@@ -335,7 +336,12 @@ function ConversationRow({ data }: { data: ConversationRowData }) {
 						</p>
 						<div className="flex items-center gap-2 text-xs text-muted-foreground">
 							<Clock className="h-3 w-3" />
-							<span>{formatDistanceToNow(data._creationTime)} ago</span>
+							<span>
+								{formatDistanceToNow(
+									data.lastMessage?.at ?? data._creationTime,
+								)}{" "}
+								ago
+							</span>
 						</div>
 					</div>
 				</div>

@@ -276,7 +276,7 @@ export const getStats = query({
 				escalated: stats.escalated,
 				resolved: stats.resolved,
 				total,
-				approximate: false,
+				approximate: stats.approximate ?? false,
 			};
 		}
 

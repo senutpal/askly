@@ -64,14 +64,21 @@ export const updateLastMessage = internalMutation({
 		conversationId: v.id("conversations"),
 		text: v.string(),
 		role: lastMessageRoleValidator,
+		at: v.number(),
 		agentName: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		const conversation = await ctx.db.get(args.conversationId);
+		if (!conversation) return;
+		if (conversation.lastMessage && conversation.lastMessage.at > args.at) {
+			return;
+		}
+
 		await ctx.db.patch(args.conversationId, {
 			lastMessage: {
 				text: args.text,
 				role: args.role,
-				at: Date.now(),
+				at: args.at,
 				...(args.agentName ? { agentName: args.agentName } : {}),
 			},
 		});

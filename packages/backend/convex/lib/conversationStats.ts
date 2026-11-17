@@ -4,7 +4,7 @@ const statuses = ["unresolved", "escalated", "resolved"] as const;
 
 export type ConversationStatus = (typeof statuses)[number];
 
-export const conversationStatsCap = 2000;
+export const conversationStatsCap = 200;
 
 export const countConversations = async (
 	db: DatabaseReader,
@@ -57,13 +57,12 @@ export const adjustConversationStats = async (
 			args.organizationId,
 		);
 
-		if (approximate) return;
-
 		await ctx.db.insert("conversationStats", {
 			organizationId: args.organizationId,
 			unresolved: counts.unresolved,
 			escalated: counts.escalated,
 			resolved: counts.resolved,
+			approximate,
 			updatedAt: Date.now(),
 		});
 		return;
