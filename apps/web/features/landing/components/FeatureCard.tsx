@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@workspace/ui";
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import React from "react";
 
 interface Feature {

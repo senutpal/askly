@@ -1,5 +1,6 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -27,20 +28,18 @@ const PrerequisiteCard = ({
 	items,
 }: {
 	title: string;
-	icon: any;
+	icon: LucideIcon;
 	items: { label: string; sub?: string; href?: string }[];
 }) => (
-	<div
-		className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300"
-	>
+	<div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300">
 		<div className="flex items-center gap-2 mb-4 text-zinc-900 dark:text-white">
 			<Icon className="w-5 h-5" />
 			<h4 className="font-medium">{title}</h4>
 		</div>
 		<ul className="space-y-3">
-			{items.map((item, idx) => (
+			{items.map((item) => (
 				<li
-					key={idx}
+					key={item.label}
 					className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400"
 				>
 					<div className="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 shrink-0" />

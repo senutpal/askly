@@ -1,7 +1,7 @@
 "use client";
 
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthLayout, LandingLayout } from "@/features/auth";
 import LandingPage from "@/features/landing/LandingPage";
 import Loader from "@/features/landing/Loader";

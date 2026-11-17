@@ -2,7 +2,6 @@
 
 import { CrossDotPattern } from "@workspace/ui";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
-import React from "react";
 import { FooterBottom } from "./FooterBottom";
 import { FooterBrand } from "./FooterBrand";
 import { FooterNav } from "./FooterNav";
@@ -17,7 +16,11 @@ const productLinks = [
 const socialLinks = [
 	{ icon: Twitter, href: "https://twitter.com/askly", label: "Twitter" },
 	{ icon: Github, href: "https://github.com/askly", label: "GitHub" },
-	{ icon: Linkedin, href: "https://linkedin.com/company/askly", label: "LinkedIn" },
+	{
+		icon: Linkedin,
+		href: "https://linkedin.com/company/askly",
+		label: "LinkedIn",
+	},
 	{ icon: Mail, href: "mailto:hello@askly.ai", label: "Email" },
 ];
 

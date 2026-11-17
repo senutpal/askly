@@ -228,9 +228,7 @@ export const ApiReferenceView = () => {
 						Error Handling & Limits
 					</SectionHeading>
 					<div className="grid md:grid-cols-2 gap-6">
-						<div
-							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
-						>
+						<div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all">
 							<h4 className="font-medium mb-4 text-zinc-900 dark:text-white">
 								Common Errors
 							</h4>
@@ -261,9 +259,7 @@ export const ApiReferenceView = () => {
 							</ul>
 						</div>
 
-						<div
-							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all"
-						>
+						<div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 transition-all">
 							<h4 className="font-medium mb-4 text-zinc-900 dark:text-white">
 								Rate Limits
 							</h4>

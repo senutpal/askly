@@ -118,6 +118,7 @@ export default function Navbar() {
 					<div className="flex items-center gap-3">
 						{mounted && (
 							<button
+								type="button"
 								onClick={toggleTheme}
 								className="relative group flex h-9 w-9 items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
 								aria-label="Toggle theme"
@@ -137,6 +138,7 @@ export default function Navbar() {
 						</div>
 
 						<button
+							type="button"
 							onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
 							className="md:hidden relative z-50 p-2 text-foreground"
 						>
@@ -170,7 +172,10 @@ export default function Navbar() {
 
 					<div className="mt-auto mb-10 flex flex-col gap-4">
 						<SignInButton mode="modal">
-							<button className="w-full rounded-xl bg-foreground py-4 text-lg font-medium text-background transition-transform active:scale-95">
+							<button
+								type="button"
+								className="w-full rounded-xl bg-foreground py-4 text-lg font-medium text-background transition-transform active:scale-95"
+							>
 								Get Started Now
 							</button>
 						</SignInButton>

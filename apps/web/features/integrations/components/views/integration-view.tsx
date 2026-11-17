@@ -78,9 +78,7 @@ export const IntegrationsView = () => {
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
 					{/* Header Section */}
-					<div
-						className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-					>
+					<div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
 						<div className="space-y-4">
 							<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
 								Connect your <br />
@@ -130,9 +128,7 @@ export const IntegrationsView = () => {
 							/>
 						</div>
 
-						<div
-							className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-						>
+						<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 							{filteredIntegrations.map((integration, index) => (
 								<IntegrationCard
 									key={integration.id}
@@ -196,7 +192,7 @@ const IntegrationDialog = ({
 
 				<div className="space-y-6 p-6">
 					{steps.map((step, idx) => (
-						<div key={idx} className="space-y-3">
+						<div key={step} className="space-y-3">
 							<div className="flex items-start gap-3">
 								<div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
 									{idx + 1}

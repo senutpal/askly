@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui";
 import { Zap } from "lucide-react";
-import React, { useMemo } from "react";
+import React from "react";
 import { useMobileDetect } from "@/hooks/use-mobile-detect";
 
 interface Problem {
@@ -29,54 +29,11 @@ interface ProblemCardProps {
  * Heavily optimized for mobile - no 3D transforms, no blur, simplified animations
  */
 export const ProblemCard = React.memo<ProblemCardProps>(
-	({ card, index, activeCard, total }) => {
+	({ card, index, activeCard }) => {
 		const { isMobile } = useMobileDetect();
 
 		const isActive = index === activeCard;
 		const isPast = index < activeCard;
-
-		// Optimized animation state - minimal calculations
-		const animationState = useMemo(() => {
-			if (isMobile) {
-				// Ultra-simplified mobile animations - only y and opacity
-				return {
-					y: isActive
-						? 0
-						: isPast
-							? -40 * (activeCard - index)
-							: 15 * (index - activeCard),
-					opacity: isActive
-						? 1
-						: isPast
-							? index === activeCard - 1
-								? 0.6
-								: 0
-							: 0.3,
-					scale: 1, // Fixed scale on mobile
-				};
-			}
-
-			// Desktop animations
-			return {
-				y: isActive
-					? 0
-					: isPast
-						? -50 * (activeCard - index)
-						: 20 * (index - activeCard),
-				scale: isActive
-					? 1
-					: isPast
-						? 1 - (activeCard - index) * 0.05
-						: 0.9 - (index - activeCard) * 0.05,
-				opacity: isActive
-					? 1
-					: isPast
-						? Math.max(0, 1 - (activeCard - index) * 0.3)
-						: Math.max(0, 0.4 - (index - activeCard) * 0.1),
-				rotateX: isActive ? 0 : isPast ? 10 : -10,
-				z: isActive ? 0 : -100,
-			};
-		}, [isActive, isPast, index, activeCard, isMobile]);
 
 		return (
 			<div

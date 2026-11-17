@@ -214,9 +214,7 @@ export default {
 					</p>
 
 					<div className="grid md:grid-cols-2 gap-6">
-						<div
-							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800"
-						>
+						<div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800">
 							<div className="flex items-center gap-2 mb-3">
 								<Maximize className="w-5 h-5 text-zinc-500 rotate-90" />
 								<h4 className="font-medium text-zinc-900 dark:text-white">
@@ -235,9 +233,7 @@ export default {
 							</code>
 						</div>
 
-						<div
-							className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800"
-						>
+						<div className="p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800">
 							<div className="flex items-center gap-2 mb-3">
 								<Maximize className="w-5 h-5 text-zinc-500" />
 								<h4 className="font-medium text-zinc-900 dark:text-white">

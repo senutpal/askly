@@ -23,6 +23,7 @@ export const IntegrationCard = ({
 	return (
 		<div className="group relative h-full">
 			<button
+				type="button"
 				onClick={onClick}
 				className={cn(
 					"relative flex h-full w-full flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-neutral-100 p-6 text-left transition-all duration-300",

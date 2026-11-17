@@ -58,6 +58,7 @@ const CopyButton = ({ text }: { text: string }) => {
 
 	return (
 		<button
+			type="button"
 			onClick={handleCopy}
 			className="group relative ml-2 flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-all hover:bg-foreground/5 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
 			aria-label="Copy phone number"
@@ -104,24 +105,18 @@ export const VapiPhoneNumbersTab = () => {
 					</TableHeader>
 					<TableBody>
 						{isLoading ? (
-							[...Array(1)].map((_, i) => (
-								<TableRow
-									key={i}
-									className="border-b border-border/40 hover:bg-transparent"
-								>
-									<TableCell className="px-6 py-4">
-										<div className="h-4 w-32 animate-pulse  bg-muted/50" />
-									</TableCell>
-									<TableCell className="px-6 py-4">
-										<div className="h-4 w-24 animate-pulse bg-muted/50" />
-									</TableCell>
-									<TableCell className="px-6 py-4 text-right">
-										<div className="ml-auto h-6 w-20 animate-pulse bg-muted/50" />
-									</TableCell>
-								</TableRow>
-							))
+							<TableRow className="border-b border-border/40 hover:bg-transparent">
+								<TableCell className="px-6 py-4">
+									<div className="h-4 w-32 animate-pulse  bg-muted/50" />
+								</TableCell>
+								<TableCell className="px-6 py-4">
+									<div className="h-4 w-24 animate-pulse bg-muted/50" />
+								</TableCell>
+								<TableCell className="px-6 py-4 text-right">
+									<div className="ml-auto h-6 w-20 animate-pulse bg-muted/50" />
+								</TableCell>
+							</TableRow>
 						) : phoneNumbers.length === 0 ? (
-							// Minimal Empty State
 							<TableRow className="hover:bg-transparent">
 								<TableCell colSpan={3} className="h-48 text-center">
 									<div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">

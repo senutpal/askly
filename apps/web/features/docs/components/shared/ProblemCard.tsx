@@ -13,9 +13,7 @@ export const ProblemCard = ({
 	description,
 	icon: Icon,
 }: ProblemCardProps) => (
-	<div
-		className="flex gap-4 p-5 rounded-xl border border-red-100 bg-red-50/30 dark:bg-red-400/10 dark:border-red-900/30 transition-all"
-	>
+	<div className="flex gap-4 p-5 rounded-xl border border-red-100 bg-red-50/30 dark:bg-red-400/10 dark:border-red-900/30 transition-all">
 		<div className="shrink-0 mt-1">
 			<Icon className="w-5 h-5 text-red-500/80 dark:text-red-400" />
 		</div>

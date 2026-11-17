@@ -34,9 +34,7 @@ export const IntroductionView = () => {
 			<div className="space-y-20 pb-10">
 				{/* Hero / Definition */}
 				<section>
-					<div
-						className="relative overflow-hidden rounded-2xl border bg-gradient-to-b from-zinc-50 to-white p-8  dark:from-zinc-900/50 dark:to-zinc-950"
-					>
+					<div className="relative overflow-hidden rounded-2xl border bg-gradient-to-b from-zinc-50 to-white p-8  dark:from-zinc-900/50 dark:to-zinc-950">
 						<div className="relative z-10">
 							<p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-3xl">
 								Askly is an open-source conversational platform engineered to
@@ -119,9 +117,7 @@ export const IntroductionView = () => {
 					</div>
 
 					{/* Impact Highlight */}
-					<div
-						className="flex items-center gap-4 p-6 rounded-xl border border-emerald-200 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-900/10"
-					>
+					<div className="flex items-center gap-4 p-6 rounded-xl border border-emerald-200 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-900/10">
 						<div className="shrink-0 p-3 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
 							<BarChart3 className="w-6 h-6" />
 						</div>

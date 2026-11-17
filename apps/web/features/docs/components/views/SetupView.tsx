@@ -325,9 +325,7 @@ export const SetupView = () => {
 
 				{/* Security Warning */}
 				<section>
-					<div
-						className="rounded-xl border border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-900/30 p-6"
-					>
+					<div className="rounded-xl border border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-900/30 p-6">
 						<div className="flex items-start gap-4">
 							<ShieldAlert className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-1" />
 							<div>

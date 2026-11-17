@@ -65,7 +65,7 @@
 }
 
 /* Optimize for high-DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (min-resolution: 2dppx), (min-resolution: 192dpi) {
 	/* Reduce expensive effects on retina displays */
 	.blur-\[100px\],
 	.blur-\[120px\] {

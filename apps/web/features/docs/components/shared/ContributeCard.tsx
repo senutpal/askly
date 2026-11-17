@@ -36,16 +36,10 @@ export const ContributeCard = ({
 				rel="noopener noreferrer"
 				className="block group h-full"
 			>
-				<div className="h-full">
-					{Content}
-				</div>
+				<div className="h-full">{Content}</div>
 			</Link>
 		);
 	}
 
-	return (
-		<div className="h-full">
-			{Content}
-		</div>
-	);
+	return <div className="h-full">{Content}</div>;
 };

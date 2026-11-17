@@ -1,6 +1,7 @@
 "use client";
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { api } from "@workspace/backend/_generated/api";
 import {
 	cn,
 	Sidebar,
@@ -16,6 +17,7 @@ import {
 	SidebarRail,
 	useSidebar,
 } from "@workspace/ui";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import {
 	Blocks,
 	Brain,
@@ -28,80 +30,77 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useQuery } from "convex-helpers/react/cache/hooks";
-import { api } from "@workspace/backend/_generated/api";
-
-
 
 export const DashboardSidebar = () => {
 	const pathname = usePathname();
 	const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
-  
-  const escalatedConversations = useQuery(api.private.conversations.getMany, {
-    paginationOpts: { numItems: 100, cursor: null },
-    status: "escalated",
-  });
+	const isCollapsed = state === "collapsed";
 
-  const escalatedCount = escalatedConversations?.page.length ?? 0;
+	const escalatedConversations = useQuery(api.private.conversations.getMany, {
+		paginationOpts: { numItems: 100, cursor: null },
+		status: "escalated",
+	});
 
-  const navigationGroups = [
-    {
-      label: "Platform",
-      items: [
-        {
-          title: "Dashboard",
-          url: "/",
-          icon: LayoutDashboard,
-        },
-      ],
-    },
-    {
-      label: "Customer Support",
-      items: [
-        {
-          title: "Conversations",
-          url: "/conversations",
-          icon: Inbox,
-          badge: escalatedConversations === undefined 
-              ? undefined 
-              : escalatedCount > 0 
-                ? String(escalatedCount) 
-                : undefined, 
-        },
-        {
-          title: "Knowledge Base",
-          url: "/files",
-          icon: LibraryBig,
-        },
-      ],
-    },
-    {
-      label: "Configuration",
-      items: [
-        {
-          title: "Widget Styling",
-          url: "/customization",
-          icon: Palette,
-        },
-        {
-          title: "Integrations",
-          url: "/integrations",
-          icon: Blocks,
-        },
-        {
-          title: "Voice Assistant",
-          url: "/plugins/vapi",
-          icon: Mic,
-        },
-        {
-          title: "Gemini",
-          url: "/plugins/gemini",
-          icon: Brain,
-        },
-      ],
-    },
-  ];
+	const escalatedCount = escalatedConversations?.page.length ?? 0;
+
+	const navigationGroups = [
+		{
+			label: "Platform",
+			items: [
+				{
+					title: "Dashboard",
+					url: "/",
+					icon: LayoutDashboard,
+				},
+			],
+		},
+		{
+			label: "Customer Support",
+			items: [
+				{
+					title: "Conversations",
+					url: "/conversations",
+					icon: Inbox,
+					badge:
+						escalatedConversations === undefined
+							? undefined
+							: escalatedCount > 0
+								? String(escalatedCount)
+								: undefined,
+				},
+				{
+					title: "Knowledge Base",
+					url: "/files",
+					icon: LibraryBig,
+				},
+			],
+		},
+		{
+			label: "Configuration",
+			items: [
+				{
+					title: "Widget Styling",
+					url: "/customization",
+					icon: Palette,
+				},
+				{
+					title: "Integrations",
+					url: "/integrations",
+					icon: Blocks,
+				},
+				{
+					title: "Voice Assistant",
+					url: "/plugins/vapi",
+					icon: Mic,
+				},
+				{
+					title: "Gemini",
+					url: "/plugins/gemini",
+					icon: Brain,
+				},
+			],
+		},
+	];
 
 	const isActive = (url: string) => {
 		if (url === "/") return pathname === "/";

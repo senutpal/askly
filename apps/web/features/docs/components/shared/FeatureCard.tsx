@@ -15,9 +15,7 @@ export const FeatureCard = ({
 	icon: Icon,
 	points,
 }: FeatureCardProps) => (
-	<div
-		className="h-full p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300"
-	>
+	<div className="h-full p-6 rounded-2xl border border-zinc-200 bg-zinc-50/50 dark:bg-zinc-900/20 dark:border-zinc-800 backdrop-blur-sm transition-all duration-300">
 		<div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mb-5 shadow-sm">
 			<Icon className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
 		</div>

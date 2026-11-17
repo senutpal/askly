@@ -232,9 +232,7 @@ export const GoogleAIView = () => {
 			<div className="min-h-screen w-full bg-background dark:bg-neutral-900 p-6 md:p-12">
 				<div className="mx-auto w-full max-w-6xl space-y-12">
 					{/* Header Section */}
-					<div
-						className="space-y-4"
-					>
+					<div className="space-y-4">
 						<h1 className="text-4xl font-bold tracking-tight md:text-6xl">
 							Power your <br />
 							<span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">

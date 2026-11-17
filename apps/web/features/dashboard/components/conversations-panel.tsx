@@ -59,7 +59,7 @@ export const ConversationsPanel = () => {
 
 	return (
 		<div className="flex h-full w-full flex-col bg-background text-sidebar-foreground">
-			<div className="flex flex-col gap-3.5 border-b light:border-gray-200 dark:border-gray-700 p-2">
+			<div className="flex flex-col gap-3.5 border-b border-gray-200 dark:border-gray-700 p-2">
 				<Select
 					defaultValue="all"
 					onValueChange={(value) =>
@@ -111,7 +111,7 @@ export const ConversationsPanel = () => {
 								<Link
 									key={conversation._id}
 									className={cn(
-										"relative flex cursor-pointer items-start gap-3 border-b light:border-gray-200 dark:border-gray-700 p-4 py-4 text-sm leading-tight hover:bg-accent hover:text-accent-foreground",
+										"relative flex cursor-pointer items-start gap-3 border-b border-gray-200 dark:border-gray-700 p-4 py-4 text-sm leading-tight hover:bg-accent hover:text-accent-foreground",
 										pathname === `/conversations/${conversation._id}` &&
 											"bg-accent text-accent-foreground",
 									)}
@@ -179,10 +179,19 @@ export const SkeletonConversations = () => {
 			<div className="relative flex w-full min-w-0 flex-col p-2">
 				<div className="w-full space-y-2 text-sm">
 					<div>
-						{Array.from({ length: 8 }).map((_, index) => (
+						{[
+							"skeleton-1",
+							"skeleton-2",
+							"skeleton-3",
+							"skeleton-4",
+							"skeleton-5",
+							"skeleton-6",
+							"skeleton-7",
+							"skeleton-8",
+						].map((skeletonId) => (
 							<div
 								className="flex items-start gap-3 rounded-lg p-4"
-								key={index}
+								key={skeletonId}
 							>
 								<Skeleton className="h-10 w-10 shrink-0 rounded-full" />
 								<div className="min-w-0 flex-1">

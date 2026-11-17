@@ -11,11 +11,7 @@ interface BentoCardProps {
 	delay?: number;
 }
 
-export const BentoCard = ({
-	children,
-	className,
-	href,
-}: BentoCardProps) => {
+export const BentoCard = ({ children, className, href }: BentoCardProps) => {
 	const cardContent = (
 		<>
 			<div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-blue-900/10" />
@@ -25,9 +21,7 @@ export const BentoCard = ({
 	);
 
 	return (
-		<div
-			className={cn("relative group h-full", className)}
-		>
+		<div className={cn("relative group h-full", className)}>
 			{href ? (
 				<Link
 					href={href}
