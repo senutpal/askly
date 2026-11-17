@@ -36,6 +36,11 @@ interface Resource {
 interface ResultsSelectionStepProps {
 	results: Resource[];
 	selectedResourceIds: Set<string>;
+	totalCount?: number;
+	importLimit?: number;
+	canLoadMore?: boolean;
+	isLoading?: boolean;
+	onLoadMore?: () => void;
 	onToggleResource: (resourceId: string) => void;
 	onToggleSelectAll: (filteredResults: Resource[]) => void;
 	onSelectByType: (type: "text" | "image" | "pdf") => void;
@@ -44,6 +49,11 @@ interface ResultsSelectionStepProps {
 export const ResultsSelectionStep = ({
 	results,
 	selectedResourceIds,
+	totalCount,
+	importLimit,
+	canLoadMore = false,
+	isLoading = false,
+	onLoadMore,
 	onToggleResource,
 	onToggleSelectAll,
 	onSelectByType,
@@ -104,7 +114,8 @@ export const ResultsSelectionStep = ({
 
 			<div className="flex items-center justify-between border-b pb-3">
 				<p className="text-sm font-medium">
-					Found {results.length} resource{results.length !== 1 && "s"}
+					Found {totalCount ?? results.length} resource
+					{(totalCount ?? results.length) !== 1 && "s"}
 					{searchQuery && ` (${filteredResults.length} matching)`}
 				</p>
 				<Button
@@ -123,9 +134,11 @@ export const ResultsSelectionStep = ({
 				<div className="space-y-2 p-4">
 					{filteredResults.length === 0 ? (
 						<div className="text-center py-8 text-muted-foreground">
-							{searchQuery
-								? "No matching resources found"
-								: "No resources found"}
+							{isLoading
+								? "Loading resources..."
+								: searchQuery
+									? "No matching resources found"
+									: "No resources found"}
 						</div>
 					) : (
 						filteredResults.map((resource) => (
@@ -140,9 +153,28 @@ export const ResultsSelectionStep = ({
 				</div>
 			</ScrollArea>
 
+			{canLoadMore && onLoadMore && (
+				<div className="flex justify-center">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onLoadMore}
+						disabled={isLoading}
+					>
+						{isLoading ? "Loading..." : "Load more resources"}
+					</Button>
+				</div>
+			)}
+
 			<p className="text-muted-foreground text-xs">
-				{selectedResourceIds.size} of {filteredResults.length} selected
+				{selectedResourceIds.size} of {filteredResults.length} loaded selected
 			</p>
+
+			{importLimit !== undefined && selectedResourceIds.size > importLimit && (
+				<p className="text-destructive text-xs">
+					Select at most {importLimit} resources per import.
+				</p>
+			)}
 
 			<div className="flex items-center gap-2 pt-2 border-t">
 				<span className="text-sm text-muted-foreground">Quick select:</span>
