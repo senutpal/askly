@@ -83,40 +83,48 @@ export const create = action({
 		});
 		const shouldTriggerAgent = conversation.status === "unresolved";
 
+		const { messageId: promptMessageId, message: promptMessage } =
+			await saveMessage(ctx, components.agent, {
+				threadId: args.threadId,
+				message: { role: "user", content: args.prompt },
+			});
+
 		await ctx.runMutation(internal.system.conversations.updateLastMessage, {
 			conversationId: conversation._id,
 			text: args.prompt,
 			role: "user",
+			at: promptMessage._creationTime,
 		});
 
-		if (shouldTriggerAgent) {
-			const agent = await createSupportAgent(ctx, conversation.organizationId);
-			const result = await agent.generateText(
-				ctx,
-				{
-					threadId: args.threadId,
-				},
-				{
-					prompt: args.prompt,
-					tools: {
-						escalateConversationTool: escalateConversation,
-						resolveConversationTool: resolveConversation,
-						searchTool: search,
-					},
-				},
-			);
+		if (!shouldTriggerAgent) return;
 
-			if (result.text.trim().length > 0) {
-				await ctx.runMutation(internal.system.conversations.updateLastMessage, {
-					conversationId: conversation._id,
-					text: result.text,
-					role: "assistant",
-				});
-			}
-		} else {
-			await saveMessage(ctx, components.agent, {
+		const agent = await createSupportAgent(ctx, conversation.organizationId);
+		const result = await agent.generateText(
+			ctx,
+			{
 				threadId: args.threadId,
-				message: { role: "user", content: args.prompt },
+			},
+			{
+				promptMessageId,
+				tools: {
+					escalateConversationTool: escalateConversation,
+					resolveConversationTool: resolveConversation,
+					searchTool: search,
+				},
+			},
+		);
+
+		const lastOutput = result.savedMessages
+			?.filter((message) => (message.text ?? "").trim().length > 0)
+			.at(-1);
+
+		if (lastOutput) {
+			await ctx.runMutation(internal.system.conversations.updateLastMessage, {
+				conversationId: conversation._id,
+				text: lastOutput.text ?? "",
+				role: lastOutput.message?.role ?? "assistant",
+				at: lastOutput._creationTime,
+				agentName: lastOutput.agentName,
 			});
 		}
 	},

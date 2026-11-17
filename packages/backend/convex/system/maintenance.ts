@@ -23,7 +23,6 @@ const CRAWL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 const CRAWL_STALE_MS = 20 * 60 * 1000;
 const RATE_LIMIT_RETENTION_MS = 24 * 60 * 60 * 1000;
 const RATE_LIMIT_BATCH = 500;
-const STATS_ORG_BATCH = 50;
 /**
  * Rows can carry up to MAX_STORED_TEXT_CHARS of extracted text, so delete
  * them a few at a time instead of reading a whole job into one transaction.
@@ -175,7 +174,7 @@ export const reconcileConversationStats = internalMutation({
 	returns: v.object({ created: v.number() }),
 	handler: async (ctx, args) => {
 		const organizations = await ctx.db.query("widgetSettings").paginate({
-			numItems: STATS_ORG_BATCH,
+			numItems: 1,
 			cursor: args.cursor ?? null,
 		});
 
@@ -195,13 +194,12 @@ export const reconcileConversationStats = internalMutation({
 				settings.organizationId,
 			);
 
-			if (approximate) continue;
-
 			await ctx.db.insert("conversationStats", {
 				organizationId: settings.organizationId,
 				unresolved: counts.unresolved,
 				escalated: counts.escalated,
 				resolved: counts.resolved,
+				approximate,
 				updatedAt: Date.now(),
 			});
 			created += 1;

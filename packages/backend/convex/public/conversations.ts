@@ -166,15 +166,18 @@ export const create = mutation({
 
 		const greeting =
 			widgetSettings?.greetMessage || "Hello, how can I help you today ?";
-		const greetingAt = Date.now();
 
-		await saveMessage(ctx, components.agent, {
-			threadId,
-			message: {
-				role: "assistant",
-				content: greeting,
+		const { message: greetingMessage } = await saveMessage(
+			ctx,
+			components.agent,
+			{
+				threadId,
+				message: {
+					role: "assistant",
+					content: greeting,
+				},
 			},
-		});
+		);
 
 		const conversationId = await ctx.db.insert("conversations", {
 			contactSessionId: session._id,
@@ -184,7 +187,7 @@ export const create = mutation({
 			lastMessage: {
 				text: greeting,
 				role: "assistant",
-				at: greetingAt,
+				at: greetingMessage._creationTime,
 			},
 		});
 

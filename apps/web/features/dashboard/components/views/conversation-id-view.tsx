@@ -192,14 +192,10 @@ export const ConversationIdView = ({
 							</AIMessage>
 						))}
 					{pendingMessage && (
-						<AIMessage className="opacity-60" from="user">
+						<AIMessage className="opacity-60" from="assistant">
 							<AIMessageContent>
 								<AIResponse>{pendingMessage}</AIResponse>
 							</AIMessageContent>
-							<DiceBearAvatar
-								seed={conversation?.contactSessionId ?? "user"}
-								size={36}
-							/>
 						</AIMessage>
 					)}
 				</AIConversationContent>

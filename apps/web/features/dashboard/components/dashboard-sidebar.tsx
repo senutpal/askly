@@ -61,7 +61,7 @@ export const DashboardSidebar = () => {
 						escalatedStats === undefined
 							? undefined
 							: escalatedCount > 0
-								? String(escalatedCount)
+								? `${escalatedCount}${escalatedStats.approximate ? "+" : ""}`
 								: undefined,
 				},
 				{

@@ -37,6 +37,7 @@ export default defineSchema({
 		unresolved: v.number(),
 		escalated: v.number(),
 		resolved: v.number(),
+		approximate: v.optional(v.boolean()),
 		updatedAt: v.number(),
 	}).index("by_organization_id", ["organizationId"]),
 

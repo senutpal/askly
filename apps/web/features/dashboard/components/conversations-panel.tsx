@@ -135,7 +135,11 @@ export const ConversationsPanel = () => {
 												{conversation.contactSession.name}
 											</span>
 											<span className="ml-auto shrink-0 text-xs text-muted-foreground">
-												{formatDistanceToNow(conversation._creationTime)}
+												{formatDistanceToNow(
+													conversation.lastMessage?.at ??
+														conversation._creationTime,
+													{ addSuffix: true },
+												)}
 											</span>
 										</div>
 										<div className="mt-1 flex items-center justify-between gap-2">
