@@ -2,7 +2,7 @@
  * Theme configuration
  */
 
-import type { ColorScheme, ThemeMode } from "../types";
+import type { ColorScheme, ThemeMode } from "../types/index.js";
 
 /** Default color schemes */
 export const DEFAULT_LIGHT_COLORS: ColorScheme = {
@@ -42,11 +42,15 @@ export function hexToRgb(
 	hex: string,
 ): { r: number; g: number; b: number } | null {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	return result
-		? {
-				r: parseInt(result[1], 16),
-				g: parseInt(result[2], 16),
-				b: parseInt(result[3], 16),
-			}
-		: null;
+	const r = result?.[1];
+	const g = result?.[2];
+	const b = result?.[3];
+	if (r === undefined || g === undefined || b === undefined) {
+		return null;
+	}
+	return {
+		r: parseInt(r, 16),
+		g: parseInt(g, 16),
+		b: parseInt(b, 16),
+	};
 }
