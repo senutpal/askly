@@ -6,13 +6,53 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ALLOWED_PROTOCOLS = ["http:", "https:"];
 const CRAWL_TIMEOUT = 30000;
 const REQUEST_DELAY = 500;
-const MAX_RESOURCES_PER_JOB = 100;
+export const MAX_RESOURCES_PER_JOB = 100;
+/** Hard ceiling so a crawl can never run away, whatever the caller asks for. */
+export const MAX_PAGES_PER_CRAWL = 200;
+/** Depth is clamped server-side; the UI never decides how far we walk. */
+export const MAX_CRAWL_DEPTH = 3;
+/** Upper bound on the pending-URL frontier to keep memory flat. */
+const MAX_QUEUED_URLS = 2_000;
+/** Keeps extracted text inside the single-document size limit. */
+export const MAX_STORED_TEXT_CHARS = 200_000;
 const MAX_REDIRECTS = 5;
+/**
+ * Leave headroom under the action timeout so a huge or slow site still ends
+ * with a saved status and partial results instead of a stuck "crawling" job.
+ */
+const MAX_CRAWL_DURATION_MS = 8 * 60 * 1000;
+
+const DOH_ENDPOINTS = [
+	"https://cloudflare-dns.com/dns-query",
+	"https://dns.google/resolve",
+] as const;
+const DNS_CACHE_TTL_MS = 60_000;
+const DNS_CACHE_MAX_ENTRIES = 500;
+const DNS_LOOKUP_TIMEOUT_MS = 5_000;
+
+type DnsCacheEntry = { expiresAt: number; addresses: string[] };
+const dnsCache = new Map<string, DnsCacheEntry>();
+
+export class CrawlCancelledError extends Error {
+	constructor() {
+		super("Crawl cancelled");
+		this.name = "CrawlCancelledError";
+	}
+}
+
+export type CrawlControl = {
+	/** Checked between pages so a cancelled job stops spending money. */
+	isCancelled?: () => Promise<boolean>;
+	/** Called periodically so the UI can show real progress. */
+	onProgress?: (progress: {
+		pagesVisited: number;
+		resourcesFound: number;
+	}) => Promise<void>;
+};
 
 /**
  * Reject any URL that could target internal infrastructure or local files.
- * Used for the seed URL, every discovered link/resource, every redirect hop,
- * and in private/webCrawl.ts before fetching stored resource URLs.
+ * Used for the seed URL, every discovered link/resource, and every redirect.
  */
 export function assertPublicUrl(rawUrl: string): void {
 	let url: URL;
@@ -53,6 +93,98 @@ export function assertPublicUrl(rawUrl: string): void {
 	}
 }
 
+/**
+ * Resolve the hostname and reject it when *any* answer points at private
+ * space. This closes the gap where a public-looking hostname maps to
+ * 127.0.0.1 or 169.254.169.254 at request time.
+ *
+ * DNS is resolved over HTTPS (DoH) because the Convex runtime does not expose
+ * the system resolver. There is a small residual TOCTOU window between this
+ * lookup and the socket connect; the connection itself cannot be pinned from
+ * this runtime, so private-network egress filtering at the platform level is
+ * still recommended as defence in depth.
+ */
+async function assertPublicHostname(hostname: string): Promise<void> {
+	const host = hostname
+		.toLowerCase()
+		.replace(/^\[|\]$/g, "")
+		.replace(/\.$/, "");
+	if (!host || isIpLiteral(host)) return;
+
+	const addresses = await resolveHostAddresses(host);
+	if (addresses.length === 0) {
+		throw new Error("Could not resolve URL host");
+	}
+
+	for (const address of addresses) {
+		if (isBlockedIpv4(address) || isBlockedIpv6(address)) {
+			throw new Error("URL host resolves to a private address");
+		}
+	}
+}
+
+function isIpLiteral(hostname: string): boolean {
+	return hostname.includes(":") || /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
+}
+
+async function resolveHostAddresses(hostname: string): Promise<string[]> {
+	const cached = dnsCache.get(hostname);
+	if (cached && cached.expiresAt > Date.now()) {
+		return cached.addresses;
+	}
+
+	for (const endpoint of DOH_ENDPOINTS) {
+		try {
+			const [ipv4, ipv6] = await Promise.all([
+				queryDoh(endpoint, hostname, "A"),
+				queryDoh(endpoint, hostname, "AAAA"),
+			]);
+			const addresses = [...new Set([...ipv4, ...ipv6])];
+			if (addresses.length > 0) {
+				if (dnsCache.size >= DNS_CACHE_MAX_ENTRIES) {
+					const oldest = dnsCache.keys().next().value;
+					if (oldest) dnsCache.delete(oldest);
+				}
+				dnsCache.set(hostname, {
+					addresses,
+					expiresAt: Date.now() + DNS_CACHE_TTL_MS,
+				});
+				return addresses;
+			}
+		} catch {
+			// Try the next resolver.
+		}
+	}
+
+	return [];
+}
+
+async function queryDoh(
+	endpoint: string,
+	hostname: string,
+	type: "A" | "AAAA",
+): Promise<string[]> {
+	const url = `${endpoint}?name=${encodeURIComponent(hostname)}&type=${type}`;
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), DNS_LOOKUP_TIMEOUT_MS);
+	try {
+		const response = await fetch(url, {
+			headers: { accept: "application/dns-json" },
+			signal: controller.signal,
+		});
+		if (!response.ok) return [];
+
+		const data = (await response.json()) as {
+			Answer?: Array<{ type: number; data: string }>;
+		};
+		return (data.Answer ?? [])
+			.filter((answer) => answer.type === 1 || answer.type === 28)
+			.map((answer) => answer.data);
+	} finally {
+		clearTimeout(timeout);
+	}
+}
+
 function isBlockedIpv4(ip: string): boolean {
 	const octets = ip.split(".").map(Number);
 	if (
@@ -70,7 +202,7 @@ function isBlockedIpv4(ip: string): boolean {
 		a === 127 || // 127/8 loopback (incl. 127.0.0.1)
 		(a === 169 && b === 254) || // 169.254/16 link-local (incl. 169.254.169.254 metadata)
 		(a === 172 && b >= 16 && b <= 31) || // 172.16/12
-		(a === 192 && b === 0) || // 192.0.0.0/16 reserved (incl. 192.0.0/24, 192.0.2/24)
+		(a === 192 && b === 0) || // 192.0.0.0/16 reserved
 		(a === 192 && b === 168) || // 192.168/16
 		(a === 198 && (b === 18 || b === 19)) || // 198.18/15 benchmarking
 		a >= 224 // 224/4 multicast + reserved
@@ -149,7 +281,8 @@ function isBlockedIpv6(ip: string): boolean {
 
 /**
  * axios follows redirects automatically, which would bypass URL validation on
- * each hop. Disable automatic redirects and re-validate every target manually.
+ * each hop. Disable automatic redirects, re-validate every target manually,
+ * and verify the resolved address of every host before connecting.
  */
 export async function fetchPublicUrl(
 	url: string,
@@ -159,12 +292,16 @@ export async function fetchPublicUrl(
 
 	for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects++) {
 		assertPublicUrl(currentUrl);
+		const parsed = new URL(currentUrl);
+		await assertPublicHostname(parsed.hostname);
 
 		const response = await axios.get(currentUrl, {
 			...options,
+			// Force the fetch adapter so `redirect: "manual"` is honoured. The
+			// XHR adapter follows redirects transparently, which would skip the
+			// per-hop URL validation below.
+			adapter: "fetch",
 			maxRedirects: 0,
-			// axios' fetch adapter ignores maxRedirects; this makes fetch return
-			// the 3xx response so each hop can be validated before following it.
 			fetchOptions: { redirect: "manual" },
 			validateStatus: (status) =>
 				(status >= 200 && status < 300) || (status >= 300 && status < 400),
@@ -202,6 +339,8 @@ export type CrawledResource = {
 	size?: number;
 	sourceUrl: string;
 	contentHash: string;
+	/** Extracted text for HTML pages, so importing does not re-fetch them. */
+	text?: string;
 };
 
 export type CrawlResult = {
@@ -212,25 +351,48 @@ export type CrawlResult = {
 
 export async function crawlWebsite(
 	options: CrawlOptions,
+	control?: CrawlControl,
 ): Promise<CrawlResult> {
-	const { url, maxDepth, includeImages, includePdfs, includeText } = options;
+	const { url, includeImages, includePdfs, includeText } = options;
+	const maxDepth = Math.max(
+		0,
+		Math.min(MAX_CRAWL_DEPTH, Math.floor(options.maxDepth)),
+	);
 
 	assertPublicUrl(url);
 	const baseUrl = new URL(url);
+	const robots = await fetchRobotsRules(baseUrl.origin);
+
+	if (!isAllowedByRobots(robots, `${baseUrl.pathname}${baseUrl.search}`)) {
+		throw new Error("This site's robots.txt does not allow crawling this URL");
+	}
 
 	const resources: CrawledResource[] = [];
 	const visitedUrls = new Set<string>();
 	const urlsToVisit: { url: string; depth: number }[] = [
 		{ url: baseUrl.href, depth: 0 },
 	];
+	const deadline = Date.now() + MAX_CRAWL_DURATION_MS;
 
-	while (urlsToVisit.length && resources.length < MAX_RESOURCES_PER_JOB) {
+	while (
+		urlsToVisit.length &&
+		visitedUrls.size < MAX_PAGES_PER_CRAWL &&
+		resources.length < MAX_RESOURCES_PER_JOB &&
+		Date.now() < deadline
+	) {
+		if (control?.isCancelled && (await control.isCancelled())) {
+			throw new CrawlCancelledError();
+		}
+
 		const current = urlsToVisit.shift();
 		if (!current || current.depth > maxDepth) continue;
 
 		const normalized = normalizeUrl(current.url);
 		if (visitedUrls.has(normalized)) continue;
 		visitedUrls.add(normalized);
+
+		const path = `${new URL(current.url).pathname}${new URL(current.url).search}`;
+		if (!isAllowedByRobots(robots, path)) continue;
 
 		if (visitedUrls.size > 1) await delay(REQUEST_DELAY);
 
@@ -240,18 +402,18 @@ export async function crawlWebsite(
 				timeout: CRAWL_TIMEOUT,
 				responseType: "arraybuffer",
 				maxContentLength: MAX_FILE_SIZE,
-				headers: { "User-Agent": "AsklyBot/1.0" },
+				headers: { "User-Agent": "AsklyBot/1.0 (+https://askly.app/bot)" },
 			});
 		} catch {
 			continue;
 		}
 
-		const contentType = response.headers["content-type"] || "";
+		const contentType = String(response.headers["content-type"] || "");
 		const data = new Uint8Array(response.data);
 		const size = data.byteLength;
 
 		if (contentType.includes("text/html")) {
-			const html = new TextDecoder().decode(data);
+			const html = decodeBody(data, contentType);
 			const pageResources = await extractResourcesFromHtml(html, current.url, {
 				includeImages,
 				includePdfs,
@@ -262,6 +424,9 @@ export async function crawlWebsite(
 
 			if (current.depth < maxDepth) {
 				for (const link of extractLinks(html, current.url, baseUrl.origin)) {
+					// Bound the frontier so a page with a huge link list cannot
+					// grow memory without limit.
+					if (urlsToVisit.length >= MAX_QUEUED_URLS) break;
 					if (!visitedUrls.has(normalizeUrl(link))) {
 						urlsToVisit.push({ url: link, depth: current.depth + 1 });
 					}
@@ -288,12 +453,145 @@ export async function crawlWebsite(
 				size,
 			});
 		}
+
+		if (control?.onProgress && visitedUrls.size % 5 === 0) {
+			await control.onProgress({
+				pagesVisited: visitedUrls.size,
+				resourcesFound: deduplicateResources(resources).length,
+			});
+		}
 	}
 
 	return {
 		resources: deduplicateResources(resources),
 		pagesVisited: visitedUrls.size,
 	};
+}
+
+type RobotsRules = { allow: string[]; disallow: string[] };
+
+async function fetchRobotsRules(origin: string): Promise<RobotsRules> {
+	try {
+		const response = await fetchPublicUrl(`${origin}/robots.txt`, {
+			timeout: 5000,
+			responseType: "text",
+			headers: { "User-Agent": "AsklyBot/1.0 (+https://askly.app/bot)" },
+		});
+		if (typeof response.data !== "string") {
+			return { allow: [], disallow: [] };
+		}
+		return parseRobots(response.data);
+	} catch {
+		// No robots.txt (or it is unreachable): treat the site as crawlable.
+		return { allow: [], disallow: [] };
+	}
+}
+
+function parseRobots(text: string): RobotsRules {
+	const groups: Array<{
+		agents: string[];
+		rules: Array<{ allow: boolean; path: string }>;
+	}> = [];
+	let current: (typeof groups)[number] | null = null;
+	let groupHasRules = false;
+
+	for (const rawLine of text.split(/\r?\n/)) {
+		const line = (rawLine.split("#")[0] ?? "").trim();
+
+		if (!line) {
+			current = null;
+			groupHasRules = false;
+			continue;
+		}
+
+		const separator = line.indexOf(":");
+		if (separator === -1) continue;
+
+		const key = line.slice(0, separator).trim().toLowerCase();
+		const value = line.slice(separator + 1).trim();
+
+		if (key === "user-agent") {
+			// A user-agent line after rules starts the next group.
+			if (!current || groupHasRules) {
+				current = { agents: [], rules: [] };
+				groups.push(current);
+				groupHasRules = false;
+			}
+			current.agents.push(value.toLowerCase());
+			continue;
+		}
+
+		if (!current) continue;
+
+		if (key === "allow" || key === "disallow") {
+			groupHasRules = true;
+			// An empty value carries no path and no meaning.
+			if (!value) continue;
+			current.rules.push({ allow: key === "allow", path: value });
+		}
+	}
+
+	const isOurAgent = (agent: string) =>
+		agent !== "*" && agent.includes("asklybot");
+	const specific = groups.filter((group) =>
+		group.agents.some((agent) => isOurAgent(agent)),
+	);
+	const wildcard = groups.filter((group) => group.agents.includes("*"));
+	const active = specific.length > 0 ? specific : wildcard;
+
+	const allow: string[] = [];
+	const disallow: string[] = [];
+	for (const group of active) {
+		for (const rule of group.rules) {
+			if (rule.allow) {
+				allow.push(rule.path);
+			} else {
+				disallow.push(rule.path);
+			}
+		}
+	}
+
+	return { allow, disallow };
+}
+
+function isAllowedByRobots(rules: RobotsRules, path: string): boolean {
+	let bestMatchLength = -1;
+	let allowed = true;
+
+	for (const rule of rules.allow) {
+		if (path.startsWith(rule) && rule.length >= bestMatchLength) {
+			bestMatchLength = rule.length;
+			allowed = true;
+		}
+	}
+
+	for (const rule of rules.disallow) {
+		if (path.startsWith(rule) && rule.length > bestMatchLength) {
+			bestMatchLength = rule.length;
+			allowed = false;
+		}
+	}
+
+	return allowed;
+}
+
+function decodeBody(data: Uint8Array, contentType: string): string {
+	const headerCharset = /charset=([^;]+)/i
+		.exec(contentType)?.[1]
+		?.trim()
+		.replace(/["']/g, "");
+
+	let charset = headerCharset;
+	if (!charset) {
+		const head = new TextDecoder("utf-8").decode(data.subarray(0, 2048));
+		charset = /<meta[^>]+charset=["']?([\w-]+)/i.exec(head)?.[1];
+	}
+
+	try {
+		return new TextDecoder(charset || "utf-8").decode(data);
+	} catch {
+		return new TextDecoder("utf-8").decode(data);
+	}
 }
 
 async function extractResourcesFromHtml(
@@ -313,13 +611,15 @@ async function extractResourcesFromHtml(
 			document.querySelector("title")?.textContent?.trim() || "Untitled Page";
 		const content = extractText(document);
 		if (content.length > 50) {
-			const contentHash = hashString(content);
+			const storedText = content.slice(0, MAX_STORED_TEXT_CHARS);
+			const contentHash = hashString(storedText);
 			resources.push({
 				url: pageUrl,
 				type: "text",
 				title,
 				contentHash,
 				sourceUrl: pageUrl,
+				text: storedText,
 			});
 		}
 	}
@@ -395,8 +695,10 @@ function extractLinks(html: string, pageUrl: string, origin: string): string[] {
 	const { document } = parseHTML(html);
 	const links: string[] = [];
 	for (const a of Array.from(document.querySelectorAll("a[href]"))) {
+		const href = a.getAttribute("href");
+		if (!href) continue;
 		try {
-			const full = new URL(a.getAttribute("href")!, pageUrl);
+			const full = new URL(href, pageUrl);
 			if (full.origin === origin) {
 				full.hash = "";
 				assertPublicUrl(full.href);
@@ -408,11 +710,6 @@ function extractLinks(html: string, pageUrl: string, origin: string): string[] {
 }
 function hashString(str: string): string {
 	return CryptoJS.SHA256(str).toString(CryptoJS.enc.Hex);
-}
-
-function _hashBytes(arr: Uint8Array): string {
-	const wordArray = CryptoJS.lib.WordArray.create(arr);
-	return CryptoJS.SHA256(wordArray).toString(CryptoJS.enc.Hex);
 }
 
 function normalizeUrl(url: string): string {
