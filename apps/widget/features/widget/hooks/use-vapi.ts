@@ -1,7 +1,11 @@
 import Vapi from "@vapi-ai/web";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import { vapiSecretsAtom, widgetSettingsAtom } from "../atoms/widget-atoms";
+import {
+	vapiSecretsAtom,
+	widgetOpenAtom,
+	widgetSettingsAtom,
+} from "../atoms/widget-atoms";
 
 interface TranscriptMessage {
 	role: "user" | "assistant";
@@ -11,6 +15,7 @@ interface TranscriptMessage {
 export const useVapi = () => {
 	const vapiSecrets = useAtomValue(vapiSecretsAtom);
 	const widgetSettings = useAtomValue(widgetSettingsAtom);
+	const isWidgetOpen = useAtomValue(widgetOpenAtom);
 	const [vapi, setVapi] = useState<Vapi | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
 	const [isConnecting, setIsConnecting] = useState(false);
@@ -62,6 +67,18 @@ export const useVapi = () => {
 			vapiInstance?.stop();
 		};
 	}, [vapiSecrets]);
+
+	// When the host page closes the widget, end any active call so the microphone
+	// is released even though the iframe is only hidden (not destroyed).
+	useEffect(() => {
+		if (!isWidgetOpen && vapi) {
+			vapi.stop();
+			setIsConnected(false);
+			setIsConnecting(false);
+			setIsSpeaking(false);
+		}
+	}, [isWidgetOpen, vapi]);
+
 	const startCall = () => {
 		if (!vapiSecrets || !widgetSettings?.vapiSettings?.assistantId) {
 			return;

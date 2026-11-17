@@ -49,6 +49,8 @@ export const WidgetInboxScreen = () => {
 						onClick={() => setScreen("selection")}
 						variant="ghost"
 						size="icon"
+						type="button"
+						aria-label="Back to options"
 						className="h-8 w-8 rounded-full hover:bg-black/5"
 					>
 						<ArrowLeftIcon className="size-4 text-gray-600" />

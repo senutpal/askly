@@ -11,15 +11,19 @@ import {
 	FormMessage,
 	Input,
 } from "@workspace/ui";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { WidgetHeader } from "@/features/widget/components/components/widget-header";
 import {
 	contactSessionIdAtomFamily,
+	errorMessageAtom,
 	organizationIdAtom,
 	screenAtom,
+	vapiSecretsAtom,
 } from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
@@ -29,10 +33,13 @@ const formSchema = z.object({
 
 export default function WidgetAuthScreen() {
 	const setScreen = useSetAtom(screenAtom);
+	const setErrorMessage = useSetAtom(errorMessageAtom);
+	const setVapiSecrets = useSetAtom(vapiSecretsAtom);
 	const organizationId = useAtomValue(organizationIdAtom);
 	const setContactSessionId = useSetAtom(
 		contactSessionIdAtomFamily(organizationId || ""),
 	);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -42,10 +49,12 @@ export default function WidgetAuthScreen() {
 	});
 
 	const createContactSession = useMutation(api.public.contactSessions.create);
+	const getVapiSecrets = useAction(api.public.secrets.getVapiSecrets);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
+		setSubmitError(null);
 		if (!organizationId) {
-			console.warn("No organizationId, skipping");
+			setSubmitError("Organization ID is missing. Please try again later.");
 			return;
 		}
 
@@ -68,7 +77,6 @@ export default function WidgetAuthScreen() {
 				: {};
 
 		try {
-			console.log("Creating contact session...");
 			const contactSessionId = await createContactSession({
 				...values,
 				organizationId,
@@ -76,9 +84,26 @@ export default function WidgetAuthScreen() {
 			});
 
 			setContactSessionId(contactSessionId);
+
+			// Voice is optional: fetch credentials with the brand-new session in the
+			// background. Failure simply keeps voice options hidden.
+			void getVapiSecrets({ contactSessionId })
+				.then((secrets) => {
+					setVapiSecrets(secrets);
+				})
+				.catch(() => {
+					setVapiSecrets(null);
+				});
+
 			setScreen("selection");
-		} catch (err) {
-			console.error("Failed to create contact session:", err);
+		} catch (error) {
+			const message =
+				error instanceof ConvexError
+					? (error.data as { message?: string } | undefined)?.message ||
+						"Unable to start your session. Please try again."
+					: "Unable to start your session. Please try again.";
+			setSubmitError(message);
+			setErrorMessage(message);
 		}
 	};
 
@@ -94,6 +119,15 @@ export default function WidgetAuthScreen() {
 						className="flex flex-col gap-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700"
 						onSubmit={form.handleSubmit(onSubmit)}
 					>
+						{submitError && (
+							<p
+								role="alert"
+								aria-live="polite"
+								className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600"
+							>
+								{submitError}
+							</p>
+						)}
 						<FormField
 							control={form.control}
 							name="name"

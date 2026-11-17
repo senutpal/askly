@@ -16,5 +16,8 @@ export * from "./components/views/widget-view";
 // State & Constants
 export * from "./constants";
 // Hooks
+export * from "./hooks/use-askly-parent-messages";
 export * from "./hooks/use-vapi";
+// Embedding protocol
+export * from "./lib/widget-post-message";
 export * from "./types";

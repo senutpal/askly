@@ -16,7 +16,11 @@ export const WidgetErrorScreen = () => {
 				<h3 className="text-lg font-semibold text-gray-900 tracking-tight">
 					Something went wrong
 				</h3>
-				<p className="text-sm text-gray-500 leading-relaxed">
+				<p
+					role="alert"
+					aria-live="polite"
+					className="text-sm text-gray-500 leading-relaxed"
+				>
 					{errorMessage || "We couldn't load the widget. Please try again."}
 				</p>
 			</div>

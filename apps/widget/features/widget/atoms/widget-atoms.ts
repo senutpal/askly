@@ -17,6 +17,8 @@ export const contactSessionIdAtomFamily = atomFamily((organizationId: string) =>
 
 export const errorMessageAtom = atom<string | null>(null);
 export const loadingMessageAtom = atom<string | null>(null);
+/** Mirrors the open/close state announced by the embed loader. */
+export const widgetOpenAtom = atom(true);
 export const conversationIdAtom = atom<Id<"conversations"> | null>(null);
 
 export const widgetSettingsAtom = atom<Doc<"widgetSettings"> | null>(null);

@@ -1,11 +1,33 @@
 import { EMBED_CONFIG } from "./config";
 import { chatBubbleIcon, closeIcon } from "./icons";
 
+/** The complete (and only) postMessage command set shared with the widget. */
+const ASKLY_MESSAGE_TYPES = [
+	"askly:open",
+	"askly:close",
+	"askly:toggle",
+] as const;
+
+type AsklyMessageType = (typeof ASKLY_MESSAGE_TYPES)[number];
+
+const isAsklyMessage = (data: unknown): data is { type: AsklyMessageType } => {
+	if (typeof data !== "object" || data === null) {
+		return false;
+	}
+	const type = (data as { type?: unknown }).type;
+	return (
+		typeof type === "string" &&
+		(ASKLY_MESSAGE_TYPES as readonly string[]).includes(type)
+	);
+};
+
 (() => {
 	let iframe: HTMLIFrameElement | null = null;
 	let container: HTMLDivElement | null = null;
 	let button: HTMLButtonElement | null = null;
 	let isOpen = false;
+	let iframeLoaded = false;
+	let visibilityTimer: ReturnType<typeof setTimeout> | null = null;
 	let organizationId: string | null = null;
 	let position: "bottom-right" | "bottom-left" = EMBED_CONFIG.DEFAULT_POSITION;
 
@@ -47,6 +69,9 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 	function render() {
 		button = document.createElement("button");
 		button.id = "askly-widget-button";
+		button.type = "button";
+		button.setAttribute("aria-label", "Open Askly support chat");
+		button.setAttribute("aria-expanded", "false");
 		button.innerHTML = chatBubbleIcon;
 		button.style.cssText = `
       position: fixed;
@@ -98,7 +123,13 @@ import { chatBubbleIcon, closeIcon } from "./icons";
     `;
 
 		iframe = document.createElement("iframe");
-		iframe.src = buildWidgetUrl();
+		iframe.title = "Askly support chat";
+		// Defer loading the widget bundle until the launcher is first opened.
+		iframe.loading = "lazy";
+		iframe.setAttribute(
+			"sandbox",
+			"allow-scripts allow-forms allow-same-origin allow-popups allow-downloads",
+		);
 		iframe.style.cssText = `
       width: 100%;
       height: 100%;
@@ -113,31 +144,64 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 	}
 
 	function buildWidgetUrl(): string {
+		if (!organizationId) {
+			throw new Error("Askly Widget: organization id is required");
+		}
 		const params = new URLSearchParams();
-		params.append("organizationId", organizationId!);
+		params.append("organizationId", organizationId);
 		return `${EMBED_CONFIG.WIDGET_URL}?${params.toString()}`;
 	}
 
 	function handleMessage(event: MessageEvent) {
+		let widgetOrigin: string;
 		try {
-			const allowedOrigin = new URL(EMBED_CONFIG.WIDGET_URL).origin;
-			if (event.origin !== allowedOrigin) return;
+			widgetOrigin = new URL(EMBED_CONFIG.WIDGET_URL).origin;
 		} catch (error) {
 			console.error("Askly Widget: Invalid WIDGET_URL configuration", error);
 			return;
 		}
 
-		const { type, payload } = event.data;
+		// Commands may come from scripts on the host page (same origin as this
+		// script) or from the widget iframe itself (e.g. its close button).
+		const fromHost =
+			event.origin === window.location.origin && event.source === window;
+		const fromWidget =
+			event.origin === widgetOrigin &&
+			iframe !== null &&
+			event.source === iframe.contentWindow;
+		if (!fromHost && !fromWidget) {
+			return;
+		}
 
-		switch (type) {
-			case "close":
+		if (!isAsklyMessage(event.data)) {
+			return;
+		}
+
+		switch (event.data.type) {
+			case "askly:open":
+				show();
+				break;
+			case "askly:close":
 				hide();
 				break;
-			case "resize":
-				if (payload.height && container) {
-					container.style.height = `${payload.height}px`;
-				}
+			case "askly:toggle":
+				toggleWidget();
 				break;
+		}
+	}
+
+	/** Forward the current open/close state into the widget iframe. */
+	function notifyWidget(type: AsklyMessageType) {
+		if (!iframeLoaded || !iframe?.contentWindow) {
+			return;
+		}
+		try {
+			iframe.contentWindow.postMessage(
+				{ type },
+				new URL(EMBED_CONFIG.WIDGET_URL).origin,
+			);
+		} catch {
+			// Ignore configuration/postMessage failures; the UI still works.
 		}
 	}
 
@@ -152,32 +216,54 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 	function show() {
 		if (container && button) {
 			isOpen = true;
+			if (visibilityTimer) {
+				clearTimeout(visibilityTimer);
+				visibilityTimer = null;
+			}
+			if (!iframeLoaded && iframe) {
+				iframe.src = buildWidgetUrl();
+				iframeLoaded = true;
+			}
 			container.style.display = "block";
-			setTimeout(() => {
+			visibilityTimer = setTimeout(() => {
 				if (container) {
 					container.style.opacity = "1";
 					container.style.transform = "translateY(0)";
 				}
 			}, 10);
 			button.innerHTML = closeIcon;
+			button.setAttribute("aria-label", "Close Askly support chat");
+			button.setAttribute("aria-expanded", "true");
+			notifyWidget("askly:open");
 		}
 	}
 
 	function hide() {
 		if (container && button) {
 			isOpen = false;
+			if (visibilityTimer) {
+				clearTimeout(visibilityTimer);
+				visibilityTimer = null;
+			}
 			container.style.opacity = "0";
 			container.style.transform = "translateY(10px)";
-			setTimeout(() => {
+			visibilityTimer = setTimeout(() => {
 				if (container) container.style.display = "none";
 			}, 300);
 			button.innerHTML = chatBubbleIcon;
 			button.style.background = "#3b82f6";
+			button.setAttribute("aria-label", "Open Askly support chat");
+			button.setAttribute("aria-expanded", "false");
+			notifyWidget("askly:close");
 		}
 	}
 
 	function destroy() {
 		window.removeEventListener("message", handleMessage);
+		if (visibilityTimer) {
+			clearTimeout(visibilityTimer);
+			visibilityTimer = null;
+		}
 		if (container) {
 			container.remove();
 			container = null;
@@ -187,6 +273,7 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 			button.remove();
 			button = null;
 		}
+		iframeLoaded = false;
 		isOpen = false;
 	}
 
@@ -206,12 +293,14 @@ import { chatBubbleIcon, closeIcon } from "./icons";
 		init();
 	}
 
-	(window as any).AsklyWidget = {
+	const widgetApi = {
 		init: reinit,
 		show,
 		hide,
 		destroy,
 	};
+	(window as typeof window & { AsklyWidget: typeof widgetApi }).AsklyWidget =
+		widgetApi;
 
 	init();
 })();

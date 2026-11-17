@@ -16,11 +16,7 @@ export const WidgetContactScreen = () => {
 
 	const handleCopy = async () => {
 		if (!phoneNumber) {
-			return (
-				<div className="flex h-full flex-col items-center justify-center">
-					<p className="text-muted-foreground">Phone number not configured</p>
-				</div>
-			);
+			return;
 		}
 		try {
 			await navigator.clipboard.writeText(phoneNumber);
@@ -42,6 +38,8 @@ export const WidgetContactScreen = () => {
 						onClick={() => setScreen("selection")}
 						variant="ghost"
 						size="icon"
+						type="button"
+						aria-label="Back to options"
 						className="h-8 w-8 rounded-full hover:bg-black/5"
 					>
 						<ArrowLeftIcon className="size-4 text-gray-600" />
