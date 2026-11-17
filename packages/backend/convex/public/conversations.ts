@@ -3,6 +3,7 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
+import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 
 export const getMany = query({
@@ -116,6 +117,11 @@ export const create = mutation({
 		// The organization is always derived from the validated contact session,
 		// never from a caller-supplied value (cross-tenant boundary).
 		const organizationId = session.organizationId;
+
+		await consumeRateLimit(ctx, `conversation:session:${session._id}`, {
+			limit: RATE_LIMITS.conversationPerSession.limit,
+			windowMs: RATE_LIMITS.conversationPerSession.windowMs,
+		});
 
 		const widgetSettings = await ctx.db
 			.query("widgetSettings")

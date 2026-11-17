@@ -163,9 +163,27 @@ export const addFile = action({
 
 export const list = query({
 	args: {
-		category: v.optional(v.string()),
 		paginationOpts: paginationOptsValidator,
 	},
+	returns: v.object({
+		page: v.array(
+			v.object({
+				id: v.string(),
+				name: v.string(),
+				type: v.string(),
+				size: v.string(),
+				status: v.union(
+					v.literal("ready"),
+					v.literal("processing"),
+					v.literal("error"),
+				),
+				url: v.union(v.string(), v.null()),
+				category: v.optional(v.string()),
+			}),
+		),
+		isDone: v.boolean(),
+		continueCursor: v.string(),
+	}),
 	handler: async (ctx, args) => {
 		const identity = await ctx.auth.getUserIdentity();
 		if (identity === null) {
@@ -201,12 +219,8 @@ export const list = query({
 			results.page.map((entry) => convertEntryToPublicFile(ctx, entry)),
 		);
 
-		const fileteredFiles = args.category
-			? files.filter((file) => file.category === args.category)
-			: files;
-
 		return {
-			page: fileteredFiles,
+			page: files,
 			isDone: results.isDone,
 			continueCursor: results.continueCursor,
 		};

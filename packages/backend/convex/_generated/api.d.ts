@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
+import type * as lib_rateLimit from "../lib/rateLimit.js";
 import type * as lib_webCrawler from "../lib/webCrawler.js";
 import type * as private_contactSessions from "../private/contactSessions.js";
 import type * as private_conversations from "../private/conversations.js";
@@ -34,7 +36,9 @@ import type * as system_ai_tools_resolveConversation from "../system/ai/tools/re
 import type * as system_ai_tools_search from "../system/ai/tools/search.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_conversations from "../system/conversations.js";
+import type * as system_maintenance from "../system/maintenance.js";
 import type * as system_plugins from "../system/plugins.js";
+import type * as system_rateLimit from "../system/rateLimit.js";
 import type * as system_secrets from "../system/secrets.js";
 import type * as userApiKeys_helpers from "../userApiKeys/helpers.js";
 
@@ -53,7 +57,9 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
   "lib/extractTextContent": typeof lib_extractTextContent;
+  "lib/rateLimit": typeof lib_rateLimit;
   "lib/webCrawler": typeof lib_webCrawler;
   "private/contactSessions": typeof private_contactSessions;
   "private/conversations": typeof private_conversations;
@@ -79,7 +85,9 @@ declare const fullApi: ApiFromModules<{
   "system/ai/tools/search": typeof system_ai_tools_search;
   "system/contactSessions": typeof system_contactSessions;
   "system/conversations": typeof system_conversations;
+  "system/maintenance": typeof system_maintenance;
   "system/plugins": typeof system_plugins;
+  "system/rateLimit": typeof system_rateLimit;
   "system/secrets": typeof system_secrets;
   "userApiKeys/helpers": typeof userApiKeys_helpers;
 }>;

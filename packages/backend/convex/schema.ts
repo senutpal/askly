@@ -76,6 +76,7 @@ export default defineSchema({
 			v.literal("crawling"),
 			v.literal("completed"),
 			v.literal("failed"),
+			v.literal("cancelled"),
 		),
 		maxDepth: v.number(),
 		options: v.object({
@@ -104,10 +105,25 @@ export default defineSchema({
 		selected: v.boolean(),
 		addedToKnowledgeBase: v.boolean(),
 		sourceUrl: v.string(),
+		// Extracted text captured at crawl time so importing a page does not
+		// re-fetch it. Only set for text resources, and only when it fits in a
+		// single Convex document (see MAX_STORED_TEXT_CHARS).
+		text: v.optional(v.string()),
 		error: v.optional(v.string()),
 	})
 		.index("by_job_id", ["jobId"])
 		.index("by_content_hash", ["contentHash"])
 		.index("by_type", ["type"])
 		.index("by_job_and_type", ["jobId", "type"]),
+
+	// Fixed-window counters for abuse protection on public endpoints. One row
+	// per key ("message:session:<id>", "crawl:org:<id>", ...). Rows are swept
+	// by the cleanupRateLimits cron.
+	rateLimits: defineTable({
+		key: v.string(),
+		windowStart: v.number(),
+		count: v.number(),
+	})
+		.index("by_key", ["key"])
+		.index("by_window_start", ["windowStart"]),
 });

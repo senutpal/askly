@@ -3,6 +3,7 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components, internal } from "../_generated/api";
 import { action, query } from "../_generated/server";
+import { RATE_LIMITS } from "../lib/rateLimit";
 import {
 	createSupportAgent,
 	supportAgent,
@@ -60,6 +61,26 @@ export const create = action({
 				message: "Conversation resolved",
 			});
 		}
+		if (args.prompt.length > 4000) {
+			throw new ConvexError({
+				code: "BAD_REQUEST",
+				message: "Message is too long",
+			});
+		}
+		// Charge the public budgets only after every cheap validation passed,
+		// and before the (paid) model call.
+		await ctx.runMutation(internal.system.rateLimit.consumeMany, {
+			buckets: [
+				{
+					key: `message:session:${contactSession._id}`,
+					...RATE_LIMITS.messagePerSession,
+				},
+				{
+					key: `message:org:${conversation.organizationId}`,
+					...RATE_LIMITS.messagePerOrganization,
+				},
+			],
+		});
 		const shouldTriggerAgent = conversation.status === "unresolved";
 		if (shouldTriggerAgent) {
 			const agent = await createSupportAgent(ctx, conversation.organizationId);

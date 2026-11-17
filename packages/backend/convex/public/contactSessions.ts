@@ -1,7 +1,10 @@
 import { v } from "convex/values";
 import { mutation } from "../_generated/server";
+import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
 
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
+const MAX_NAME_LENGTH = 120;
+const MAX_EMAIL_LENGTH = 254;
 
 export const create = mutation({
 	args: {
@@ -30,8 +33,14 @@ export const create = mutation({
 		if (!name) {
 			throw new Error("Name is required");
 		}
+		if (name.length > MAX_NAME_LENGTH) {
+			throw new Error("Name is too long");
+		}
 
 		const email = args.email.trim().toLowerCase();
+		if (email.length > MAX_EMAIL_LENGTH) {
+			throw new Error("Email is too long");
+		}
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
 			throw new Error("Invalid email format");
@@ -47,6 +56,15 @@ export const create = mutation({
 		if (!widgetSettings) {
 			throw new Error("Organization not found");
 		}
+
+		// Only charge known organizations: the organization id is client
+		// supplied, and charging unknown ids would let a caller grow the
+		// rate-limit table at will.
+		await consumeRateLimit(
+			ctx,
+			`contact-session:org:${args.organizationId}`,
+			RATE_LIMITS.contactSessionPerOrganization,
+		);
 
 		const now = Date.now();
 		const expiresAt = now + SESSION_DURATION;
