@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { internalMutation } from "../_generated/server";
+import { countConversations } from "../lib/conversationStats";
 
 /**
  * Housekeeping run by convex/crons.ts.
@@ -22,6 +23,7 @@ const CRAWL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 const CRAWL_STALE_MS = 20 * 60 * 1000;
 const RATE_LIMIT_RETENTION_MS = 24 * 60 * 60 * 1000;
 const RATE_LIMIT_BATCH = 500;
+const STATS_ORG_BATCH = 50;
 /**
  * Rows can carry up to MAX_STORED_TEXT_CHARS of extracted text, so delete
  * them a few at a time instead of reading a whole job into one transaction.
@@ -165,5 +167,54 @@ export const cleanupRateLimits = internalMutation({
 		}
 
 		return { deleted: stale.length };
+	},
+});
+
+export const reconcileConversationStats = internalMutation({
+	args: { cursor: v.optional(v.union(v.string(), v.null())) },
+	returns: v.object({ created: v.number() }),
+	handler: async (ctx, args) => {
+		const organizations = await ctx.db.query("widgetSettings").paginate({
+			numItems: STATS_ORG_BATCH,
+			cursor: args.cursor ?? null,
+		});
+
+		let created = 0;
+		for (const settings of organizations.page) {
+			const existing = await ctx.db
+				.query("conversationStats")
+				.withIndex("by_organization_id", (q) =>
+					q.eq("organizationId", settings.organizationId),
+				)
+				.unique();
+
+			if (existing) continue;
+
+			const { counts, approximate } = await countConversations(
+				ctx.db,
+				settings.organizationId,
+			);
+
+			if (approximate) continue;
+
+			await ctx.db.insert("conversationStats", {
+				organizationId: settings.organizationId,
+				unresolved: counts.unresolved,
+				escalated: counts.escalated,
+				resolved: counts.resolved,
+				updatedAt: Date.now(),
+			});
+			created += 1;
+		}
+
+		if (!organizations.isDone) {
+			await ctx.scheduler.runAfter(
+				0,
+				internal.system.maintenance.reconcileConversationStats,
+				{ cursor: organizations.continueCursor },
+			);
+		}
+
+		return { created };
 	},
 });

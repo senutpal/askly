@@ -82,9 +82,16 @@ export const create = action({
 			],
 		});
 		const shouldTriggerAgent = conversation.status === "unresolved";
+
+		await ctx.runMutation(internal.system.conversations.updateLastMessage, {
+			conversationId: conversation._id,
+			text: args.prompt,
+			role: "user",
+		});
+
 		if (shouldTriggerAgent) {
 			const agent = await createSupportAgent(ctx, conversation.organizationId);
-			await agent.generateText(
+			const result = await agent.generateText(
 				ctx,
 				{
 					threadId: args.threadId,
@@ -98,6 +105,14 @@ export const create = action({
 					},
 				},
 			);
+
+			if (result.text.trim().length > 0) {
+				await ctx.runMutation(internal.system.conversations.updateLastMessage, {
+					conversationId: conversation._id,
+					text: result.text,
+					role: "assistant",
+				});
+			}
 		} else {
 			await saveMessage(ctx, components.agent, {
 				threadId: args.threadId,

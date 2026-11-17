@@ -9,10 +9,11 @@
  */
 
 import type * as crons from "../crons.js";
+import type * as lib_conversationStats from "../lib/conversationStats.js";
+import type * as lib_conversations from "../lib/conversations.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as lib_rateLimit from "../lib/rateLimit.js";
 import type * as lib_webCrawler from "../lib/webCrawler.js";
-import type * as private_contactSessions from "../private/contactSessions.js";
 import type * as private_conversations from "../private/conversations.js";
 import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
@@ -58,10 +59,11 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
+  "lib/conversationStats": typeof lib_conversationStats;
+  "lib/conversations": typeof lib_conversations;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "lib/rateLimit": typeof lib_rateLimit;
   "lib/webCrawler": typeof lib_webCrawler;
-  "private/contactSessions": typeof private_contactSessions;
   "private/conversations": typeof private_conversations;
   "private/files": typeof private_files;
   "private/messages": typeof private_messages;

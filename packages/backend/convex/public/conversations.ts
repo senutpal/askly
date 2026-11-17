@@ -1,16 +1,46 @@
-import { type MessageDoc, saveMessage } from "@convex-dev/agent";
+import { saveMessage } from "@convex-dev/agent";
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
+import { adjustConversationStats } from "../lib/conversationStats";
+import {
+	conversationStatusValidator,
+	lastMessageValidator,
+	toLastMessage,
+} from "../lib/conversations";
 import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
 import { supportAgent } from "../system/ai/agents/supportAgent";
+
+const paginationResultValidator = v.object({
+	page: v.array(
+		v.object({
+			_id: v.id("conversations"),
+			_creationTime: v.number(),
+			status: conversationStatusValidator,
+			organizationId: v.string(),
+			threadId: v.string(),
+			lastMessage: v.union(lastMessageValidator, v.null()),
+		}),
+	),
+	isDone: v.boolean(),
+	continueCursor: v.string(),
+	splitCursor: v.optional(v.union(v.string(), v.null())),
+	pageStatus: v.optional(
+		v.union(
+			v.literal("SplitRecommended"),
+			v.literal("SplitRequired"),
+			v.null(),
+		),
+	),
+});
 
 export const getMany = query({
 	args: {
 		contactSessionId: v.id("contactSessions"),
 		paginationOpts: paginationOptsValidator,
 	},
+	returns: paginationResultValidator,
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.db.get(args.contactSessionId);
 
@@ -31,18 +61,18 @@ export const getMany = query({
 
 		const conversationsWithLastMessage = await Promise.all(
 			conversations.page.map(async (conversation) => {
-				let lastMessage: MessageDoc | null = null;
+				let lastMessage = conversation.lastMessage ?? null;
 
-				const messages = await supportAgent.listMessages(ctx, {
-					threadId: conversation.threadId,
-					paginationOpts: {
-						numItems: 1,
-						cursor: null,
-					},
-				});
-
-				if (messages.page.length > 0) {
-					lastMessage = messages.page[0] ?? null;
+				if (!conversation.lastMessage) {
+					const messages = await supportAgent.listMessages(ctx, {
+						threadId: conversation.threadId,
+						paginationOpts: {
+							numItems: 1,
+							cursor: null,
+						},
+					});
+					const message = messages.page[0];
+					lastMessage = message ? toLastMessage(message) : null;
 				}
 
 				return {
@@ -134,12 +164,15 @@ export const create = mutation({
 			userId: organizationId,
 		});
 
+		const greeting =
+			widgetSettings?.greetMessage || "Hello, how can I help you today ?";
+		const greetingAt = Date.now();
+
 		await saveMessage(ctx, components.agent, {
 			threadId,
 			message: {
 				role: "assistant",
-				content:
-					widgetSettings?.greetMessage || "Hello, how can I help you today ?",
+				content: greeting,
 			},
 		});
 
@@ -148,6 +181,16 @@ export const create = mutation({
 			status: "unresolved",
 			organizationId,
 			threadId,
+			lastMessage: {
+				text: greeting,
+				role: "assistant",
+				at: greetingAt,
+			},
+		});
+
+		await adjustConversationStats(ctx, {
+			organizationId,
+			to: "unresolved",
 		});
 
 		return conversationId;

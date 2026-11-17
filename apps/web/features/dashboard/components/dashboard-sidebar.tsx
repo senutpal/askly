@@ -36,12 +36,8 @@ export const DashboardSidebar = () => {
 	const { state } = useSidebar();
 	const isCollapsed = state === "collapsed";
 
-	const escalatedConversations = useQuery(api.private.conversations.getMany, {
-		paginationOpts: { numItems: 100, cursor: null },
-		status: "escalated",
-	});
-
-	const escalatedCount = escalatedConversations?.page.length ?? 0;
+	const escalatedStats = useQuery(api.private.conversations.getStats);
+	const escalatedCount = escalatedStats?.escalated ?? 0;
 
 	const navigationGroups = [
 		{
@@ -62,7 +58,7 @@ export const DashboardSidebar = () => {
 					url: "/conversations",
 					icon: Inbox,
 					badge:
-						escalatedConversations === undefined
+						escalatedStats === undefined
 							? undefined
 							: escalatedCount > 0
 								? String(escalatedCount)
