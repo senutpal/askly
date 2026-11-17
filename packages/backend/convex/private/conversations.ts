@@ -1,9 +1,47 @@
-import type { MessageDoc } from "@convex-dev/agent";
 import { type PaginationResult, paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
 import { mutation, query } from "../_generated/server";
+import {
+	adjustConversationStats,
+	countConversations,
+} from "../lib/conversationStats";
+import {
+	contactSessionFields,
+	conversationStatusValidator,
+	lastMessageValidator,
+	toLastMessage,
+} from "../lib/conversations";
 import { supportAgent } from "../system/ai/agents/supportAgent";
+
+const paginationResultValidator = v.object({
+	page: v.array(
+		v.object({
+			_id: v.id("conversations"),
+			_creationTime: v.number(),
+			threadId: v.string(),
+			organizationId: v.string(),
+			contactSessionId: v.id("contactSessions"),
+			status: conversationStatusValidator,
+			lastMessage: v.union(lastMessageValidator, v.null()),
+			contactSession: v.object({
+				_id: v.id("contactSessions"),
+				_creationTime: v.number(),
+				...contactSessionFields,
+			}),
+		}),
+	),
+	isDone: v.boolean(),
+	continueCursor: v.string(),
+	splitCursor: v.optional(v.union(v.string(), v.null())),
+	pageStatus: v.optional(
+		v.union(
+			v.literal("SplitRecommended"),
+			v.literal("SplitRequired"),
+			v.null(),
+		),
+	),
+});
 
 export const updateStatus = mutation({
 	args: {
@@ -47,8 +85,15 @@ export const updateStatus = mutation({
 			});
 		}
 
+		if (conversation.status === args.status) return;
+
 		await ctx.db.patch(args.conversationId, {
 			status: args.status,
+		});
+		await adjustConversationStats(ctx, {
+			organizationId: orgId,
+			from: conversation.status,
+			to: args.status,
 		});
 	},
 });
@@ -109,14 +154,9 @@ export const getOne = query({
 export const getMany = query({
 	args: {
 		paginationOpts: paginationOptsValidator,
-		status: v.optional(
-			v.union(
-				v.literal("unresolved"),
-				v.literal("escalated"),
-				v.literal("resolved"),
-			),
-		),
+		status: v.optional(conversationStatusValidator),
 	},
+	returns: paginationResultValidator,
 	handler: async (ctx, args) => {
 		const identity = await ctx.auth.getUserIdentity();
 		if (identity === null) {
@@ -157,23 +197,24 @@ export const getMany = query({
 
 		const conversationsWithAdditionalData = await Promise.all(
 			conversations.page.map(async (conversation) => {
-				let lastMessage: MessageDoc | null = null;
 				const contactSession = await ctx.db.get(conversation.contactSessionId);
 
 				if (!contactSession) {
 					return null;
 				}
 
-				const messages = await supportAgent.listMessages(ctx, {
-					threadId: conversation.threadId,
-					paginationOpts: {
-						numItems: 1,
-						cursor: null,
-					},
-				});
+				let lastMessage = conversation.lastMessage ?? null;
 
-				if (messages.page.length > 0) {
-					lastMessage = messages.page[0] ?? null;
+				if (!conversation.lastMessage) {
+					const messages = await supportAgent.listMessages(ctx, {
+						threadId: conversation.threadId,
+						paginationOpts: {
+							numItems: 1,
+							cursor: null,
+						},
+					});
+					const message = messages.page[0];
+					lastMessage = message ? toLastMessage(message) : null;
 				}
 
 				return {
@@ -191,6 +232,60 @@ export const getMany = query({
 		return {
 			...conversations,
 			page: validConversations,
+		};
+	},
+});
+
+export const getStats = query({
+	args: {},
+	returns: v.object({
+		unresolved: v.number(),
+		escalated: v.number(),
+		resolved: v.number(),
+		total: v.number(),
+		approximate: v.boolean(),
+	}),
+	handler: async (ctx) => {
+		const identity = await ctx.auth.getUserIdentity();
+		if (identity === null) {
+			throw new ConvexError({
+				code: "UNAUTHORIZED",
+				message: "Identity Not Found",
+			});
+		}
+
+		const orgId = identity.orgId as string;
+
+		if (!orgId) {
+			throw new ConvexError({
+				code: "UNAUTHORIZED",
+				message: "Organization Not Found",
+			});
+		}
+
+		const stats = await ctx.db
+			.query("conversationStats")
+			.withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+			.unique();
+
+		if (stats) {
+			const total = stats.unresolved + stats.escalated + stats.resolved;
+
+			return {
+				unresolved: stats.unresolved,
+				escalated: stats.escalated,
+				resolved: stats.resolved,
+				total,
+				approximate: false,
+			};
+		}
+
+		const { counts, approximate } = await countConversations(ctx.db, orgId);
+
+		return {
+			...counts,
+			total: counts.unresolved + counts.escalated + counts.resolved,
+			approximate,
 		};
 	},
 });

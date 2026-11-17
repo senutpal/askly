@@ -105,7 +105,7 @@ export const ConversationsPanel = () => {
 					<div className="flex w-full flex-1 flex-col text-sm">
 						{conversations.results.map((conversation) => {
 							const isLastMessageFromOperator =
-								conversation.lastMessage?.message?.role !== "user";
+								conversation.lastMessage?.role !== "user";
 
 							return (
 								<Link

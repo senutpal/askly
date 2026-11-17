@@ -27,4 +27,11 @@ crons.interval(
 	internal.system.maintenance.cleanupRateLimits,
 );
 
+crons.interval(
+	"reconcile conversation stats",
+	{ hours: 1 },
+	internal.system.maintenance.reconcileConversationStats,
+	{},
+);
+
 export default crons;

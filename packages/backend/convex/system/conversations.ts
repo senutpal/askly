@@ -1,5 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { adjustConversationStats } from "../lib/conversationStats";
+import { lastMessageRoleValidator } from "../lib/conversations";
 
 export const escalate = internalMutation({
 	args: {
@@ -18,7 +20,14 @@ export const escalate = internalMutation({
 			});
 		}
 
+		if (conversation.status === "escalated") return;
+
 		await ctx.db.patch(conversation._id, { status: "escalated" });
+		await adjustConversationStats(ctx, {
+			organizationId: conversation.organizationId,
+			from: conversation.status,
+			to: "escalated",
+		});
 	},
 });
 
@@ -39,7 +48,33 @@ export const resolve = internalMutation({
 			});
 		}
 
+		if (conversation.status === "resolved") return;
+
 		await ctx.db.patch(conversation._id, { status: "resolved" });
+		await adjustConversationStats(ctx, {
+			organizationId: conversation.organizationId,
+			from: conversation.status,
+			to: "resolved",
+		});
+	},
+});
+
+export const updateLastMessage = internalMutation({
+	args: {
+		conversationId: v.id("conversations"),
+		text: v.string(),
+		role: lastMessageRoleValidator,
+		agentName: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		await ctx.db.patch(args.conversationId, {
+			lastMessage: {
+				text: args.text,
+				role: args.role,
+				at: Date.now(),
+				...(args.agentName ? { agentName: args.agentName } : {}),
+			},
+		});
 	},
 });
 

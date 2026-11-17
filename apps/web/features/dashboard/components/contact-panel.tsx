@@ -1,7 +1,6 @@
 "use client";
 
-import { api } from "@workspace/backend/_generated/api";
-import type { Id } from "@workspace/backend/_generated/dataModel";
+import type { Doc } from "@workspace/backend/_generated/dataModel";
 import {
 	Accordion,
 	AccordionContent,
@@ -11,10 +10,8 @@ import {
 	DiceBearAvatar,
 } from "@workspace/ui";
 import Bowser from "bowser";
-import { useQuery } from "convex-helpers/react/cache/hooks";
 import { ClockIcon, GlobeIcon, MailIcon, MonitorIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import type React from "react";
 import { useMemo } from "react";
 
@@ -44,15 +41,11 @@ type InfoSection = {
 	items: InfoItem[];
 };
 
-export const ContactPanel = () => {
-	const params = useParams();
-	const conversationId = params.conversationId as Id<"conversations"> | null;
-
-	const contactSession = useQuery(
-		api.private.contactSessions.getOneByConversationId,
-		conversationId ? { conversationId } : "skip",
-	);
-
+export const ContactPanel = ({
+	contactSession,
+}: {
+	contactSession: Doc<"contactSessions"> | null | undefined;
+}) => {
 	const parseUserAgent = useMemo(() => {
 		return (userAgent?: string) => {
 			if (!userAgent) {

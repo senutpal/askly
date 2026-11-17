@@ -19,7 +19,7 @@ import {
 	TableRow,
 	useInfiniteScroll,
 } from "@workspace/ui";
-import { usePaginatedQuery } from "convex/react";
+import { usePaginatedQuery } from "convex-helpers/react/cache/hooks";
 import {
 	FileIcon,
 	FileText,

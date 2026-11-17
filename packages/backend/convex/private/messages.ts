@@ -4,6 +4,7 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { action, mutation, query } from "../_generated/server";
+import { adjustConversationStats } from "../lib/conversationStats";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import {
 	GEMINI_MODEL,
@@ -98,6 +99,11 @@ export const create = mutation({
 
 		if (conversation.status === "unresolved") {
 			await ctx.db.patch(args.conversationId, { status: "escalated" });
+			await adjustConversationStats(ctx, {
+				organizationId: orgId,
+				from: "unresolved",
+				to: "escalated",
+			});
 		}
 
 		await saveMessage(ctx, components.agent, {
@@ -106,6 +112,17 @@ export const create = mutation({
 			message: {
 				role: "assistant",
 				content: args.prompt,
+			},
+		});
+
+		const agentName = identity.familyName;
+
+		await ctx.db.patch(args.conversationId, {
+			lastMessage: {
+				text: args.prompt,
+				role: "assistant",
+				at: Date.now(),
+				...(agentName ? { agentName } : {}),
 			},
 		});
 	},

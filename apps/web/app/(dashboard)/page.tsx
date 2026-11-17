@@ -28,8 +28,9 @@ import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Page() {
 	const conversations = useQuery(api.private.conversations.getMany, {
-		paginationOpts: { numItems: 100, cursor: null },
+		paginationOpts: { numItems: 5, cursor: null },
 	});
+	const conversationStats = useQuery(api.private.conversations.getStats);
 	const files = useQuery(api.private.files.list, {
 		paginationOpts: { numItems: 3, cursor: null },
 	});
@@ -38,26 +39,22 @@ export default function Page() {
 
 	const isLoading =
 		conversations === undefined ||
+		conversationStats === undefined ||
 		files === undefined ||
 		vapiPlugin === undefined ||
 		widgetSettings === undefined;
 
-	const conversationStats = conversations?.page.reduce(
-		(acc, conv) => {
-			if (conv.status === "resolved") acc.resolved++;
-			else if (conv.status === "escalated") acc.escalated++;
-			else acc.active++;
-			return acc;
-		},
-		{ active: 0, resolved: 0, escalated: 0 },
-	) || { active: 0, resolved: 0, escalated: 0 };
+	const stats = conversationStats ?? {
+		unresolved: 0,
+		escalated: 0,
+		resolved: 0,
+		total: 0,
+		approximate: false,
+	};
 
-	const total =
-		conversationStats.active +
-		conversationStats.resolved +
-		conversationStats.escalated;
 	const efficiency =
-		total > 0 ? Math.round((conversationStats.resolved / total) * 100) : 0;
+		stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0;
+	const approximateSuffix = stats.approximate ? "+" : "";
 
 	return (
 		<div className="min-h-screen w-full bg-background dark:bg-neutral-900 text-foreground selection:bg-primary/10 selection:text-primary">
@@ -101,7 +98,7 @@ export default function Page() {
 						<div className="md:col-span-4">
 							<StatCard
 								label="Active Inquiries"
-								value={conversationStats.active}
+								value={`${stats.unresolved}${approximateSuffix}`}
 								icon={<MessageSquare className="h-4 w-4" />}
 							/>
 						</div>
@@ -115,7 +112,7 @@ export default function Page() {
 						<div className="md:col-span-4">
 							<StatCard
 								label="Escalations"
-								value={conversationStats.escalated}
+								value={`${stats.escalated}${approximateSuffix}`}
 								icon={<Users className="h-4 w-4" />}
 							/>
 						</div>
@@ -152,7 +149,7 @@ export default function Page() {
 										</div>
 									) : (
 										<div className="flex flex-col gap-1">
-											{conversations?.page.slice(0, 5).map((conv) => (
+											{conversations?.page.map((conv) => (
 												<ConversationRow key={conv._id} data={conv} />
 											))}
 										</div>

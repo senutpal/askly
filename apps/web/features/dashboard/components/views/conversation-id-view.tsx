@@ -90,16 +90,23 @@ export const ConversationIdView = ({
 	};
 
 	const createMessage = useMutation(api.private.messages.create);
+	const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+	const [messageError, setMessageError] = useState<string | null>(null);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
+		setPendingMessage(values.message);
+		setMessageError(null);
 		try {
 			await createMessage({
 				conversationId,
 				prompt: values.message,
 			});
 			form.reset();
+			setPendingMessage(null);
 		} catch (error) {
 			console.error(error);
+			setPendingMessage(null);
+			setMessageError("Message could not be sent. Please try again.");
 		}
 	};
 
@@ -184,9 +191,24 @@ export const ConversationIdView = ({
 								)}
 							</AIMessage>
 						))}
+					{pendingMessage && (
+						<AIMessage className="opacity-60" from="user">
+							<AIMessageContent>
+								<AIResponse>{pendingMessage}</AIResponse>
+							</AIMessageContent>
+							<DiceBearAvatar
+								seed={conversation?.contactSessionId ?? "user"}
+								size={36}
+							/>
+						</AIMessage>
+					)}
 				</AIConversationContent>
 				<AIConversationScrollButton />
 			</AIConversation>
+
+			{messageError && (
+				<p className="px-4 pt-2 text-xs text-destructive">{messageError}</p>
+			)}
 
 			<div className="p-2">
 				<Form {...form}>
