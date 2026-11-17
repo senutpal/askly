@@ -5,7 +5,9 @@
 		"dev": "convex dev",
 		"deploy": "convex deploy",
 		"setup": "convex dev --until-success",
-		"start": "convex dev"
+		"start": "convex dev",
+		"lint": "biome check convex",
+		"typecheck": "tsc --noEmit -p convex/tsconfig.json"
 	},
 	"exports": {
 		"./convex": "./convex/*.ts"
@@ -15,7 +17,7 @@
 		"@types/node": "^20.19.9",
 		"@workspace/typescript-config": "workspace:*",
 		"depcheck": "^1.4.7",
-		"typescript": "latest"
+		"typescript": "5.9.3"
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^2.0.17",

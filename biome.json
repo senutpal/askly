@@ -6,11 +6,13 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!**/_generated"]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineEnding": "lf"
 	},
 	"linter": {
 		"enabled": true,
@@ -23,6 +25,11 @@
 			"quoteStyle": "double"
 		}
 	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
 	"assist": {
 		"enabled": true,
 		"actions": {
@@ -30,5 +37,41 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["apps/widget/public/widget.js"],
+			"linter": {
+				"rules": {
+					"complexity": { "noCommaOperator": "off" },
+					"suspicious": { "noAssignInExpressions": "off" }
+				}
+			}
+		},
+		{
+			"includes": ["packages/ui/src/components/**/*.tsx"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useSemanticElements": "off",
+						"useFocusableInteractive": "off",
+						"useAriaPropsForRole": "off",
+						"useKeyWithClickEvents": "off",
+						"noStaticElementInteractions": "off",
+						"noSvgWithoutTitle": "off"
+					},
+					"suspicious": { "noArrayIndexKey": "off" }
+				}
+			}
+		},
+		{
+			"includes": ["packages/ui/src/components/splash-cursor.tsx"],
+			"linter": {
+				"rules": {
+					"correctness": { "useHookAtTopLevel": "off" },
+					"style": { "noNonNullAssertion": "off" }
+				}
+			}
+		}
+	]
 }

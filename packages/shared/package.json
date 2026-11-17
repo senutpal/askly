@@ -27,7 +27,7 @@
 	},
 	"devDependencies": {
 		"@workspace/typescript-config": "workspace:*",
-		"typescript": "^5.9.2"
+		"typescript": "5.9.3"
 	},
 	"dependencies": {
 		"zod": "^4.1.11"

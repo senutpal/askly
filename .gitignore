@@ -2,7 +2,6 @@
 .dockerignore
 Dockerfile
 docker-compose.yml
-.github/
 # Dependencies
 node_modules
 .pnp
@@ -23,9 +22,25 @@ coverage
 
 # Turbo
 .turbo
+*.tsbuildinfo
 
 # Vercel
 .vercel
+
+# AI / agent tooling — never commit
+.agents/
+.claude/
+.cursor/
+.codex/
+.windsurf/
+.roo/
+opencode.json
+AGENTS.md
+CLAUDE.md
+.claude.json
+skills-lock.json
+**/convex/_generated/ai/
+/apps/landing-v2/
 
 # Build Outputs
 .next/
