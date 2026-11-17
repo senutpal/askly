@@ -96,9 +96,7 @@ export const CustomizationForm = ({
 	return (
 		<div className="grid gap-8 lg:grid-cols-2">
 			{/* Left Column: Form */}
-			<div
-				className="space-y-6"
-			>
+			<div className="space-y-6">
 				<Form {...form}>
 					<form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
 						{/* General Settings Card */}
@@ -160,26 +158,28 @@ export const CustomizationForm = ({
 								</div>
 
 								<div className="space-y-4">
-									{[1, 2, 3].map((num) => (
-										<FormField
-											key={num}
-											control={form.control}
-											name={`defaultSuggestions.suggestion${num}` as any}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Suggestion {num}</FormLabel>
-													<FormControl>
-														<Input
-															{...field}
-															placeholder={`e.g. Question ${num}`}
-															className="rounded-xl border-border/50 bg-background/50 focus:ring-primary/20"
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									))}
+									{(["suggestion1", "suggestion2", "suggestion3"] as const).map(
+										(suggestionKey, index) => (
+											<FormField
+												key={suggestionKey}
+												control={form.control}
+												name={`defaultSuggestions.${suggestionKey}`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Suggestion {index + 1}</FormLabel>
+														<FormControl>
+															<Input
+																{...field}
+																placeholder={`e.g. Question ${index + 1}`}
+																className="rounded-xl border-border/50 bg-background/50 focus:ring-primary/20"
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										),
+									)}
 								</div>
 							</div>
 						</div>

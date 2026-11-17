@@ -23,7 +23,8 @@ export const FeaturesHeader = React.memo(() => {
 				</span>
 			</h2>
 			<p className="text-lg md:text-xl leading-relaxed max-w-2xl text-muted-foreground">
-				A unified cognitive architecture designed to handle the complexities of modern communication at enterprise scale.
+				A unified cognitive architecture designed to handle the complexities of
+				modern communication at enterprise scale.
 			</p>
 		</div>
 	);

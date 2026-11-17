@@ -13,9 +13,7 @@ export const TechSpecItem = ({
 	description,
 	icon: Icon,
 }: TechSpecItemProps) => (
-	<div
-		className="group flex items-start gap-4 p-4 rounded-xl border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-white dark:hover:bg-zinc-900/50 transition-all duration-200"
-	>
+	<div className="group flex items-start gap-4 p-4 rounded-xl border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-white dark:hover:bg-zinc-900/50 transition-all duration-200">
 		<div className="mt-1 text-zinc-400 group-hover:text-blue-500 transition-colors">
 			<Icon className="w-5 h-5" />
 		</div>

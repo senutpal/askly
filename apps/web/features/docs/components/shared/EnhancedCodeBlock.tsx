@@ -5,7 +5,6 @@ import { useState } from "react";
 
 export const EnhancedCodeBlock = ({
 	code,
-	language = "bash",
 	filename,
 }: {
 	code: string;

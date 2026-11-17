@@ -45,6 +45,7 @@ export const WidgetPreview = ({ data }: WidgetPreviewProps) => {
 								</div>
 							</div>
 							<button
+								type="button"
 								onClick={() => setIsOpen(false)}
 								className="text-white/80 hover:text-white"
 							>
@@ -53,9 +54,9 @@ export const WidgetPreview = ({ data }: WidgetPreviewProps) => {
 						</div>
 
 						<div className="flex h-[300px] flex-col gap-4 overflow-y-auto p-4">
-							{messages.map((msg, idx) => (
+							{messages.map((msg) => (
 								<div
-									key={idx}
+									key={`${msg.role}-${msg.content}`}
 									className={`max-w-[80%] rounded-2xl p-3 text-sm ${
 										msg.role === "agent"
 											? "bg-muted text-foreground rounded-tl-none"
@@ -69,10 +70,11 @@ export const WidgetPreview = ({ data }: WidgetPreviewProps) => {
 
 						<div className="flex flex-col gap-2 overflow-x-auto p-2 px-4 pb-0 scrollbar-hide">
 							{Object.values(data.defaultSuggestions || {}).map(
-								(suggestion, idx) =>
+								(suggestion) =>
 									suggestion && (
 										<button
-											key={idx}
+											type="button"
+											key={suggestion}
 											className="whitespace-nowrap rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground hover:bg-muted"
 										>
 											{suggestion}
@@ -98,6 +100,7 @@ export const WidgetPreview = ({ data }: WidgetPreviewProps) => {
 			</div>
 			{!isOpen && (
 				<button
+					type="button"
 					onClick={() => setIsOpen(true)}
 					className="absolute bottom-0 right-0 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-105 transition-transform"
 				>

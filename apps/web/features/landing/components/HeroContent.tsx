@@ -28,8 +28,8 @@ export const HeroContent = React.memo(() => {
 			</h1>
 
 			<p className="text-lg md:text-xl leading-relaxed max-w-[90%] md:max-w-xl text-muted-foreground">
-				The AI-first communication layer for modern institutions.
-				Multilingual answers for students, zero overhead for staff.
+				The AI-first communication layer for modern institutions. Multilingual
+				answers for students, zero overhead for staff.
 			</p>
 
 			<div className="flex md:mt-3 flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">

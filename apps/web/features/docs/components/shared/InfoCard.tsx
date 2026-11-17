@@ -9,14 +9,8 @@ interface InfoCardProps {
 	delay?: number;
 }
 
-export const InfoCard = ({
-	title,
-	description,
-	icon: Icon,
-}: InfoCardProps) => (
-	<div
-		className="p-6 rounded-2xl border bg-white dark:bg-zinc-900/20 hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
-	>
+export const InfoCard = ({ title, description, icon: Icon }: InfoCardProps) => (
+	<div className="p-6 rounded-2xl border bg-white dark:bg-zinc-900/20 hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors">
 		<div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-900 dark:text-white">
 			<Icon className="w-5 h-5" />
 		</div>

@@ -53,6 +53,7 @@ export const ResourceItem = ({
 	onToggle,
 }: ResourceItemProps) => {
 	return (
+		// biome-ignore lint/a11y/useSemanticElements: the row is a convenience click target that contains its own checkbox control, so it cannot be a <button>
 		<div
 			role="button"
 			tabIndex={0}

@@ -5,9 +5,9 @@ import { dark, neobrutalism } from "@clerk/themes";
 import { Toaster } from "@workspace/ui";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 import { ThemeProvider, useTheme } from "next-themes";
 import * as React from "react";
-import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 
 if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 	throw new Error("NEXT_PUBLIC_CONVEX_URL environment variable is required");
@@ -30,9 +30,7 @@ function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
 			<Toaster />
 			<ClerkProvider appearance={appearance}>
 				<ConvexProviderWithClerk useAuth={useAuth} client={convex}>
-          <ConvexQueryCacheProvider>
-            {children}
-          </ConvexQueryCacheProvider>
+					<ConvexQueryCacheProvider>{children}</ConvexQueryCacheProvider>
 				</ConvexProviderWithClerk>
 			</ClerkProvider>
 		</>

@@ -27,9 +27,9 @@ export const ROICard = React.memo(() => {
 					</p>
 				</div>
 				<div className="mt-8 h-16 flex items-end gap-1">
-					{heights.map((h, i) => (
+					{heights.map((h) => (
 						<div
-							key={i}
+							key={h}
 							className="flex-1 bg-orange-500/20 rounded-t-sm dark:bg-orange-500/40 relative group hover:bg-orange-500 transition-colors"
 							style={{ height: `${h}%` }}
 						>

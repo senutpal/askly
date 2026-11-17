@@ -193,13 +193,12 @@ export const FeaturesView = () => {
 								interact with institutional knowledge.
 							</p>
 						</div>
-						<Link href="/docs/quick-start">
-							<button
-								className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium transition-colors hover:bg-zinc-800 dark:hover:bg-zinc-200"
-							>
-								Start Integration
-								<ArrowRight className="w-4 h-4" />
-							</button>
+						<Link
+							href="/docs/quick-start"
+							className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-medium transition-colors hover:bg-zinc-800 dark:hover:bg-zinc-200"
+						>
+							Start Integration
+							<ArrowRight className="w-4 h-4" />
 						</Link>
 					</div>
 				</section>

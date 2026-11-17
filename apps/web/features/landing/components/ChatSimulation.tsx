@@ -5,34 +5,89 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const messageSets = [
 	[
-		{ id: 1, role: "user", text: "Until when can we fill out the form?", lang: "English" },
-		{ id: 2, role: "ai", text: "Applications close on March 31st.", lang: "English" },
-		{ id: 3, role: "user", text: "ফর্ম আমরা কতদিন পর্যন্ত পূরণ করতে পারবো?", lang: "Bengali" },
-		{ id: 4, role: "ai", text: "ফর্ম জমা দেওয়ার শেষ তারিখ ৩১ মার্চ।", lang: "Bengali" },
+		{
+			id: 1,
+			role: "user",
+			text: "Until when can we fill out the form?",
+			lang: "English",
+		},
+		{
+			id: 2,
+			role: "ai",
+			text: "Applications close on March 31st.",
+			lang: "English",
+		},
+		{
+			id: 3,
+			role: "user",
+			text: "ফর্ম আমরা কতদিন পর্যন্ত পূরণ করতে পারবো?",
+			lang: "Bengali",
+		},
+		{
+			id: 4,
+			role: "ai",
+			text: "ফর্ম জমা দেওয়ার শেষ তারিখ ৩১ মার্চ।",
+			lang: "Bengali",
+		},
 	],
 	[
-		{ id: 1, role: "user", text: "When is the last date for fee payment?", lang: "English" },
+		{
+			id: 1,
+			role: "user",
+			text: "When is the last date for fee payment?",
+			lang: "English",
+		},
 		{ id: 2, role: "ai", text: "You must pay by April 10.", lang: "English" },
 		{ id: 3, role: "user", text: "शुल्क कब तक जमा कर सकते हैं?", lang: "Hindi" },
-		{ id: 4, role: "ai", text: "शुल्क 10 अप्रैल तक जमा किया जा सकता है।", lang: "Hindi" },
+		{
+			id: 4,
+			role: "ai",
+			text: "शुल्क 10 अप्रैल तक जमा किया जा सकता है।",
+			lang: "Hindi",
+		},
 	],
 	[
-		{ id: 1, role: "user", text: "What time do classes start?", lang: "English" },
+		{
+			id: 1,
+			role: "user",
+			text: "What time do classes start?",
+			lang: "English",
+		},
 		{ id: 2, role: "ai", text: "Classes begin at 9 AM.", lang: "English" },
 		{ id: 3, role: "user", text: "क्लास कितने बजे से शुरू होती है?", lang: "Hindi" },
 		{ id: 4, role: "ai", text: "क्लास सुबह 9 बजे शुरू होती है।", lang: "Hindi" },
 	],
 	[
-		{ id: 1, role: "user", text: "When can we check into the hostel?", lang: "English" },
+		{
+			id: 1,
+			role: "user",
+			text: "When can we check into the hostel?",
+			lang: "English",
+		},
 		{ id: 2, role: "ai", text: "Check-in starts on July 15.", lang: "English" },
 		{ id: 3, role: "user", text: "হোস্টেলে কখন উঠতে পারবো?", lang: "Bengali" },
 		{ id: 4, role: "ai", text: "১৫ জুলাই থেকে হোস্টেলে ওঠা যাবে।", lang: "Bengali" },
 	],
 	[
-		{ id: 1, role: "user", text: "How do I get my student ID card?", lang: "English" },
-		{ id: 2, role: "ai", text: "You can collect it from the admin office.", lang: "English" },
+		{
+			id: 1,
+			role: "user",
+			text: "How do I get my student ID card?",
+			lang: "English",
+		},
+		{
+			id: 2,
+			role: "ai",
+			text: "You can collect it from the admin office.",
+			lang: "English",
+		},
 		{ id: 3, role: "user", text: "আইডी কার্ড কিভাবে মিলবে?", lang: "Hindi" },
-		{ id: 4, role: "ai", text: "আইডী কার্ড প্রশাসন কার্যালয় থেকে পাবেন।", lang: "Hindi" },
+		{
+			id: 4,
+			role: "ai",
+			text: "আইডী কার্ড প্রশাসন কার্যালয় থেকে পাবেন।",
+			lang: "Hindi",
+		},
 	],
 ];
 

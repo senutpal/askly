@@ -190,13 +190,17 @@ export const WebCrawlerDialog = ({
 		if (allFilteredSelected) {
 			setSelectedResourceIds((prev) => {
 				const newSet = new Set(prev);
-				filteredIds.forEach((id) => newSet.delete(id));
+				filteredIds.forEach((id) => {
+					newSet.delete(id);
+				});
 				return newSet;
 			});
 		} else {
 			setSelectedResourceIds((prev) => {
 				const newSet = new Set(prev);
-				filteredIds.forEach((id) => newSet.add(id));
+				filteredIds.forEach((id) => {
+					newSet.add(id);
+				});
 				return newSet;
 			});
 		}

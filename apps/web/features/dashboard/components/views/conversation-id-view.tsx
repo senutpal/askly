@@ -1,7 +1,6 @@
 "use client";
 
-import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
-import { useCachedThreadMessages } from "@/hooks/use-cached-thread-messages";
+import { toUIMessages } from "@convex-dev/agent/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -28,12 +27,14 @@ import {
 	useInfiniteScroll,
 } from "@workspace/ui";
 import { useAction, useMutation } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useCachedThreadMessages } from "@/hooks/use-cached-thread-messages";
 import { ConversationStatusButton } from "../conversation-status-button";
-import { useQuery } from "convex-helpers/react/cache/hooks";
+
 const formSchema = z.object({
 	message: z.string().min(1, "Message is required"),
 });
@@ -46,7 +47,6 @@ export const ConversationIdView = ({
 	const conversation = useQuery(api.private.conversations.getOne, {
 		conversationId,
 	});
-
 
 	const messagesArgs = conversation?.threadId
 		? { threadId: conversation.threadId }
@@ -143,7 +143,7 @@ export const ConversationIdView = ({
 
 	return (
 		<div className="flex h-full flex-col bg-muted">
-			<header className="flex items-center justify-between border-b bg-background light:border-gray-200 dark:border-gray-700 p-2.5 ">
+			<header className="flex items-center justify-between border-b bg-background border-gray-200 dark:border-gray-700 p-2.5 ">
 				<Button size="sm" variant="ghost">
 					<MoreHorizontalIcon />
 				</Button>
@@ -170,7 +170,7 @@ export const ConversationIdView = ({
 						)
 						?.map((message) => (
 							<AIMessage
-								from={message.role === "user" ? "assistant" : "user"}
+								from={message.role === "user" ? "user" : "assistant"}
 								key={message.id}
 							>
 								<AIMessageContent>
@@ -254,14 +254,23 @@ export const ConversationIdView = ({
 export const ConversationIdViewLoading = () => {
 	return (
 		<div className="flex h-full flex-col bg-muted">
-			<header className="flex items-center justify-between border-b light:border-gray-200 dark:border-gray-700 bg-background p-2.5">
+			<header className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-background p-2.5">
 				<Button disabled size="sm" variant="ghost">
 					<MoreHorizontalIcon />
 				</Button>
 			</header>
 			<AIConversation className="max-h-[calc(100vh-180px)] min-h-[calc(100vh-180px)]">
 				<AIConversationContent>
-					{Array.from({ length: 8 }, (_, index) => {
+					{[
+						"skeleton-1",
+						"skeleton-2",
+						"skeleton-3",
+						"skeleton-4",
+						"skeleton-5",
+						"skeleton-6",
+						"skeleton-7",
+						"skeleton-8",
+					].map((skeletonId, index) => {
 						const isUser = index % 2 === 0;
 						const widths = ["w-48", "w-60", "w-72"];
 						const width = widths[index % widths.length];
@@ -272,7 +281,7 @@ export const ConversationIdViewLoading = () => {
 									"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
 									isUser ? "is-user" : "is-assistant flex-row-reverse",
 								)}
-								key={index}
+								key={skeletonId}
 							>
 								<Skeleton
 									className={`h-9 ${width} rounded-lg bg-neutral-200 dark:bg-gray-600 `}

@@ -46,9 +46,7 @@ export const PluginCard = ({
 						{/* Connection Line */}
 						<div className="relative flex w-16 items-center justify-center">
 							<div className="h-1 w-full rounded-full bg-border/50" />
-							<div
-								className="absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)]"
-							/>
+							<div className="absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
 						</div>
 
 						<div className="relative flex h-24 w-24 items-center justify-center rounded-3xl border border-white/10 bg-white/10 shadow-2xl backdrop-blur-md transition-transform hover:scale-105 dark:bg-black/40">

@@ -89,7 +89,10 @@ export default function ProblemSection() {
 			const rect = container.getBoundingClientRect();
 			const containerHeight = container.offsetHeight;
 			const scrolled = -rect.top;
-			const progress = Math.max(0, Math.min(1, scrolled / (containerHeight - window.innerHeight)));
+			const progress = Math.max(
+				0,
+				Math.min(1, scrolled / (containerHeight - window.innerHeight)),
+			);
 			const cardCount = problems.length;
 			const step = 1 / cardCount;
 			const index = Math.min(Math.floor(progress / step), cardCount - 1);
@@ -103,10 +106,7 @@ export default function ProblemSection() {
 	const activeProblem = problems[activeCard] || problems[0];
 
 	return (
-		<section
-			id="problem"
-			className="relative text-neutral-900 dark:text-white"
-		>
+		<section id="problem" className="relative text-neutral-900 dark:text-white">
 			<TopographyPattern />
 
 			<div ref={containerRef} className="relative h-[250vh]">
@@ -125,7 +125,9 @@ export default function ProblemSection() {
 
 							<div className="relative min-h-[180px]">
 								<div className="absolute top-0 left-0 transition-opacity duration-300">
-									<h3 className={`text-2xl font-semibold mb-4 bg-gradient-to-b text-transparent bg-clip-text ${activeProblem?.accent}`}>
+									<h3
+										className={`text-2xl font-semibold mb-4 bg-gradient-to-b text-transparent bg-clip-text ${activeProblem?.accent}`}
+									>
 										{activeProblem?.title}
 									</h3>
 									<p className="text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
@@ -155,12 +157,20 @@ export default function ProblemSection() {
 										className={`absolute inset-0 rounded-3xl p-1 h-[250px] md:h-full bg-gradient-to-b from-neutral-100 to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-lg transition-all duration-300 ease-out ${isActive ? "z-30" : "z-0"} ${isActive ? card.shadow : ""}`}
 										style={{
 											transform: `translateY(${isActive ? 0 : isPast ? -40 * (activeCard - index) : 15 * (index - activeCard)}px) scale(${isActive ? 1 : 0.95})`,
-											opacity: isActive ? 1 : isPast ? (index === activeCard - 1 ? 0.6 : 0) : 0.3,
+											opacity: isActive
+												? 1
+												: isPast
+													? index === activeCard - 1
+														? 0.6
+														: 0
+													: 0.3,
 										}}
 									>
 										<div className="relative h-full w-full rounded-[20px] bg-white dark:bg-neutral-900 overflow-hidden flex flex-col justify-between p-6 md:p-8 border border-neutral-200 dark:border-neutral-800">
 											<div className="relative z-10 flex justify-between items-start">
-												<div className={`p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white ${card.accent}`}>
+												<div
+													className={`p-3 rounded-2xl bg-gradient-to-br shadow-lg text-white ${card.accent}`}
+												>
 													<card.icon className="w-6 h-6" />
 												</div>
 											</div>

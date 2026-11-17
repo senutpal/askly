@@ -17,9 +17,7 @@ export const ActionCard = ({
 	icon: Icon,
 }: ActionCardProps) => (
 	<Link href={href} className="block group">
-		<div
-			className="h-full p-6 rounded-xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700"
-		>
+		<div className="h-full p-6 rounded-xl border border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
 			<Icon className="w-6 h-6 mb-4 text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
 			<h4 className="font-medium text-zinc-900 dark:text-white mb-1 flex items-center gap-2">
 				{title}
