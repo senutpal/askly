@@ -2,21 +2,20 @@ import { createClerkClient } from "@clerk/backend";
 import { v } from "convex/values";
 import { action } from "../_generated/server";
 
-const secretKey = process.env.CLERK_SECRET_KEY;
-if (!secretKey) {
-	throw new Error("CLERK_SECRET_KEY environment variable is required");
-}
-
-const clerkClient = createClerkClient({
-	secretKey,
-});
-
 export const validate = action({
 	args: {
 		organizationId: v.string(),
 	},
 	handler: async (_, args) => {
 		try {
+			// Construct the client lazily so a missing CLERK_SECRET_KEY cannot throw
+			// at module import / push time.
+			const secretKey = process.env.CLERK_SECRET_KEY;
+			if (!secretKey) {
+				return { valid: false, reason: "Failed to validate organization" };
+			}
+			const clerkClient = createClerkClient({ secretKey });
+
 			await clerkClient.organizations.getOrganization({
 				organizationId: args.organizationId,
 			});

@@ -48,6 +48,12 @@ export const create = action({
 				message: "Conversation does not belong to this session",
 			});
 		}
+		if (conversation.organizationId !== contactSession.organizationId) {
+			throw new ConvexError({
+				code: "FORBIDDEN",
+				message: "Conversation organization does not match this session",
+			});
+		}
 		if (conversation.status === "resolved") {
 			throw new ConvexError({
 				code: "BAD REQUEST",
@@ -104,6 +110,12 @@ export const getMany = query({
 			throw new ConvexError({
 				code: "FORBIDDEN",
 				message: "Conversation not found for this session",
+			});
+		}
+		if (conversation.organizationId !== contactSession.organizationId) {
+			throw new ConvexError({
+				code: "FORBIDDEN",
+				message: "Conversation organization does not match this session",
 			});
 		}
 		const paginated = await supportAgent.listMessages(ctx, {

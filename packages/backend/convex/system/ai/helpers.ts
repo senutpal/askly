@@ -3,6 +3,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { internal } from "../../_generated/api";
 import type { ActionCtx } from "../../_generated/server";
+import { GEMINI_EMBEDDING_MODEL } from "./constants";
 
 export async function getGoogleAIApiKey(
 	ctx: ActionCtx,
@@ -44,7 +45,7 @@ export async function createGoogleAI(
 export async function createGoogleTextEmbedding(
 	ctx: ActionCtx,
 	organizationId: string,
-	model = "gemini-embedding-001",
+	model = GEMINI_EMBEDDING_MODEL,
 ): Promise<
 	ReturnType<ReturnType<typeof createGoogleGenerativeAI>["textEmbedding"]>
 > {

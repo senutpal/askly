@@ -4,13 +4,28 @@ import { action } from "../_generated/server";
 
 export const getVapiSecrets = action({
 	args: {
-		organizationId: v.string(),
+		contactSessionId: v.id("contactSessions"),
 	},
 	handler: async (ctx, args) => {
+		const contactSession = (await ctx.runQuery(
+			internal.system.contactSessions.getOne,
+			{ contactSessionId: args.contactSessionId },
+		)) as { organizationId: string; expiresAt: number } | null;
+
+		if (!contactSession || contactSession.expiresAt < Date.now()) {
+			throw new ConvexError({
+				code: "UNAUTHORIZED",
+				message: "Invalid Session",
+			});
+		}
+
+		// Organization is derived from the validated session, never from the caller.
+		const organizationId = contactSession.organizationId;
+
 		const plugin = (await ctx.runAction(
 			internal.system.secrets.getByOrganizationIdAndService,
 			{
-				organizationId: args.organizationId,
+				organizationId,
 				service: "vapi",
 			},
 		)) as { privateApiKey: string; publicApiKey: string } | null;
@@ -28,6 +43,7 @@ export const getVapiSecrets = action({
 			});
 		}
 
+		// Only the public key is returned; the private key is never exposed.
 		return {
 			publicApiKey: publicApiKey,
 		};

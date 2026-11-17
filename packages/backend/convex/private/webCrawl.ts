@@ -1,5 +1,4 @@
 import { contentHashFromArrayBuffer } from "@convex-dev/rag";
-import axios from "axios";
 import { ConvexError, v } from "convex/values";
 import { parseHTML } from "linkedom";
 import { internal } from "../_generated/api";
@@ -13,7 +12,11 @@ import {
 	query,
 } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
-import { crawlWebsite } from "../lib/webCrawler";
+import {
+	assertPublicUrl,
+	crawlWebsite,
+	fetchPublicUrl,
+} from "../lib/webCrawler";
 import { createRAG } from "../system/ai/rag";
 
 type StartCrawlArgs = {
@@ -51,6 +54,9 @@ async function startCrawlHandler(
 			message: "Organization Not Found",
 		});
 	}
+
+	// Reject unsafe seed URLs before persisting a job or scheduling work.
+	assertPublicUrl(args.url);
 
 	const jobId = (await ctx.runMutation(internal.private.webCrawl.createJob, {
 		organizationId: orgId,
@@ -199,22 +205,19 @@ export const getResults = query({
 			});
 		}
 
-		let results;
-		if (args.typeFilter) {
-			results = await ctx.db
-				.query("crawlResults")
-				.withIndex("by_job_and_type", (q) =>
-					q
-						.eq("jobId", args.jobId)
-						.eq("type", args.typeFilter as "text" | "image" | "pdf"),
-				)
-				.collect();
-		} else {
-			results = await ctx.db
-				.query("crawlResults")
-				.withIndex("by_job_id", (q) => q.eq("jobId", args.jobId))
-				.collect();
-		}
+		const results = args.typeFilter
+			? await ctx.db
+					.query("crawlResults")
+					.withIndex("by_job_and_type", (q) =>
+						q
+							.eq("jobId", args.jobId)
+							.eq("type", args.typeFilter as "text" | "image" | "pdf"),
+					)
+					.collect()
+			: await ctx.db
+					.query("crawlResults")
+					.withIndex("by_job_id", (q) => q.eq("jobId", args.jobId))
+					.collect();
 
 		return results;
 	},
@@ -289,8 +292,16 @@ export const addSelectedResources = action({
 				let bytes: ArrayBuffer;
 				let mimeType: string;
 				const filename = resource.title ?? "file";
+
+				// Re-validate the stored URL before fetching: crawled pages are
+				// untrusted and may have injected internal/off-origin resource URLs.
+				assertPublicUrl(resource.url);
+
 				if (resource.type === "text") {
-					const response = await axios.get(resource.url, { timeout: 15000 });
+					const response = await fetchPublicUrl(resource.url, {
+						timeout: 15000,
+						maxContentLength: 10 * 1024 * 1024,
+					});
 					const { document } = parseHTML(response.data);
 					const textContent = extractTextFromPage(
 						document,
@@ -299,7 +310,7 @@ export const addSelectedResources = action({
 					bytes = new TextEncoder().encode(textContent).buffer;
 					mimeType = "text/plain";
 				} else {
-					const response = await axios.get(resource.url, {
+					const response = await fetchPublicUrl(resource.url, {
 						responseType: "arraybuffer",
 						timeout: 30000,
 						maxContentLength: 10 * 1024 * 1024,

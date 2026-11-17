@@ -101,7 +101,6 @@ export const getOne = query({
 
 export const create = mutation({
 	args: {
-		organizationId: v.string(),
 		contactSessionId: v.id("contactSessions"),
 	},
 	handler: async (ctx, args) => {
@@ -114,15 +113,19 @@ export const create = mutation({
 			});
 		}
 
+		// The organization is always derived from the validated contact session,
+		// never from a caller-supplied value (cross-tenant boundary).
+		const organizationId = session.organizationId;
+
 		const widgetSettings = await ctx.db
 			.query("widgetSettings")
 			.withIndex("by_organization_id", (q) =>
-				q.eq("organizationId", args.organizationId),
+				q.eq("organizationId", organizationId),
 			)
 			.unique();
 
 		const { threadId } = await supportAgent.createThread(ctx, {
-			userId: args.organizationId,
+			userId: organizationId,
 		});
 
 		await saveMessage(ctx, components.agent, {
@@ -137,7 +140,7 @@ export const create = mutation({
 		const conversationId = await ctx.db.insert("conversations", {
 			contactSessionId: session._id,
 			status: "unresolved",
-			organizationId: args.organizationId,
+			organizationId,
 			threadId,
 		});
 
