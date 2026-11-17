@@ -131,13 +131,17 @@ export const WidgetLoadingScreen = ({
 		if (step !== "vapi") {
 			return;
 		}
-		if (!organizationId) {
-			setErrorMessage("Organization ID is required");
-			setScreen("error");
+
+		// Voice credentials are scoped to a valid contact session. Without one,
+		// keep voice options hidden and continue to the normal routing step.
+		if (!contactSessionId || !sessionValid) {
+			setVapiSecrets(null);
+			setStep("done");
 			return;
 		}
+
 		setLoadingMessage("Loading Voice Features");
-		getVapiSecrets({ organizationId })
+		getVapiSecrets({ contactSessionId })
 			.then((secrets) => {
 				setVapiSecrets(secrets);
 				setStep("done");
@@ -148,12 +152,11 @@ export const WidgetLoadingScreen = ({
 			});
 	}, [
 		step,
-		organizationId,
+		contactSessionId,
+		sessionValid,
 		getVapiSecrets,
 		setVapiSecrets,
 		setLoadingMessage,
-		setErrorMessage,
-		setScreen,
 	]);
 
 	useEffect(() => {

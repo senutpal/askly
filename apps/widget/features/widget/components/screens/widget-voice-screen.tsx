@@ -21,6 +21,7 @@ export const WidgetVoiceScreen = () => {
 		endCall,
 		isConnecting,
 		startCall,
+		error,
 	} = useVapi();
 
 	return (
@@ -31,6 +32,8 @@ export const WidgetVoiceScreen = () => {
 						onClick={() => setScreen("selection")}
 						variant="ghost"
 						size="icon"
+						type="button"
+						aria-label="Back to options"
 						className="h-8 w-8 rounded-full hover:bg-black/5"
 					>
 						<ArrowLeftIcon className="size-4 text-gray-600" />
@@ -93,6 +96,16 @@ export const WidgetVoiceScreen = () => {
 					</div>
 				</div>
 			)}
+			{error && (
+				<p
+					role="alert"
+					aria-live="polite"
+					className="mx-4 mb-2 rounded-xl bg-red-50 px-4 py-3 text-center text-sm text-red-600"
+				>
+					{error.message ||
+						"The voice call couldn't be connected. Please try again."}
+				</p>
+			)}
 			<div className="border-t border-gray-100 bg-white p-6 pb-8">
 				<div className="flex flex-col items-center gap-y-4">
 					<div className="flex w-full justify-center">
@@ -100,6 +113,8 @@ export const WidgetVoiceScreen = () => {
 							<Button
 								className="w-full h-12 rounded-2xl bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/30 active:scale-[0.98] transition-all"
 								size="lg"
+								type="button"
+								aria-label="End voice call"
 								onClick={() => endCall()}
 							>
 								<MicOff className="mr-2 size-4" />
@@ -109,6 +124,8 @@ export const WidgetVoiceScreen = () => {
 							<Button
 								disabled={isConnecting}
 								size="lg"
+								type="button"
+								aria-label="Start voice call"
 								onClick={() => startCall()}
 								className="w-full h-12 rounded-2xl bg-black text-white shadow-lg shadow-black/5 hover:bg-gray-900 hover:shadow-xl hover:shadow-black/10 active:scale-[0.98] transition-all"
 							>

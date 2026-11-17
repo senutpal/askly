@@ -9,12 +9,20 @@
 		w = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="18" y1="6" x2="6" y2="18"></line>
   <line x1="6" y1="6" x2="18" y2="18"></line>
-</svg>`;
+</svg>`,
+		T = ["askly:open", "askly:close", "askly:toggle"],
+		isAskly = (d) =>
+			typeof d === "object" &&
+			d !== null &&
+			typeof d.type === "string" &&
+			T.includes(d.type);
 	(() => {
 		let n = null,
 			t = null,
 			e = null,
 			d = !1,
+			l = !1,
+			S = null,
 			r = null,
 			a = o.DEFAULT_POSITION;
 		const c = document.currentScript;
@@ -40,6 +48,9 @@
 		function f() {
 			(e = document.createElement("button")),
 				(e.id = "askly-widget-button"),
+				(e.type = "button"),
+				e.setAttribute("aria-label", "Open Askly support chat"),
+				e.setAttribute("aria-expanded", "false"),
 				(e.innerHTML = h),
 				(e.style.cssText = `
       position: fixed;
@@ -87,7 +98,12 @@
       transition: all 0.3s ease;
     `),
 				(n = document.createElement("iframe")),
-				(n.src = y()),
+				(n.title = "Askly support chat"),
+				(n.loading = "lazy"),
+				n.setAttribute(
+					"sandbox",
+					"allow-scripts allow-forms allow-same-origin allow-popups allow-downloads",
+				),
 				(n.style.cssText = `
       width: 100%;
       height: 100%;
@@ -103,22 +119,35 @@
 			return i.append("organizationId", r), `${o.WIDGET_URL}?${i.toString()}`;
 		}
 		function m(i) {
+			let p;
 			try {
-				const p = new URL(o.WIDGET_URL).origin;
-				if (i.origin !== p) return;
-			} catch (p) {
-				console.error("Askly Widget: Invalid WIDGET_URL configuration", p);
+				p = new URL(o.WIDGET_URL).origin;
+			} catch (E) {
+				console.error("Askly Widget: Invalid WIDGET_URL configuration", E);
 				return;
 			}
-			const { type: s, payload: l } = i.data;
-			switch (s) {
-				case "close":
+			const fromHost =
+					i.origin === window.location.origin && i.source === window,
+				fromWidget = i.origin === p && n && i.source === n.contentWindow;
+			if (!fromHost && !fromWidget) return;
+			if (!isAskly(i.data)) return;
+			switch (i.data.type) {
+				case "askly:open":
+					x();
+					break;
+				case "askly:close":
 					u();
 					break;
-				case "resize":
-					l.height && t && (t.style.height = `${l.height}px`);
+				case "askly:toggle":
+					v();
 					break;
 			}
+		}
+		function q(type) {
+			if (!l || !n || !n.contentWindow) return;
+			try {
+				n.contentWindow.postMessage({ type }, new URL(o.WIDGET_URL).origin);
+			} catch {}
 		}
 		function v() {
 			d ? u() : x();
@@ -127,28 +156,42 @@
 			t &&
 				e &&
 				((d = !0),
+				S && clearTimeout(S),
+				(S = null),
+				!l && n && ((n.src = y()), (l = !0)),
 				(t.style.display = "block"),
-				setTimeout(() => {
+				(S = setTimeout(() => {
 					t && ((t.style.opacity = "1"), (t.style.transform = "translateY(0)"));
-				}, 10),
-				(e.innerHTML = w));
+				}, 10)),
+				(e.innerHTML = w),
+				e.setAttribute("aria-label", "Close Askly support chat"),
+				e.setAttribute("aria-expanded", "true"),
+				q("askly:open"));
 		}
 		function u() {
 			t &&
 				e &&
 				((d = !1),
+				S && clearTimeout(S),
+				(S = null),
 				(t.style.opacity = "0"),
 				(t.style.transform = "translateY(10px)"),
-				setTimeout(() => {
+				(S = setTimeout(() => {
 					t && (t.style.display = "none");
-				}, 300),
+				}, 300)),
 				(e.innerHTML = h),
-				(e.style.background = "#3b82f6"));
+				(e.style.background = "#3b82f6"),
+				e.setAttribute("aria-label", "Open Askly support chat"),
+				e.setAttribute("aria-expanded", "false"),
+				q("askly:close"));
 		}
 		function b() {
 			window.removeEventListener("message", m),
+				S && clearTimeout(S),
+				(S = null),
 				t && (t.remove(), (t = null), (n = null)),
 				e && (e.remove(), (e = null)),
+				(l = !1),
 				(d = !1);
 		}
 		function E(i) {

@@ -5,6 +5,7 @@ import { screenAtom } from "@/features/widget/atoms/widget-atoms";
 import WidgetAuthScreen from "@/features/widget/components/screens/widget-auth-screen";
 import { WidgetErrorScreen } from "@/features/widget/components/screens/widget-error-screen";
 import { WidgetLoadingScreen } from "@/features/widget/components/screens/widget-loading-screen";
+import { useAsklyParentMessages } from "@/features/widget/hooks/use-askly-parent-messages";
 import WidgetChatScreen from "../screens/widget-chat-screen";
 import { WidgetContactScreen } from "../screens/widget-contact-screen";
 import { WidgetInboxScreen } from "../screens/widget-inbox-screen";
@@ -17,6 +18,7 @@ interface Props {
 
 export const WidgetView = ({ organizationId }: Props) => {
 	const screen = useAtomValue(screenAtom);
+	useAsklyParentMessages();
 
 	const screenComponents = {
 		loading: <WidgetLoadingScreen organizationId={organizationId} />,

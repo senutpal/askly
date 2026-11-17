@@ -23,13 +23,14 @@ import {
 } from "@workspace/ui";
 import { useAction, useQuery } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { ArrowLeft, Menu } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
 	contactSessionIdAtomFamily,
 	conversationIdAtom,
+	errorMessageAtom,
 	organizationIdAtom,
 	screenAtom,
 	WidgetHeader,
@@ -43,6 +44,8 @@ const formSchema = z.object({
 export default function WidgetChatScreen() {
 	const setScreen = useSetAtom(screenAtom);
 	const setConversationId = useSetAtom(conversationIdAtom);
+	const setErrorMessage = useSetAtom(errorMessageAtom);
+	const [sendError, setSendError] = useState<string | null>(null);
 
 	const widgetSettings = useAtomValue(widgetSettingsAtom);
 	const conversationId = useAtomValue(conversationIdAtom);
@@ -105,12 +108,21 @@ export default function WidgetChatScreen() {
 		if (!conversation || !contactSessionId) {
 			return;
 		}
-		form.reset();
-		await createMessage({
-			threadId: conversation.threadId,
-			prompt: values.message,
-			contactSessionId,
-		});
+		setSendError(null);
+		try {
+			await createMessage({
+				threadId: conversation.threadId,
+				prompt: values.message,
+				contactSessionId,
+			});
+			// Only clear the draft once the message was accepted, so a failed send
+			// does not silently discard what the user typed.
+			form.reset();
+		} catch {
+			const message = "Your message couldn't be sent. Please try again.";
+			setSendError(message);
+			setErrorMessage(message);
+		}
 	};
 
 	return (
@@ -122,6 +134,8 @@ export default function WidgetChatScreen() {
 							onClick={onBack}
 							variant="ghost"
 							size="icon"
+							type="button"
+							aria-label="Back to conversations"
 							className="h-9 w-9 rounded-full hover:bg-black/5 transition-colors"
 						>
 							<ArrowLeft className="size-5 text-gray-700" />
@@ -136,14 +150,6 @@ export default function WidgetChatScreen() {
 							</span>
 						</div>
 					</div>
-
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-9 w-9 rounded-full hover:bg-black/5 transition-colors"
-					>
-						<Menu className="size-5 text-gray-700" />
-					</Button>
 				</div>
 			</WidgetHeader>
 			<AIConversation className="bg-white">
@@ -177,7 +183,13 @@ export default function WidgetChatScreen() {
 									}
 								>
 									{isLoading ? (
-										<div className="flex items-center gap-2 text-gray-500">
+										// biome-ignore lint/a11y/useSemanticElements: role="status" is the correct live-region semantics for a typing indicator; <output> is for form results
+										<div
+											role="status"
+											aria-live="polite"
+											aria-label="Assistant is typing"
+											className="flex items-center gap-2 text-gray-500"
+										>
 											<div className="flex space-x-1">
 												<div className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]" />
 												<div className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -230,6 +242,15 @@ export default function WidgetChatScreen() {
 				</AISuggestions>
 			)}
 			<div className="p-4 bg-white/80 backdrop-blur-md border-t border-gray-100">
+				{sendError && (
+					<p
+						role="alert"
+						aria-live="polite"
+						className="mb-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-600"
+					>
+						{sendError}
+					</p>
+				)}
 				<Form {...form}>
 					<AIInput
 						className="rounded-2xl border border-gray-200 bg-white shadow-lg shadow-black/5 focus-within:border-black/10 focus-within:ring-4 focus-within:ring-black/[0.03] transition-all overflow-hidden"
@@ -259,13 +280,18 @@ export default function WidgetChatScreen() {
 							)}
 						/>
 						<AIInputToolbar className="pr-2 pb-2">
-							<AIInputTools className="text-gray-400 hover:text-gray-600" />
+							<AIInputTools
+								role="group"
+								aria-label="Message attachments"
+								className="text-gray-400 hover:text-gray-600"
+							/>
 							<AIInputSubmit
 								disabled={
 									conversation?.status === "resolved" || !form.formState.isValid
 								}
 								status="ready"
 								type="submit"
+								aria-label="Send message"
 								className="bg-black text-white hover:bg-gray-800 rounded-xl h-8 w-8 p-0 flex items-center justify-center transition-colors"
 							/>
 						</AIInputToolbar>

@@ -18,6 +18,9 @@ export const WidgetFooter = () => {
 				onClick={() => setScreen("selection")}
 				size="icon"
 				variant="ghost"
+				type="button"
+				aria-label="Home"
+				aria-current={screen === "selection" ? "page" : undefined}
 			>
 				<HomeIcon
 					className="size-5"
@@ -35,6 +38,9 @@ export const WidgetFooter = () => {
 				onClick={() => setScreen("inbox")}
 				size="icon"
 				variant="ghost"
+				type="button"
+				aria-label="Inbox"
+				aria-current={screen === "inbox" ? "page" : undefined}
 			>
 				<InboxIcon
 					className="size-5"

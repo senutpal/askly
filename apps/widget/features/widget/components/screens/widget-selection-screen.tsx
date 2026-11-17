@@ -3,6 +3,7 @@
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronRightIcon, MessageSquareText, Mic, Phone } from "lucide-react";
 import { useState } from "react";
@@ -47,12 +48,28 @@ export const WidgetSelectionScreen = () => {
 		try {
 			const conversationId = await createConversation({
 				contactSessionId,
-				organizationId,
 			});
 			setConversationId(conversationId);
 			setScreen("chat");
-		} catch {
-			setScreen("auth");
+		} catch (error) {
+			const data =
+				error instanceof ConvexError
+					? (error.data as { code?: string; message?: string } | undefined)
+					: undefined;
+
+			if (data?.code === "UNAUTHORIZED") {
+				setErrorMessage(
+					data.message || "Your session has expired. Please try again.",
+				);
+				setScreen("auth");
+				return;
+			}
+
+			setErrorMessage(
+				data?.message ||
+					"We couldn't start your conversation. Please try again.",
+			);
+			setScreen("error");
 		} finally {
 			setIsPending(false);
 		}
