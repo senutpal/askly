@@ -54,25 +54,3 @@ export const getByOrganizationIdAndService = internalQuery({
 			.first();
 	},
 });
-
-export const remove = internalMutation({
-	args: {
-		service: pluginServiceValidator,
-		organizationId: v.string(),
-	},
-	returns: v.null(),
-	handler: async (ctx, args) => {
-		const existingPlugin = await ctx.db
-			.query("plugins")
-			.withIndex("by_organization_id_and_service", (q) =>
-				q.eq("organizationId", args.organizationId).eq("service", args.service),
-			)
-			.unique();
-
-		if (existingPlugin) {
-			await ctx.db.delete(existingPlugin._id);
-		}
-
-		return null;
-	},
-});

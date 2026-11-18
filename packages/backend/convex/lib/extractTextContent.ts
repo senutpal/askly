@@ -12,6 +12,9 @@ const SUPPORTED_IMAGE_TYPES = [
 	"image/gif",
 ] as const;
 
+const mediaTypeOf = (mimeType: string) =>
+	mimeType.split(";")[0]?.trim().toLowerCase() ?? "";
+
 const SYSTEM_PROMPTS = {
 	images:
 		"Turn images to text. If it's a document, transcribe it. If it's not a document, describe it.",
@@ -35,12 +38,20 @@ export async function extractTextContent(
 	const url = await ctx.storage.getUrl(storageId);
 	assert(url, "Failed to get storage url");
 
-	if (SUPPORTED_IMAGE_TYPES.some((type) => type === mimeType)) {
+	const mediaType = mediaTypeOf(mimeType);
+
+	if (SUPPORTED_IMAGE_TYPES.some((type) => type === mediaType)) {
 		return extractImageText(ctx, organizationId, url);
 	}
 
-	if (mimeType.toLowerCase().includes("pdf")) {
-		return extractPdfText(ctx, organizationId, url, mimeType, filename);
+	if (mediaType.includes("pdf")) {
+		return extractPdfText(
+			ctx,
+			organizationId,
+			url,
+			"application/pdf",
+			filename,
+		);
 	}
 
 	if (mimeType.toLowerCase().includes("text")) {

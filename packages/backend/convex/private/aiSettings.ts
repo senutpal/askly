@@ -4,6 +4,7 @@ import { internal } from "../_generated/api";
 import { describeProviderFailure } from "../lib/aiErrors";
 import {
 	aiProviderValidator,
+	embeddingProviderValidator,
 	getEmbeddingConfig,
 	getProviderDefinition,
 	pluginServiceForProvider,
@@ -193,7 +194,7 @@ export const save = authedAction({
 			embeddingProvider: embedding.provider,
 			embeddingModel: embedding.model,
 			embeddingDimension: embedding.dimension,
-			reembedRequired,
+			acknowledgeReembed: args.acknowledgeReembed === true,
 		});
 
 		return { reembedRequired };
@@ -258,7 +259,7 @@ export const testConnection = authedAction({
 
 			return {
 				ok: true,
-				message: `${provider.name} connection successful.`,
+				message: `${provider.name} chat connection successful.`,
 			};
 		} catch (error) {
 			return { ok: false, ...describeProviderFailure(error) };
@@ -272,26 +273,9 @@ export const removeKey = authedAction({
 	},
 	returns: v.null(),
 	handler: async (ctx, args) => {
-		const settings = await getResolvedAiSettings(ctx, ctx.orgId);
-
-		if (args.provider === settings.provider) {
-			throw new ConvexError({
-				code: "KEY_IN_USE",
-				message: "Switch to another provider before removing this key.",
-			});
-		}
-
-		if (args.provider === settings.embedding.provider) {
-			throw new ConvexError({
-				code: "KEY_IN_USE",
-				message:
-					"This key is used for knowledge base embeddings. Switch providers before removing it.",
-			});
-		}
-
-		await ctx.runMutation(internal.system.plugins.remove, {
+		await ctx.runMutation(internal.system.ai.settings.removeKey, {
 			organizationId: ctx.orgId,
-			service: pluginServiceForProvider(args.provider),
+			provider: args.provider,
 		});
 
 		return null;
@@ -299,17 +283,44 @@ export const removeKey = authedAction({
 });
 
 export const confirmReembed = authedMutation({
-	args: {},
+	args: {
+		embeddingProvider: embeddingProviderValidator,
+		embeddingModel: v.string(),
+		embeddingDimension: v.number(),
+	},
 	returns: v.null(),
-	handler: async (ctx) => {
+	handler: async (ctx, args) => {
 		const settings = await ctx.db
 			.query("aiSettings")
 			.withIndex("by_organization_id", (q) => q.eq("organizationId", ctx.orgId))
 			.unique();
 
-		if (settings) {
-			await ctx.db.patch(settings._id, { reembedRequired: false });
+		if (!settings) {
+			return null;
 		}
+
+		if (
+			requiresReembed(
+				{
+					provider: settings.embeddingProvider,
+					model: settings.embeddingModel,
+					dimension: settings.embeddingDimension,
+				},
+				{
+					provider: args.embeddingProvider,
+					model: args.embeddingModel,
+					dimension: args.embeddingDimension,
+				},
+			)
+		) {
+			throw new ConvexError({
+				code: "STALE_REEMBED_CONFIRMATION",
+				message:
+					"The embedding configuration changed. Review the new warning before confirming.",
+			});
+		}
+
+		await ctx.db.patch(settings._id, { reembedRequired: false });
 
 		return null;
 	},

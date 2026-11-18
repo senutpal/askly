@@ -15,7 +15,12 @@ const parseErrorData = (data: unknown): ConvexErrorData | null => {
 	}
 
 	if (data && typeof data === "object") {
-		return data as ConvexErrorData;
+		const { code, message } = data as { code?: unknown; message?: unknown };
+
+		return {
+			code: typeof code === "string" ? code : undefined,
+			message: typeof message === "string" ? message : undefined,
+		};
 	}
 
 	return null;

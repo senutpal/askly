@@ -1,4 +1,4 @@
-import { APICallError, LoadAPIKeyError } from "ai";
+import { APICallError, LoadAPIKeyError, RetryError } from "ai";
 
 export type ProviderFailure = {
 	code: string;
@@ -46,6 +46,10 @@ const statusFailure = (statusCode: number): ProviderFailure | null => {
 };
 
 export const describeProviderFailure = (error: unknown): ProviderFailure => {
+	if (RetryError.isInstance(error)) {
+		return describeProviderFailure(error.lastError);
+	}
+
 	if (APICallError.isInstance(error) && error.statusCode) {
 		const failure = statusFailure(error.statusCode);
 

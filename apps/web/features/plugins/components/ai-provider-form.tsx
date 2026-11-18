@@ -127,22 +127,29 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 	};
 
 	const persist = async (acknowledgeReembed: boolean) => {
+		const submittedApiKey = apiKey.trim();
+		const submittedEmbeddingApiKey = embeddingApiKey.trim();
+
 		setIsSaving(true);
 
 		try {
 			const result = await saveSettings({
 				provider,
 				model,
-				apiKey: apiKey.trim() || undefined,
+				apiKey: submittedApiKey || undefined,
 				embeddingApiKey: usesSeparateEmbeddingKey
-					? embeddingApiKey.trim() || undefined
+					? submittedEmbeddingApiKey || undefined
 					: undefined,
 				baseUrl: baseUrl.trim() || undefined,
 				acknowledgeReembed: acknowledgeReembed || undefined,
 			});
 
-			setApiKey("");
-			setEmbeddingApiKey("");
+			setApiKey((current) =>
+				current.trim() === submittedApiKey ? "" : current,
+			);
+			setEmbeddingApiKey((current) =>
+				current.trim() === submittedEmbeddingApiKey ? "" : current,
+			);
 			resetTestResult();
 			setIsReembedOpen(false);
 			toast.success(
@@ -447,8 +454,9 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 			</div>
 
 			<AiProviderReembedDialog
-				embeddingLabel={`${embeddingDefinition.name} (${embedding.model})`}
+				currentEmbeddingLabel={`${getProviderDefinition(settings.embeddingProvider).name} (${settings.embeddingModel})`}
 				isSaving={isSaving}
+				nextEmbeddingLabel={`${embeddingDefinition.name} (${embedding.model})`}
 				onConfirm={() => void persist(true)}
 				onOpenChange={setIsReembedOpen}
 				open={isReembedOpen}

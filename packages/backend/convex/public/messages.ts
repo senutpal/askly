@@ -83,7 +83,10 @@ export const create = action({
 				},
 			],
 		});
-		const shouldTriggerAgent = conversation.status === "unresolved";
+		const agent =
+			conversation.status === "unresolved"
+				? await createSupportAgent(ctx, conversation.organizationId)
+				: null;
 
 		const { messageId: promptMessageId, message: promptMessage } =
 			await saveMessage(ctx, components.agent, {
@@ -98,9 +101,8 @@ export const create = action({
 			at: promptMessage._creationTime,
 		});
 
-		if (!shouldTriggerAgent) return null;
+		if (!agent) return null;
 
-		const agent = await createSupportAgent(ctx, conversation.organizationId);
 		const result = await agent.generateText(
 			ctx,
 			{

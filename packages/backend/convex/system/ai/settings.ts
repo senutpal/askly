@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import type { Doc } from "../../_generated/dataModel";
 import { internalMutation, internalQuery } from "../../_generated/server";
 import {
@@ -9,6 +9,8 @@ import {
 	type EmbeddingConfig,
 	embeddingProviderValidator,
 	getEmbeddingConfig,
+	pluginServiceForProvider,
+	requiresReembed,
 } from "../../lib/aiProviders";
 import { aiSettingsDocValidator } from "../../lib/validators";
 
@@ -67,7 +69,7 @@ export const upsert = internalMutation({
 		embeddingProvider: embeddingProviderValidator,
 		embeddingModel: v.string(),
 		embeddingDimension: v.number(),
-		reembedRequired: v.boolean(),
+		acknowledgeReembed: v.boolean(),
 	},
 	returns: v.null(),
 	handler: async (ctx, args) => {
@@ -78,6 +80,22 @@ export const upsert = internalMutation({
 			)
 			.unique();
 
+		const current = resolveAiSettings(existing);
+		const embedding: EmbeddingConfig = {
+			provider: args.embeddingProvider,
+			model: args.embeddingModel,
+			dimension: args.embeddingDimension,
+		};
+		const embeddingChanged = requiresReembed(current.embedding, embedding);
+
+		if (embeddingChanged && !args.acknowledgeReembed) {
+			throw new ConvexError({
+				code: "REEMBED_REQUIRED",
+				message:
+					"Changing the embedding provider requires re-embedding the knowledge base. Acknowledge the warning to continue.",
+			});
+		}
+
 		const values = {
 			provider: args.provider,
 			model: args.model,
@@ -85,7 +103,7 @@ export const upsert = internalMutation({
 			embeddingProvider: args.embeddingProvider,
 			embeddingModel: args.embeddingModel,
 			embeddingDimension: args.embeddingDimension,
-			reembedRequired: existing?.reembedRequired || args.reembedRequired,
+			reembedRequired: embeddingChanged || current.reembedRequired,
 			updatedAt: Date.now(),
 		};
 
@@ -96,6 +114,54 @@ export const upsert = internalMutation({
 				organizationId: args.organizationId,
 				...values,
 			});
+		}
+
+		return null;
+	},
+});
+
+export const removeKey = internalMutation({
+	args: {
+		organizationId: v.string(),
+		provider: aiProviderValidator,
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const settings = await ctx.db
+			.query("aiSettings")
+			.withIndex("by_organization_id", (q) =>
+				q.eq("organizationId", args.organizationId),
+			)
+			.unique();
+
+		const current = resolveAiSettings(settings);
+
+		if (args.provider === current.provider) {
+			throw new ConvexError({
+				code: "KEY_IN_USE",
+				message: "Switch to another provider before removing this key.",
+			});
+		}
+
+		if (args.provider === current.embedding.provider) {
+			throw new ConvexError({
+				code: "KEY_IN_USE",
+				message:
+					"This key is used for knowledge base embeddings. Switch providers before removing it.",
+			});
+		}
+
+		const plugin = await ctx.db
+			.query("plugins")
+			.withIndex("by_organization_id_and_service", (q) =>
+				q
+					.eq("organizationId", args.organizationId)
+					.eq("service", pluginServiceForProvider(args.provider)),
+			)
+			.unique();
+
+		if (plugin) {
+			await ctx.db.delete(plugin._id);
 		}
 
 		return null;

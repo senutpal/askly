@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@workspace/backend/_generated/api";
+import type { EmbeddingConfig } from "@workspace/backend/lib/aiProviders";
 import {
 	Alert,
 	AlertDescription,
@@ -14,14 +15,24 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { getErrorMessage } from "../lib/convex-error";
 
-export const AiProviderReembedBanner = () => {
+interface AiProviderReembedBannerProps {
+	embedding: EmbeddingConfig;
+}
+
+export const AiProviderReembedBanner = ({
+	embedding,
+}: AiProviderReembedBannerProps) => {
 	const confirmReembed = useMutation(api.private.aiSettings.confirmReembed);
 	const [isConfirming, setIsConfirming] = useState(false);
 
 	const onConfirm = async () => {
 		try {
 			setIsConfirming(true);
-			await confirmReembed({});
+			await confirmReembed({
+				embeddingProvider: embedding.provider,
+				embeddingModel: embedding.model,
+				embeddingDimension: embedding.dimension,
+			});
 			toast.success("Re-embed warning cleared");
 		} catch (error) {
 			toast.error(getErrorMessage(error, "Something went wrong"));

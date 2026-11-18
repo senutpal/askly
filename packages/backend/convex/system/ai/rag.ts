@@ -37,5 +37,6 @@ export const createOrganizationRAG = async (
 			embeddingDimension: embedding.dimension,
 		}),
 		namespace: ragNamespaceForEmbedding(organizationId, embedding),
+		embedding,
 	};
 };

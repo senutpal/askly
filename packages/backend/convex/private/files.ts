@@ -11,11 +11,43 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
+import {
+	DEFAULT_AI_PROVIDER,
+	type EmbeddingConfig,
+	getEmbeddingConfig,
+} from "../lib/aiProviders";
 import { extractTextContent } from "../lib/extractTextContent";
 import { authedAction, authedMutation, authedQuery } from "../lib/functions";
 import { fileListValidator, fileUploadValidator } from "../lib/validators";
 import { createOrganizationRAG, createRagForEmbedding } from "../system/ai/rag";
 import { resolveAiSettings } from "../system/ai/settings";
+
+const resolveFileNamespace = async (
+	ctx: QueryCtx,
+	organizationId: string,
+	embedding: EmbeddingConfig,
+) => {
+	const active = createRagForEmbedding(organizationId, embedding);
+	const activeNamespace = await active.rag.getNamespace(ctx, {
+		namespace: active.namespace,
+	});
+
+	if (activeNamespace) {
+		return { rag: active.rag, namespaceId: activeNamespace.namespaceId };
+	}
+
+	const legacy = createRagForEmbedding(
+		organizationId,
+		getEmbeddingConfig(DEFAULT_AI_PROVIDER),
+	);
+	const legacyNamespace = await legacy.rag.getNamespace(ctx, {
+		namespace: legacy.namespace,
+	});
+
+	return legacyNamespace
+		? { rag: legacy.rag, namespaceId: legacyNamespace.namespaceId }
+		: null;
+};
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
 	return (
@@ -34,21 +66,20 @@ export const deleteFile = authedMutation({
 				organizationId: ctx.orgId,
 			}),
 		);
-		const { rag, namespace } = createRagForEmbedding(
+		const resolved = await resolveFileNamespace(
+			ctx,
 			ctx.orgId,
 			settings.embedding,
 		);
 
-		const namespaceDoc = await rag.getNamespace(ctx, { namespace });
-
-		if (!namespaceDoc) {
+		if (!resolved) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Namespace",
 			});
 		}
 
-		const entry = await rag.getEntry(ctx, {
+		const entry = await resolved.rag.getEntry(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -72,7 +103,7 @@ export const deleteFile = authedMutation({
 			await ctx.storage.delete(metadata.storageId);
 		}
 
-		await rag.deleteAsync(ctx, {
+		await resolved.rag.deleteAsync(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -92,32 +123,42 @@ export const addFile = authedAction({
 		const { bytes, filename, category } = args;
 		const mimeType = args.mimeType || guessMimeType(filename, bytes);
 
-		const blob = new Blob([bytes], { type: mimeType });
-
-		const storageId = await ctx.storage.store(blob);
-
-		const text = await extractTextContent(ctx, {
-			storageId,
-			filename,
-			bytes,
-			mimeType,
-			organizationId: ctx.orgId,
-		});
-
 		const { rag, namespace } = await createOrganizationRAG(ctx, ctx.orgId);
 
-		const { entryId, created } = await rag.add(ctx, {
-			namespace,
-			text,
-			key: filename,
-			metadata: {
+		const blob = new Blob([bytes], { type: mimeType });
+		const storageId = await ctx.storage.store(blob);
+
+		let entryId: EntryId;
+		let created: boolean;
+
+		try {
+			const text = await extractTextContent(ctx, {
 				storageId,
-				uploadedBy: ctx.orgId,
 				filename,
-				category: category ?? null,
-			} satisfies EntryMetadata,
-			contentHash: await contentHashFromArrayBuffer(bytes),
-		});
+				bytes,
+				mimeType,
+				organizationId: ctx.orgId,
+			});
+
+			const result = await rag.add(ctx, {
+				namespace,
+				text,
+				key: filename,
+				metadata: {
+					storageId,
+					uploadedBy: ctx.orgId,
+					filename,
+					category: category ?? null,
+				} satisfies EntryMetadata,
+				contentHash: await contentHashFromArrayBuffer(bytes),
+			});
+
+			entryId = result.entryId;
+			created = result.created;
+		} catch (error) {
+			await ctx.storage.delete(storageId);
+			throw error;
+		}
 
 		let url: string | null = null;
 
@@ -154,19 +195,18 @@ export const list = authedQuery({
 				organizationId: ctx.orgId,
 			}),
 		);
-		const { rag, namespace } = createRagForEmbedding(
+		const resolved = await resolveFileNamespace(
+			ctx,
 			ctx.orgId,
 			settings.embedding,
 		);
 
-		const namespaceDoc = await rag.getNamespace(ctx, { namespace });
-
-		if (!namespaceDoc) {
+		if (!resolved) {
 			return { page: [], isDone: true, continueCursor: "" };
 		}
 
-		const results = await rag.list(ctx, {
-			namespaceId: namespaceDoc.namespaceId,
+		const results = await resolved.rag.list(ctx, {
+			namespaceId: resolved.namespaceId,
 			paginationOpts: args.paginationOpts,
 		});
 

@@ -26,6 +26,18 @@ afterAll(() => {
 
 const setup = () => convexTest(schema, modules);
 
+const parseErrorPayload = (value: unknown): unknown => {
+	if (typeof value !== "string") {
+		return value;
+	}
+
+	try {
+		return parseErrorPayload(JSON.parse(value));
+	} catch {
+		return value;
+	}
+};
+
 const expectConvexError = async (
 	promise: Promise<unknown>,
 	expected: { code: string; message: string },
@@ -44,15 +56,7 @@ const expectConvexError = async (
 		return;
 	}
 
-	const data: unknown = error.data;
-
-	expect(typeof data).toBe("string");
-
-	if (typeof data !== "string") {
-		return;
-	}
-
-	expect(JSON.parse(data)).toEqual(expected);
+	expect(parseErrorPayload(error.data)).toEqual(expected);
 };
 
 const saveOpenAi = (
@@ -211,6 +215,44 @@ describe("AI settings", () => {
 		});
 	});
 
+	it("keeps a legacy Gemini key for organizations without settings", async () => {
+		const t = setup();
+
+		await t.action(internal.system.secrets.upsert, {
+			organizationId: "org_a",
+			service: "google-ai",
+			text: "legacy-google-key",
+		});
+
+		const before = await t
+			.withIdentity({ orgId: "org_a" })
+			.query(api.private.aiSettings.get);
+
+		expect(before).toMatchObject({
+			provider: "google",
+			hasApiKey: true,
+			keys: { google: true, openai: false, anthropic: false },
+		});
+
+		await t
+			.withIdentity({ orgId: "org_a" })
+			.action(api.private.aiSettings.save, {
+				provider: "google",
+				model: "gemini-4-argon",
+			});
+
+		const after = await t
+			.withIdentity({ orgId: "org_a" })
+			.query(api.private.aiSettings.get);
+
+		expect(after).toMatchObject({
+			provider: "google",
+			model: "gemini-4-argon",
+			hasApiKey: true,
+			reembedRequired: false,
+		});
+	});
+
 	it("requires a Google key for Anthropic embeddings", async () => {
 		const t = setup();
 
@@ -301,7 +343,11 @@ describe("AI settings", () => {
 		await saveOpenAi(t, "org_a");
 		await t
 			.withIdentity({ orgId: "org_a" })
-			.mutation(api.private.aiSettings.confirmReembed);
+			.mutation(api.private.aiSettings.confirmReembed, {
+				embeddingProvider: "openai",
+				embeddingModel: "text-embedding-3-large",
+				embeddingDimension: 3072,
+			});
 
 		const view = await t
 			.withIdentity({ orgId: "org_a" })
@@ -310,27 +356,61 @@ describe("AI settings", () => {
 		expect(view.reembedRequired).toBe(false);
 	});
 
-	it("keeps a pending re-embed warning when a stale save arrives", async () => {
+	it("rejects a stale re-embed confirmation", async () => {
 		const t = setup();
 
 		await saveOpenAi(t, "org_a");
 
-		await t.mutation(internal.system.ai.settings.upsert, {
-			organizationId: "org_a",
-			provider: "openai",
-			model: "gpt-6.1-terra",
-			embeddingProvider: "openai",
-			embeddingModel: "text-embedding-3-large",
-			embeddingDimension: 3072,
-			reembedRequired: false,
-		});
+		await expectConvexError(
+			t
+				.withIdentity({ orgId: "org_a" })
+				.mutation(api.private.aiSettings.confirmReembed, {
+					embeddingProvider: "google",
+					embeddingModel: "gemini-embedding-001",
+					embeddingDimension: 3072,
+				}),
+			{
+				code: "STALE_REEMBED_CONFIRMATION",
+				message:
+					"The embedding configuration changed. Review the new warning before confirming.",
+			},
+		);
 
 		const view = await t
 			.withIdentity({ orgId: "org_a" })
 			.query(api.private.aiSettings.get);
 
 		expect(view.reembedRequired).toBe(true);
-		expect(view.model).toBe("gpt-6.1-terra");
+	});
+
+	it("rejects a stale save that would change embeddings silently", async () => {
+		const t = setup();
+
+		await saveOpenAi(t, "org_a");
+
+		await expectConvexError(
+			t.mutation(internal.system.ai.settings.upsert, {
+				organizationId: "org_a",
+				provider: "google",
+				model: "gemini-3.5-flash-lite",
+				embeddingProvider: "google",
+				embeddingModel: "gemini-embedding-001",
+				embeddingDimension: 3072,
+				acknowledgeReembed: false,
+			}),
+			{
+				code: "REEMBED_REQUIRED",
+				message:
+					"Changing the embedding provider requires re-embedding the knowledge base. Acknowledge the warning to continue.",
+			},
+		);
+
+		const view = await t
+			.withIdentity({ orgId: "org_a" })
+			.query(api.private.aiSettings.get);
+
+		expect(view.provider).toBe("openai");
+		expect(view.reembedRequired).toBe(true);
 	});
 
 	it("rejects a base URL that points at private infrastructure", async () => {

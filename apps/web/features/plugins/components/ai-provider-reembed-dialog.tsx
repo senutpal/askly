@@ -12,16 +12,18 @@ import {
 import { Loader2, TriangleAlert } from "lucide-react";
 
 interface AiProviderReembedDialogProps {
-	embeddingLabel: string;
+	currentEmbeddingLabel: string;
 	isSaving: boolean;
+	nextEmbeddingLabel: string;
 	onConfirm: () => void;
 	onOpenChange: (open: boolean) => void;
 	open: boolean;
 }
 
 export const AiProviderReembedDialog = ({
-	embeddingLabel,
+	currentEmbeddingLabel,
 	isSaving,
+	nextEmbeddingLabel,
 	onConfirm,
 	onOpenChange,
 	open,
@@ -36,8 +38,9 @@ export const AiProviderReembedDialog = ({
 					</DialogTitle>
 					<DialogDescription>
 						Switching embeddings changes how vectors are produced. Existing
-						vectors from {embeddingLabel} cannot be searched with the new model,
-						so files stay unavailable until they are re-embedded.
+						vectors were created with {currentEmbeddingLabel} and cannot be
+						searched with {nextEmbeddingLabel}, so those files stay unavailable
+						until they are re-embedded.
 					</DialogDescription>
 				</DialogHeader>
 				<div className="mt-2 rounded-xl border border-amber-500/30 bg-amber-50/60 p-4 text-amber-900 text-sm dark:bg-amber-950/30 dark:text-amber-100">

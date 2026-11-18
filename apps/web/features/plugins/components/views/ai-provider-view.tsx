@@ -28,7 +28,15 @@ export const AiProviderView = () => {
 					<Skeleton className="h-[32rem] w-full rounded-3xl" />
 				) : (
 					<div className="space-y-6">
-						{settings.reembedRequired ? <AiProviderReembedBanner /> : null}
+						{settings.reembedRequired ? (
+							<AiProviderReembedBanner
+								embedding={{
+									provider: settings.embeddingProvider,
+									model: settings.embeddingModel,
+									dimension: settings.embeddingDimension,
+								}}
+							/>
+						) : null}
 						<AiProviderForm settings={settings} />
 					</div>
 				)}
