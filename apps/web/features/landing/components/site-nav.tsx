@@ -21,26 +21,60 @@ export const SiteNav = () => {
 	const navRef = useRef<HTMLElement>(null);
 	const brandRef = useRef<HTMLAnchorElement>(null);
 	const toggleRef = useRef<HTMLButtonElement>(null);
+	const lastFocusedRef = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		const handleFocusIn = (event: FocusEvent) => {
+			if (
+				event.target instanceof HTMLElement &&
+				navRef.current?.contains(event.target)
+			) {
+				lastFocusedRef.current = event.target;
+			} else {
+				lastFocusedRef.current = null;
+			}
+		};
+
+		document.addEventListener("focusin", handleFocusIn);
+		return () => document.removeEventListener("focusin", handleFocusIn);
+	}, []);
 
 	useEffect(() => {
 		const media = window.matchMedia("(max-width: 660px)");
-		const closeOnDesktop = (event: MediaQueryListEvent) => {
-			if (event.matches) return;
-
+		const handleBreakpointChange = (event: MediaQueryListEvent) => {
 			const activeElement = document.activeElement;
+			const candidate =
+				activeElement instanceof HTMLElement &&
+				navRef.current?.contains(activeElement)
+					? activeElement
+					: lastFocusedRef.current;
+
+			if (event.matches) {
+				const isDesktopLink =
+					candidate instanceof HTMLElement &&
+					candidate !== brandRef.current &&
+					candidate !== toggleRef.current &&
+					!candidate.closest("#landing-mobile-menu");
+
+				if (isDesktopLink) {
+					toggleRef.current?.focus();
+				}
+				return;
+			}
+
 			const focusLost =
-				activeElement === toggleRef.current ||
-				(activeElement instanceof HTMLElement &&
-					Boolean(activeElement.closest("#landing-mobile-menu")));
+				candidate === toggleRef.current ||
+				(candidate instanceof HTMLElement &&
+					Boolean(candidate.closest("#landing-mobile-menu")));
 
 			setOpen(false);
 
 			if (focusLost) brandRef.current?.focus();
 		};
 
-		media.addEventListener("change", closeOnDesktop);
+		media.addEventListener("change", handleBreakpointChange);
 
-		return () => media.removeEventListener("change", closeOnDesktop);
+		return () => media.removeEventListener("change", handleBreakpointChange);
 	}, []);
 
 	useEffect(() => {
