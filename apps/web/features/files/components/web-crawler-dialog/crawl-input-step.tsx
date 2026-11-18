@@ -57,6 +57,10 @@ export const CrawlInputStep = ({
 						}
 					}}
 				/>
+				<div className="rounded-xl border border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
+					The crawler extracts static HTML. Client-rendered single-page apps
+					(React/Vue/Angular without SSR) may yield minimal content.
+				</div>
 			</div>
 
 			<div className="space-y-2">

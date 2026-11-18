@@ -11,15 +11,24 @@ export const ImportProgressStep = ({
 	current,
 	total,
 }: ImportProgressStepProps) => {
+	const percent =
+		total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 py-12">
 			<Loader2Icon className="size-12 animate-spin text-primary" />
-			<div className="text-center">
+			<div className="text-center w-full max-w-xs space-y-3">
 				<p className="font-medium">
-					Importing {current} of {total}
+					Importing {current} of {total} ({percent}%)
 				</p>
-				<p className="text-muted-foreground text-sm mt-1">
-					This may take a moment...
+				<div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+					<div
+						className="h-full bg-primary transition-all duration-300"
+						style={{ width: `${percent}%` }}
+					/>
+				</div>
+				<p className="text-muted-foreground text-xs">
+					Extracting text and generating embeddings...
 				</p>
 			</div>
 		</div>
