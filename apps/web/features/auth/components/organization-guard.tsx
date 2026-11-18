@@ -12,11 +12,7 @@ export const OrganizationGuard = ({
 	const { organization, isLoaded } = useOrganization();
 
 	if (!isLoaded) {
-		return (
-			<AuthLayout>
-				<div>Loading...</div>
-			</AuthLayout>
-		);
+		return <AuthLayout>{children}</AuthLayout>;
 	}
 
 	if (!organization) {
@@ -26,5 +22,6 @@ export const OrganizationGuard = ({
 			</AuthLayout>
 		);
 	}
+
 	return <AuthLayout>{children}</AuthLayout>;
 };
