@@ -128,6 +128,14 @@ export const UsageGuideView = () => {
 						structures, course catalogs, FAQs, policies, and any other
 						frequently referenced documents to improve AI accuracy.
 					</AlertBox>
+
+					<AlertBox type="info" title="Embeddings & Provider Compatibility">
+						Askly generates 3072-dimensional vector embeddings using Google
+						Gemini (<code>gemini-embedding-001</code>) or OpenAI (
+						<code>text-embedding-3-large</code>). Switching embedding providers
+						invalidates existing stored vectors because vector spaces differ;
+						changing providers requires a re-embed job to restore searchability.
+					</AlertBox>
 				</section>
 
 				{/* Widget Settings */}

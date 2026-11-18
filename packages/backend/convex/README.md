@@ -88,3 +88,13 @@ function handleButtonPress() {
 Use the Convex CLI to push your functions to a deployment. See everything
 the Convex CLI can do by running `npx convex -h` in your project root
 directory. To learn more, launch the docs with `npx convex docs`.
+
+## Knowledge Base Embeddings
+
+Askly uses vector embeddings for semantic document retrieval via `@convex-dev/rag`:
+
+- **Google Gemini**: Uses `gemini-embedding-001` with **3072** dimensions.
+- **OpenAI**: Uses `text-embedding-3-large` with **3072** dimensions.
+
+### Provider Switching & Re-embedding
+Vector spaces across different embedding providers and models are mathematically incompatible. Switching providers invalidates existing stored vectors in the RAG namespace. When changing the embedding provider in Settings, existing files cannot be searched with the new provider until a re-embed job is executed to re-index the knowledge base.
