@@ -11,12 +11,9 @@ export const LANDING_OG_IMAGE_ALT =
 	"Askly: Support that reads your docs. A path winds through green hills.";
 
 export const LANDING_LINKS = {
-	signUp: "/sign-up",
-	signIn: "/sign-in",
 	docs: "/docs",
 	features: "/docs/features",
 	setup: "/docs/integration",
-	demo: "#demo",
 	top: "#top",
 	github: "https://github.com/senutpal/askly",
 } as const;
