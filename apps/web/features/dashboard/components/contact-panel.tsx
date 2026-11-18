@@ -9,7 +9,6 @@ import {
 	Button,
 	DiceBearAvatar,
 } from "@workspace/ui";
-import Bowser from "bowser";
 import { ClockIcon, GlobeIcon, MailIcon, MonitorIcon } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
@@ -41,33 +40,95 @@ type InfoSection = {
 	items: InfoItem[];
 };
 
+function parseUserAgent(userAgent?: string) {
+	if (!userAgent) {
+		return {
+			browser: "Unknown",
+			browserVersion: "",
+			os: "Unknown",
+			osVersion: "",
+			device: "Unknown",
+			deviceModel: "",
+		};
+	}
+
+	let browser = "Unknown";
+	let browserVersion = "";
+	let os = "Unknown";
+	let osVersion = "";
+	let device = "desktop";
+
+	if (/mobile/i.test(userAgent)) {
+		device = "mobile";
+	} else if (/tablet|ipad/i.test(userAgent)) {
+		device = "tablet";
+	}
+
+	if (/windows nt 10/i.test(userAgent)) {
+		os = "Windows";
+		osVersion = "10/11";
+	} else if (/windows nt/i.test(userAgent)) {
+		os = "Windows";
+	} else if (/mac os x ([\d_]+)/i.test(userAgent)) {
+		os = "macOS";
+		const match = userAgent.match(/mac os x ([\d_]+)/i);
+		if (match?.[1]) {
+			osVersion = match[1].replace(/_/g, ".");
+		}
+	} else if (/android ([\d.]+)/i.test(userAgent)) {
+		os = "Android";
+		const match = userAgent.match(/android ([\d.]+)/i);
+		if (match?.[1]) {
+			osVersion = match[1];
+		}
+	} else if (/iphone os ([\d_]+)/i.test(userAgent)) {
+		os = "iOS";
+		const match = userAgent.match(/iphone os ([\d_]+)/i);
+		if (match?.[1]) {
+			osVersion = match[1].replace(/_/g, ".");
+		}
+	} else if (/linux/i.test(userAgent)) {
+		os = "Linux";
+	}
+
+	if (/edg\/([\d.]+)/i.test(userAgent)) {
+		browser = "Microsoft Edge";
+		browserVersion = userAgent.match(/edg\/([\d.]+)/i)?.[1] ?? "";
+	} else if (
+		/chrome\/([\d.]+)/i.test(userAgent) &&
+		!/chromium/i.test(userAgent)
+	) {
+		browser = "Chrome";
+		browserVersion = userAgent.match(/chrome\/([\d.]+)/i)?.[1] ?? "";
+	} else if (
+		/safari\/([\d.]+)/i.test(userAgent) &&
+		!/chrome/i.test(userAgent)
+	) {
+		browser = "Safari";
+		browserVersion = userAgent.match(/version\/([\d.]+)/i)?.[1] ?? "";
+	} else if (/firefox\/([\d.]+)/i.test(userAgent)) {
+		browser = "Firefox";
+		browserVersion = userAgent.match(/firefox\/([\d.]+)/i)?.[1] ?? "";
+	}
+
+	return {
+		browser,
+		browserVersion,
+		os,
+		osVersion,
+		device,
+		deviceModel: "",
+	};
+}
+
 export const ContactPanel = ({
 	contactSession,
 }: {
 	contactSession: Doc<"contactSessions"> | null | undefined;
 }) => {
-	const parseUserAgent = useMemo(() => {
-		return (userAgent?: string) => {
-			if (!userAgent) {
-				return { browser: "Unknown", os: "Unknown", device: "Unknown" };
-			}
-			const browser = Bowser.getParser(userAgent);
-			const result = browser.getResult();
-			return {
-				browser: result.browser.name || "Unknown",
-				browserVersion: result.browser.version || "",
-				os: result.os.name || "Unknown",
-				osVersion: result.os.version || "",
-				device: result.platform.type || "desktop",
-				deviceVendor: result.platform.vendor || "",
-				deviceModel: result.platform.model || "",
-			};
-		};
-	}, []);
-
 	const userAgentInfo = useMemo(
 		() => parseUserAgent(contactSession?.metadata?.userAgent),
-		[contactSession?.metadata?.userAgent, parseUserAgent],
+		[contactSession?.metadata?.userAgent],
 	);
 
 	const accordionSections = useMemo<InfoSection[]>(() => {

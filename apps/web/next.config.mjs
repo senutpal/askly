@@ -19,7 +19,12 @@ const nextConfig = {
 	},
 
 	experimental: {
-		optimizePackageImports: ["@workspace/ui", "motion", "lucide-react"],
+		optimizePackageImports: [
+			"@workspace/ui",
+			"motion",
+			"lucide-react",
+			"date-fns",
+		],
 	},
 
 	reactStrictMode: true,
