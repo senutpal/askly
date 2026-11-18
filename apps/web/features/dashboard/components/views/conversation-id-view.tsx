@@ -15,7 +15,6 @@ import {
 	AIInputToolbar,
 	AIInputTools,
 	AIMessage,
-	AIMessageContent,
 	AIResponse,
 	Button,
 	cn,
@@ -38,6 +37,31 @@ import { ConversationStatusButton } from "../conversation-status-button";
 const formSchema = z.object({
 	message: z.string().min(1, "Message is required"),
 });
+
+const skeletonWidths = ["w-48", "w-60", "w-72"];
+
+const MessageRowSkeleton = ({ index }: { index: number }) => {
+	const isFromCustomer = index % 2 === 1;
+
+	return (
+		<div
+			className={cn(
+				"flex w-full items-end gap-2 py-2",
+				isFromCustomer ? "flex-row-reverse justify-end" : "justify-end",
+			)}
+		>
+			<Skeleton
+				className={cn(
+					"h-4 rounded bg-neutral-200 dark:bg-gray-600",
+					skeletonWidths[index % skeletonWidths.length],
+				)}
+			/>
+			{isFromCustomer && (
+				<Skeleton className="size-8 rounded-full bg-neutral-200 dark:bg-gray-600" />
+			)}
+		</div>
+	);
+};
 
 export const ConversationIdView = ({
 	conversationId,
@@ -181,26 +205,9 @@ export const ConversationIdView = ({
 							"skeleton-6",
 							"skeleton-7",
 							"skeleton-8",
-						].map((skeletonId, index) => {
-							const isUser = index % 2 === 0;
-							const widths = ["w-48", "w-60", "w-72"];
-							const width = widths[index % widths.length];
-
-							return (
-								<div
-									className={cn(
-										"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
-										isUser ? "is-user" : "is-assistant flex-row-reverse",
-									)}
-									key={skeletonId}
-								>
-									<Skeleton
-										className={`h-9 ${width} rounded-lg bg-neutral-200 dark:bg-gray-600 `}
-									/>
-									<Skeleton className="size-8 rounded-full bg-neutral-200 dark:bg-gray-600" />
-								</div>
-							);
-						})
+						].map((skeletonId, index) => (
+							<MessageRowSkeleton index={index} key={skeletonId} />
+						))
 					) : (
 						<>
 							<InfiniteScrollTrigger
@@ -215,12 +222,12 @@ export const ConversationIdView = ({
 								)
 								?.map((message) => (
 									<AIMessage
-										from={message.role === "user" ? "user" : "assistant"}
+										from={message.role === "user" ? "assistant" : "user"}
 										key={message.id}
 									>
-										<AIMessageContent>
+										<div className="break-words text-sm">
 											<AIResponse>{message.text}</AIResponse>
-										</AIMessageContent>
+										</div>
 										{message.role === "user" && (
 											<DiceBearAvatar
 												seed={conversation?.contactSessionId ?? "user"}
@@ -230,10 +237,10 @@ export const ConversationIdView = ({
 									</AIMessage>
 								))}
 							{pendingMessage && (
-								<AIMessage className="opacity-60" from="assistant">
-									<AIMessageContent>
+								<AIMessage className="opacity-60" from="user">
+									<div className="break-words text-sm">
 										<AIResponse>{pendingMessage}</AIResponse>
-									</AIMessageContent>
+									</div>
 								</AIMessage>
 							)}
 						</>
@@ -328,26 +335,9 @@ export const ConversationIdViewLoading = () => {
 						"skeleton-6",
 						"skeleton-7",
 						"skeleton-8",
-					].map((skeletonId, index) => {
-						const isUser = index % 2 === 0;
-						const widths = ["w-48", "w-60", "w-72"];
-						const width = widths[index % widths.length];
-
-						return (
-							<div
-								className={cn(
-									"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
-									isUser ? "is-user" : "is-assistant flex-row-reverse",
-								)}
-								key={skeletonId}
-							>
-								<Skeleton
-									className={`h-9 ${width} rounded-lg bg-neutral-200 dark:bg-gray-600 `}
-								/>
-								<Skeleton className="size-8 rounded-full bg-neutral-200 dark:bg-gray-600" />
-							</div>
-						);
-					})}
+					].map((skeletonId, index) => (
+						<MessageRowSkeleton index={index} key={skeletonId} />
+					))}
 				</AIConversationContent>
 			</AIConversation>
 			<div className=" p-2">
