@@ -1,6 +1,7 @@
 "use client";
 
-import { Authenticated, AuthLoading } from "convex/react";
+import { RedirectToSignIn } from "@clerk/nextjs";
+import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { AuthLayout } from "@/features/auth";
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -13,6 +14,10 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 			<Authenticated>
 				<AuthLayout>{children}</AuthLayout>
 			</Authenticated>
+
+			<Unauthenticated>
+				<RedirectToSignIn />
+			</Unauthenticated>
 		</>
 	);
 };
