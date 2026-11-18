@@ -4,7 +4,7 @@ import { ConvexError, v } from "convex/values";
 import { parseHTML } from "linkedom";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import type { QueryCtx } from "../_generated/server";
+import type { ActionCtx, QueryCtx } from "../_generated/server";
 import {
 	action,
 	internalAction,
@@ -386,6 +386,206 @@ export const getResults = query({
 	},
 });
 
+async function importResource(
+	ctx: ActionCtx,
+	orgId: string,
+	jobId: Id<"crawlJobs">,
+	resourceId: Id<"crawlResults">,
+	orgRag: Awaited<ReturnType<typeof createOrganizationRAG>>["rag"],
+	namespace: string,
+	signature: string,
+): Promise<{
+	resourceId: Id<"crawlResults">;
+	success: boolean;
+	entryId?: string;
+	error?: string;
+	url: string;
+	title: string;
+}> {
+	const resource = await ctx.runQuery(internal.private.webCrawl.getResource, {
+		resourceId,
+	});
+	if (!resource) {
+		return {
+			resourceId,
+			success: false,
+			error: "Resource not found",
+			url: "",
+			title: "",
+		};
+	}
+	if (resource.jobId !== jobId) {
+		return {
+			resourceId,
+			success: false,
+			error: "Resource does not belong to this job",
+			url: resource.url,
+			title: resource.title,
+		};
+	}
+	if (
+		resource.addedToKnowledgeBase &&
+		resource.embeddingSignature === signature
+	) {
+		return {
+			resourceId,
+			success: true,
+			error: "Already in knowledge base",
+			url: resource.url,
+			title: resource.title,
+		};
+	}
+
+	assertPublicUrl(resource.url);
+
+	let filename = sanitizeFilename(resource.title);
+	let bytes: ArrayBuffer;
+	let mimeType: string;
+
+	if (resource.type === "text") {
+		const pageText = resource.text
+			? `# ${resource.title}\n\n${resource.text}`
+			: await fetchPageText(resource.url, resource.title);
+
+		const textOnly = (
+			resource.text ?? pageText.replace(/^#[^\n]*\n\n/, "")
+		).trim();
+		if (!textOnly || textOnly.length < 20) {
+			return {
+				resourceId,
+				success: false,
+				error:
+					"Page has no extractable text (client-rendered JavaScript sites are not supported)",
+				url: resource.url,
+				title: resource.title,
+			};
+		}
+
+		filename = `${filename.replace(/\.txt$/i, "")}.txt`;
+		bytes = new TextEncoder().encode(pageText).buffer as ArrayBuffer;
+		mimeType = "text/plain";
+	} else {
+		const response = await fetchPublicUrl(resource.url, {
+			responseType: "arraybuffer",
+			timeout: 30000,
+			maxContentLength: 10 * 1024 * 1024,
+		});
+		bytes = response.data as ArrayBuffer;
+		mimeType =
+			(response.headers["content-type"] as string | undefined) ||
+			guessMimeType(filename);
+	}
+
+	const blob = new Blob([bytes], { type: mimeType });
+	const storageId = await ctx.storage.store(blob);
+	const text = await extractTextContent(ctx, {
+		storageId,
+		filename,
+		bytes,
+		mimeType,
+		organizationId: orgId,
+	});
+	const { entryId, created } = await orgRag.add(ctx, {
+		namespace,
+		text,
+		key: filename,
+		metadata: {
+			storageId,
+			uploadedBy: orgId,
+			filename,
+			category: "web-crawl",
+			sourceUrl: resource.url,
+			crawledAt: Date.now(),
+		},
+		contentHash: await contentHashFromArrayBuffer(bytes),
+	});
+	if (!created) {
+		await ctx.storage.delete(storageId);
+	}
+	await ctx.runMutation(internal.private.webCrawl.markAsAdded, {
+		resourceId,
+		embeddingSignature: signature,
+	});
+	return {
+		resourceId,
+		success: true,
+		entryId,
+		url: resource.url,
+		title: resource.title,
+	};
+}
+
+export const addSingleResource = action({
+	args: {
+		jobId: v.id("crawlJobs"),
+		resourceId: v.id("crawlResults"),
+	},
+	returns: v.object({
+		resourceId: v.id("crawlResults"),
+		success: v.boolean(),
+		entryId: v.optional(v.string()),
+		error: v.optional(v.string()),
+		url: v.string(),
+		title: v.string(),
+	}),
+	handler: async (
+		ctx,
+		args,
+	): Promise<{
+		resourceId: Id<"crawlResults">;
+		success: boolean;
+		entryId?: string;
+		error?: string;
+		url: string;
+		title: string;
+	}> => {
+		const orgId = await requireOrgId(ctx);
+
+		const job = await ctx.runQuery(internal.private.webCrawl.getJobDocument, {
+			jobId: args.jobId,
+		});
+		if (!job || job.organizationId !== orgId) {
+			throw new ConvexError({ code: "NOT_FOUND", message: "Job not found" });
+		}
+
+		await ctx.runMutation(internal.system.rateLimit.consumeMany, {
+			buckets: [
+				{
+					key: `crawl:import:org:${orgId}`,
+					...RATE_LIMITS.crawlImportPerOrganization,
+				},
+			],
+		});
+
+		const {
+			rag: orgRag,
+			namespace,
+			embedding,
+		} = await createOrganizationRAG(ctx, orgId);
+		const signature = embeddingSignature(embedding);
+
+		try {
+			return await importResource(
+				ctx,
+				orgId,
+				args.jobId,
+				args.resourceId,
+				orgRag,
+				namespace,
+				signature,
+			);
+		} catch (error) {
+			return {
+				resourceId: args.resourceId,
+				success: false,
+				error: error instanceof Error ? error.message : "Unknown error",
+				url: "",
+				title: "",
+			};
+		}
+	},
+});
+
 export const addSelectedResources = action({
 	args: {
 		jobId: v.id("crawlJobs"),
@@ -403,7 +603,19 @@ export const addSelectedResources = action({
 		successful: v.number(),
 		failed: v.number(),
 	}),
-	handler: async (ctx, args) => {
+	handler: async (
+		ctx,
+		args,
+	): Promise<{
+		results: Array<{
+			resourceId: Id<"crawlResults">;
+			success: boolean;
+			entryId?: string;
+			error?: string;
+		}>;
+		successful: number;
+		failed: number;
+	}> => {
 		const orgId = await requireOrgId(ctx);
 
 		if (args.selectedResourceIds.length === 0) {
@@ -423,7 +635,6 @@ export const addSelectedResources = action({
 			throw new ConvexError({ code: "NOT_FOUND", message: "Job not found" });
 		}
 
-		// Importing triggers embeddings, so it gets its own budget.
 		await ctx.runMutation(internal.system.rateLimit.consumeMany, {
 			buckets: [
 				{
@@ -433,13 +644,6 @@ export const addSelectedResources = action({
 			],
 		});
 
-		const results: Array<{
-			resourceId: Id<"crawlResults">;
-			success: boolean;
-			entryId?: string;
-			error?: string;
-		}> = [];
-
 		const {
 			rag: orgRag,
 			namespace,
@@ -447,107 +651,31 @@ export const addSelectedResources = action({
 		} = await createOrganizationRAG(ctx, orgId);
 		const signature = embeddingSignature(embedding);
 
+		const results: Array<{
+			resourceId: Id<"crawlResults">;
+			success: boolean;
+			entryId?: string;
+			error?: string;
+		}> = [];
+
 		for (const resourceId of args.selectedResourceIds) {
 			try {
-				const resource = await ctx.runQuery(
-					internal.private.webCrawl.getResource,
-					{ resourceId },
-				);
-				if (!resource) {
-					results.push({
-						resourceId,
-						success: false,
-						error: "Resource not found",
-					});
-					continue;
-				}
-				if (resource.jobId !== args.jobId) {
-					results.push({
-						resourceId,
-						success: false,
-						error: "Resource does not belong to this job",
-					});
-					continue;
-				}
-				if (
-					resource.addedToKnowledgeBase &&
-					resource.embeddingSignature === signature
-				) {
-					results.push({
-						resourceId,
-						success: true,
-						error: "Already in knowledge base",
-					});
-					continue;
-				}
-
-				// Re-validate the stored URL before fetching: crawled pages are
-				// untrusted and may have injected internal/off-origin URLs.
-				assertPublicUrl(resource.url);
-
-				let filename = sanitizeFilename(resource.title);
-				let bytes: ArrayBuffer;
-				let mimeType: string;
-
-				if (resource.type === "text") {
-					// Prefer the text captured at crawl time: no second network
-					// call and the imported content matches what the user reviewed.
-					const pageText = resource.text
-						? `# ${resource.title}\n\n${resource.text}`
-						: await fetchPageText(resource.url, resource.title);
-
-					filename = `${filename.replace(/\.txt$/i, "")}.txt`;
-					bytes = new TextEncoder().encode(pageText).buffer as ArrayBuffer;
-					mimeType = "text/plain";
-				} else {
-					const response = await fetchPublicUrl(resource.url, {
-						responseType: "arraybuffer",
-						timeout: 30000,
-						maxContentLength: 10 * 1024 * 1024,
-					});
-					bytes = response.data as ArrayBuffer;
-					mimeType =
-						(response.headers["content-type"] as string | undefined) ||
-						guessMimeType(filename);
-				}
-
-				const blob = new Blob([bytes], { type: mimeType });
-				const storageId = await ctx.storage.store(blob);
-				const text = await extractTextContent(ctx, {
-					storageId,
-					filename,
-					bytes,
-					mimeType,
-					organizationId: orgId,
-				});
-				const { entryId, created } = await orgRag.add(ctx, {
+				const res = await importResource(
+					ctx,
+					orgId,
+					args.jobId,
+					resourceId,
+					orgRag,
 					namespace,
-					text,
-					key: filename,
-					metadata: {
-						storageId,
-						uploadedBy: orgId,
-						filename,
-						category: "web-crawl",
-						sourceUrl: resource.url,
-						crawledAt: Date.now(),
-					},
-					contentHash: await contentHashFromArrayBuffer(bytes),
-				});
-				if (!created) {
-					await ctx.storage.delete(storageId);
-				}
-				await ctx.runMutation(internal.private.webCrawl.markAsAdded, {
-					resourceId,
-					embeddingSignature: signature,
-				});
+					signature,
+				);
 				results.push({
-					resourceId,
-					success: true,
-					entryId,
+					resourceId: res.resourceId,
+					success: res.success,
+					entryId: res.entryId,
+					error: res.error,
 				});
 			} catch (error) {
-				console.error(`Error processing resource ${resourceId}:`, error);
 				results.push({
 					resourceId,
 					success: false,

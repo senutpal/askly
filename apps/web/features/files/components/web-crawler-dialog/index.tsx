@@ -16,7 +16,7 @@ import { ConvexError } from "convex/values";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { CheckCircleIcon, GlobeIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CompleteStep } from "./complete-step";
+import { CompleteStep, type ImportFailure } from "./complete-step";
 import { CrawlInputStep } from "./crawl-input-step";
 import { CrawlProgressStep } from "./crawl-progress-step";
 import { ImportProgressStep } from "./import-progress-step";
@@ -54,9 +54,7 @@ export const WebCrawlerDialog = ({
 	onOpenChange,
 }: WebCrawlerDialogProps) => {
 	const startCrawl = useAction(api.private.webCrawl.startCrawl);
-	const addSelectedResources = useAction(
-		api.private.webCrawl.addSelectedResources,
-	);
+	const addSingleResource = useAction(api.private.webCrawl.addSingleResource);
 	const cancelCrawl = useMutation(api.private.webCrawl.cancelCrawl);
 
 	const [step, setStep] = useState<CrawlStep>("input");
@@ -81,6 +79,7 @@ export const WebCrawlerDialog = ({
 		successful: 0,
 		failed: 0,
 	});
+	const [importFailures, setImportFailures] = useState<ImportFailure[]>([]);
 
 	const job = useQuery(api.private.webCrawl.getJob, jobId ? { jobId } : "skip");
 
@@ -180,6 +179,7 @@ export const WebCrawlerDialog = ({
 		if (selectedResourceIds.size === 0 || !jobId) return;
 
 		setCrawlError(null);
+		setImportFailures([]);
 		setStep("importing");
 		setImportProgress({
 			current: 0,
@@ -188,31 +188,53 @@ export const WebCrawlerDialog = ({
 			failed: 0,
 		});
 
-		try {
-			const result = await addSelectedResources({
-				jobId,
-				selectedResourceIds: Array.from(
-					selectedResourceIds,
-				) as Id<"crawlResults">[],
-			});
+		const ids = Array.from(selectedResourceIds) as Id<"crawlResults">[];
+		const failures: ImportFailure[] = [];
+		let successful = 0;
+		let failed = 0;
 
-			setImportProgress({
-				current: result.results.length,
-				total: selectedResourceIds.size,
-				successful: result.successful,
-				failed: result.failed,
-			});
+		let i = 0;
+		for (const resourceId of ids) {
+			try {
+				const result = await addSingleResource({
+					jobId,
+					resourceId,
+				});
 
-			setStep("complete");
-			if (result.failed === 0) {
-				setTimeout(() => {
-					handleClose();
-				}, 2000);
+				if (result.success) {
+					successful++;
+				} else {
+					failed++;
+					failures.push({
+						url: result.url,
+						error: result.error || "Failed to import",
+						title: result.title,
+					});
+				}
+			} catch (error) {
+				failed++;
+				failures.push({
+					url: `Resource ${resourceId}`,
+					error: getErrorMessage(error, "Failed to import"),
+					title: "Unknown",
+				});
 			}
-		} catch (error) {
-			console.error(error);
-			setCrawlError(getErrorMessage(error, "Failed to import resources"));
-			setStep("results");
+
+			i++;
+			setImportProgress({
+				current: i,
+				total: ids.length,
+				successful,
+				failed,
+			});
+		}
+
+		setImportFailures(failures);
+		setStep("complete");
+		if (failed === 0) {
+			setTimeout(() => {
+				handleClose();
+			}, 2000);
 		}
 	};
 
@@ -231,6 +253,7 @@ export const WebCrawlerDialog = ({
 			setJobId(null);
 			setSelectedResourceIds(new Set());
 			setImportProgress({ current: 0, total: 0, successful: 0, failed: 0 });
+			setImportFailures([]);
 		}, 1000);
 	};
 
@@ -375,6 +398,7 @@ export const WebCrawlerDialog = ({
 					<CompleteStep
 						successful={importProgress.successful}
 						failed={importProgress.failed}
+						failures={importFailures}
 					/>
 				)}
 
