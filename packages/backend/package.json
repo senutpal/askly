@@ -7,6 +7,7 @@
 		"setup": "convex dev --until-success",
 		"start": "convex dev",
 		"lint": "biome check convex",
+		"test": "vitest run",
 		"typecheck": "tsc --noEmit -p convex/tsconfig.json"
 	},
 	"exports": {
@@ -16,8 +17,10 @@
 		"@types/crypto-js": "^4.2.2",
 		"@types/node": "^20.19.9",
 		"@workspace/typescript-config": "workspace:*",
+		"convex-test": "^0.0.40",
 		"depcheck": "^1.4.7",
-		"typescript": "5.9.3"
+		"typescript": "5.9.3",
+		"vitest": "^3.2.4"
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^2.0.17",

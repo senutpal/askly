@@ -1,70 +1,43 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { authedMutation, authedQuery } from "../lib/functions";
+import { pluginDocValidator, pluginServiceValidator } from "../lib/validators";
 
-export const remove = mutation({
+export const remove = authedMutation({
 	args: {
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
+		service: pluginServiceValidator,
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "organization Not Found",
-			});
-		}
-
-		const exisitingPlugin = await ctx.db
+		const existingPlugin = await ctx.db
 			.query("plugins")
 			.withIndex("by_organization_id_and_service", (q) =>
-				q.eq("organizationId", orgId).eq("service", args.service),
+				q.eq("organizationId", ctx.orgId).eq("service", args.service),
 			)
 			.unique();
 
-		if (!exisitingPlugin) {
+		if (!existingPlugin) {
 			throw new ConvexError({
 				code: "NOT FOUND",
 				message: "Plugin Not Found",
 			});
 		}
 
-		await ctx.db.delete(exisitingPlugin._id);
+		await ctx.db.delete(existingPlugin._id);
+
+		return null;
 	},
 });
 
-export const getOne = query({
+export const getOne = authedQuery({
 	args: {
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
+		service: pluginServiceValidator,
 	},
+	returns: v.union(pluginDocValidator, v.null()),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "organization Not Found",
-			});
-		}
-
 		return await ctx.db
 			.query("plugins")
 			.withIndex("by_organization_id_and_service", (q) =>
-				q.eq("organizationId", orgId).eq("service", args.service),
+				q.eq("organizationId", ctx.orgId).eq("service", args.service),
 			)
 			.unique();
 	},

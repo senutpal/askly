@@ -4,6 +4,7 @@ import { ConvexError, v } from "convex/values";
 import { components, internal } from "../_generated/api";
 import { action, query } from "../_generated/server";
 import { RATE_LIMITS } from "../lib/rateLimit";
+import { messagePaginationValidator } from "../lib/validators";
 import {
 	createSupportAgent,
 	supportAgent,
@@ -18,6 +19,7 @@ export const create = action({
 		threadId: v.string(),
 		contactSessionId: v.id("contactSessions"),
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.runQuery(
 			internal.system.contactSessions.getOne,
@@ -96,7 +98,7 @@ export const create = action({
 			at: promptMessage._creationTime,
 		});
 
-		if (!shouldTriggerAgent) return;
+		if (!shouldTriggerAgent) return null;
 
 		const agent = await createSupportAgent(ctx, conversation.organizationId);
 		const result = await agent.generateText(
@@ -127,14 +129,18 @@ export const create = action({
 				agentName: lastOutput.agentName,
 			});
 		}
+
+		return null;
 	},
 });
+
 export const getMany = query({
 	args: {
 		threadId: v.string(),
 		paginationOpts: paginationOptsValidator,
 		contactSessionId: v.id("contactSessions"),
 	},
+	returns: messagePaginationValidator,
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.db.get(args.contactSessionId);
 		if (!contactSession || contactSession.expiresAt < Date.now()) {

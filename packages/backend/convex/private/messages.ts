@@ -3,8 +3,9 @@ import { generateText } from "ai";
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
-import { action, mutation, query } from "../_generated/server";
 import { adjustConversationStats } from "../lib/conversationStats";
+import { authedAction, authedMutation, authedQuery } from "../lib/functions";
+import { messagePaginationValidator } from "../lib/validators";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import {
 	GEMINI_MODEL,
@@ -12,26 +13,11 @@ import {
 } from "../system/ai/constants";
 import { createGoogleAI } from "../system/ai/helpers";
 
-export const enhanceResponse = action({
+export const enhanceResponse = authedAction({
 	args: { prompt: v.string() },
+	returns: v.string(),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "organization Not Found",
-			});
-		}
-
-		const gemini = await createGoogleAI(ctx, orgId, GEMINI_MODEL);
+		const gemini = await createGoogleAI(ctx, ctx.orgId, GEMINI_MODEL);
 
 		const response = await generateText({
 			model: gemini,
@@ -51,29 +37,13 @@ export const enhanceResponse = action({
 	},
 });
 
-export const create = mutation({
+export const create = authedMutation({
 	args: {
 		prompt: v.string(),
 		conversationId: v.id("conversations"),
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "organization Not Found",
-			});
-		}
-
 		const conversation = await ctx.db.get(args.conversationId);
 
 		if (!conversation) {
@@ -83,7 +53,7 @@ export const create = mutation({
 			});
 		}
 
-		if (conversation.organizationId !== orgId) {
+		if (conversation.organizationId !== ctx.orgId) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Organization Id",
@@ -100,7 +70,7 @@ export const create = mutation({
 		if (conversation.status === "unresolved") {
 			await ctx.db.patch(args.conversationId, { status: "escalated" });
 			await adjustConversationStats(ctx, {
-				organizationId: orgId,
+				organizationId: ctx.orgId,
 				from: "unresolved",
 				to: "escalated",
 			});
@@ -108,7 +78,7 @@ export const create = mutation({
 
 		const { message } = await saveMessage(ctx, components.agent, {
 			threadId: conversation.threadId,
-			agentName: identity.familyName,
+			agentName: ctx.identity.familyName,
 			message: {
 				role: "assistant",
 				content: args.prompt,
@@ -128,32 +98,18 @@ export const create = mutation({
 				},
 			});
 		}
+
+		return null;
 	},
 });
 
-export const getMany = query({
+export const getMany = authedQuery({
 	args: {
 		threadId: v.string(),
 		paginationOpts: paginationOptsValidator,
 	},
+	returns: messagePaginationValidator,
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "organization Not Found",
-			});
-		}
-
 		const conversation = await ctx.db
 			.query("conversations")
 			.withIndex("by_thread_id", (q) => q.eq("threadId", args.threadId))
@@ -166,18 +122,16 @@ export const getMany = query({
 			});
 		}
 
-		if (conversation.organizationId !== orgId) {
+		if (conversation.organizationId !== ctx.orgId) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid organization Id",
 			});
 		}
 
-		const paginated = await supportAgent.listMessages(ctx, {
+		return await supportAgent.listMessages(ctx, {
 			threadId: args.threadId,
 			paginationOpts: args.paginationOpts,
 		});
-
-		return paginated;
 	},
 });

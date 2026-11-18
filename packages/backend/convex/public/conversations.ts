@@ -4,43 +4,21 @@ import { ConvexError, v } from "convex/values";
 import { components } from "../_generated/api";
 import { mutation, query } from "../_generated/server";
 import { adjustConversationStats } from "../lib/conversationStats";
-import {
-	conversationStatusValidator,
-	lastMessageValidator,
-	toLastMessage,
-} from "../lib/conversations";
 import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
+import {
+	paginationResultValidator,
+	publicConversationListItemValidator,
+	publicConversationValidator,
+	toLastMessage,
+} from "../lib/validators";
 import { supportAgent } from "../system/ai/agents/supportAgent";
-
-const paginationResultValidator = v.object({
-	page: v.array(
-		v.object({
-			_id: v.id("conversations"),
-			_creationTime: v.number(),
-			status: conversationStatusValidator,
-			organizationId: v.string(),
-			threadId: v.string(),
-			lastMessage: v.union(lastMessageValidator, v.null()),
-		}),
-	),
-	isDone: v.boolean(),
-	continueCursor: v.string(),
-	splitCursor: v.optional(v.union(v.string(), v.null())),
-	pageStatus: v.optional(
-		v.union(
-			v.literal("SplitRecommended"),
-			v.literal("SplitRequired"),
-			v.null(),
-		),
-	),
-});
 
 export const getMany = query({
 	args: {
 		contactSessionId: v.id("contactSessions"),
 		paginationOpts: paginationOptsValidator,
 	},
-	returns: paginationResultValidator,
+	returns: paginationResultValidator(publicConversationListItemValidator),
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.db.get(args.contactSessionId);
 
@@ -98,6 +76,7 @@ export const getOne = query({
 		conversationId: v.id("conversations"),
 		contactSessionId: v.id("contactSessions"),
 	},
+	returns: publicConversationValidator,
 	handler: async (ctx, args) => {
 		const session = await ctx.db.get(args.contactSessionId);
 
@@ -134,6 +113,7 @@ export const create = mutation({
 	args: {
 		contactSessionId: v.id("contactSessions"),
 	},
+	returns: v.id("conversations"),
 	handler: async (ctx, args) => {
 		const session = await ctx.db.get(args.contactSessionId);
 

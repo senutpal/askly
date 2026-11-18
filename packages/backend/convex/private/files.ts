@@ -9,8 +9,10 @@ import {
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
-import { action, mutation, type QueryCtx, query } from "../_generated/server";
+import type { QueryCtx } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
+import { authedAction, authedMutation, authedQuery } from "../lib/functions";
+import { fileListValidator, fileUploadValidator } from "../lib/validators";
 import rag, { createRAG } from "../system/ai/rag";
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
@@ -21,28 +23,12 @@ function guessMimeType(filename: string, bytes: ArrayBuffer): string {
 	);
 }
 
-export const deleteFile = mutation({
+export const deleteFile = authedMutation({
 	args: { entryId: vEntryId },
+	returns: v.null(),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const namespace = await rag.getNamespace(ctx, {
-			namespace: orgId,
+			namespace: ctx.orgId,
 		});
 
 		if (!namespace) {
@@ -63,48 +49,36 @@ export const deleteFile = mutation({
 			});
 		}
 
-		if (entry.metadata?.uploadedBy !== orgId) {
+		if (entry.metadata?.uploadedBy !== ctx.orgId) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Organization",
 			});
 		}
 
-		if (entry.metadata?.storageId) {
-			await ctx.storage.delete(entry.metadata.storageId as Id<"_storage">);
+		const metadata = entry.metadata;
+
+		if (isEntryMetadata(metadata)) {
+			await ctx.storage.delete(metadata.storageId);
 		}
 
 		await rag.deleteAsync(ctx, {
 			entryId: args.entryId,
 		});
+
+		return null;
 	},
 });
 
-export const addFile = action({
+export const addFile = authedAction({
 	args: {
 		filename: v.string(),
 		mimeType: v.string(),
 		bytes: v.bytes(),
 		category: v.optional(v.string()),
 	},
+	returns: fileUploadValidator,
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const { bytes, filename, category } = args;
 		const mimeType = args.mimeType || guessMimeType(filename, bytes);
 
@@ -117,22 +91,21 @@ export const addFile = action({
 			filename,
 			bytes,
 			mimeType,
-			organizationId: orgId,
+			organizationId: ctx.orgId,
 		});
 
-		// Use organization-specific RAG instance
-		const orgRag = await createRAG(ctx, orgId);
+		const orgRag = await createRAG(ctx, ctx.orgId);
 
 		const { entryId, created } = await orgRag.add(ctx, {
-			namespace: orgId,
+			namespace: ctx.orgId,
 			text,
 			key: filename,
 			metadata: {
 				storageId,
-				uploadedBy: orgId,
+				uploadedBy: ctx.orgId,
 				filename,
 				category: category ?? null,
-			} as EntryMetadata,
+			} satisfies EntryMetadata,
 			contentHash: await contentHashFromArrayBuffer(bytes),
 		});
 
@@ -143,13 +116,12 @@ export const addFile = action({
 			await ctx.storage.delete(storageId);
 
 			const existingEntry = await orgRag.getEntry(ctx, { entryId });
-			const existingStorageId = (
-				existingEntry?.metadata as EntryMetadata | undefined
-			)?.storageId;
+			const existingMetadata = existingEntry?.metadata;
 
-			url = existingStorageId
-				? await ctx.storage.getUrl(existingStorageId)
-				: null;
+			url =
+				existingMetadata && isEntryMetadata(existingMetadata)
+					? await ctx.storage.getUrl(existingMetadata.storageId)
+					: null;
 		} else {
 			url = await ctx.storage.getUrl(storageId);
 		}
@@ -161,49 +133,14 @@ export const addFile = action({
 	},
 });
 
-export const list = query({
+export const list = authedQuery({
 	args: {
 		paginationOpts: paginationOptsValidator,
 	},
-	returns: v.object({
-		page: v.array(
-			v.object({
-				id: v.string(),
-				name: v.string(),
-				type: v.string(),
-				size: v.string(),
-				status: v.union(
-					v.literal("ready"),
-					v.literal("processing"),
-					v.literal("error"),
-				),
-				url: v.union(v.string(), v.null()),
-				category: v.optional(v.string()),
-			}),
-		),
-		isDone: v.boolean(),
-		continueCursor: v.string(),
-	}),
+	returns: fileListValidator,
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const namespace = await rag.getNamespace(ctx, {
-			namespace: orgId,
+			namespace: ctx.orgId,
 		});
 
 		if (!namespace) {
@@ -244,13 +181,30 @@ type EntryMetadata = {
 	category: string | null;
 };
 
+function isEntryMetadata(value: unknown): value is EntryMetadata {
+	if (typeof value !== "object" || value === null) {
+		return false;
+	}
+
+	return (
+		"storageId" in value &&
+		typeof value.storageId === "string" &&
+		"uploadedBy" in value &&
+		typeof value.uploadedBy === "string" &&
+		"filename" in value &&
+		typeof value.filename === "string" &&
+		"category" in value &&
+		(value.category === null || typeof value.category === "string")
+	);
+}
+
 async function convertEntryToPublicFile(
 	ctx: QueryCtx,
 	entry: Entry,
 ): Promise<PublicFile> {
-	const metadata = entry.metadata as EntryMetadata | undefined;
-
-	const storageId = metadata?.storageId;
+	const rawMetadata = entry.metadata;
+	const metadata = isEntryMetadata(rawMetadata) ? rawMetadata : null;
+	const storageId = metadata?.storageId ?? null;
 
 	let fileSize = "unknown";
 
@@ -262,7 +216,7 @@ async function convertEntryToPublicFile(
 				fileSize = formatFileSize(storageMetadata.size);
 			}
 		} catch (error) {
-			console.error("Failed to gte stroage metadata:", error);
+			console.error("Failed to get storage metadata:", error);
 		}
 	}
 	const filename = entry.key || "Unknown";

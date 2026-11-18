@@ -1,11 +1,13 @@
 import { createClerkClient } from "@clerk/backend";
 import { v } from "convex/values";
 import { action } from "../_generated/server";
+import { organizationValidationValidator } from "../lib/validators";
 
 export const validate = action({
 	args: {
 		organizationId: v.string(),
 	},
+	returns: organizationValidationValidator,
 	handler: async (_, args) => {
 		try {
 			// Construct the client lazily so a missing CLERK_SECRET_KEY cannot throw

@@ -63,7 +63,7 @@ export const VapiAssistantsTab = () => {
 								</TableCell>
 								<TableCell className="px-6 py-4">
 									<span className="text-sm">
-										{assistant.model?.model || "Not Configured"}
+										{assistant.model || "Not Configured"}
 									</span>
 								</TableCell>
 								<TableCell className="max-w-xs px-6 py-4 ">
