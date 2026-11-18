@@ -1,14 +1,16 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { pluginDocValidator, pluginServiceValidator } from "../lib/validators";
 
 export const upsert = internalMutation({
 	args: {
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
+		service: pluginServiceValidator,
 		organizationId: v.string(),
 		secretContent: v.string(),
 		iv: v.string(),
 		authTag: v.string(),
 	},
+	returns: v.null(),
 	async handler(ctx, args) {
 		const existingPlugin = await ctx.db
 			.query("plugins")
@@ -32,14 +34,17 @@ export const upsert = internalMutation({
 				authTag: args.authTag,
 			});
 		}
+
+		return null;
 	},
 });
 
 export const getByOrganizationIdAndService = internalQuery({
 	args: {
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
+		service: pluginServiceValidator,
 		organizationId: v.string(),
 	},
+	returns: v.union(pluginDocValidator, v.null()),
 	handler: async (ctx, args) => {
 		return await ctx.db
 			.query("plugins")

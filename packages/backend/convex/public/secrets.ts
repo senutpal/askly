@@ -1,16 +1,23 @@
 import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
+import type { Doc } from "../_generated/dataModel";
 import { action } from "../_generated/server";
+import {
+	isVapiCredentials,
+	type VapiCredentials,
+	vapiSecretsValidator,
+} from "../lib/validators";
 
 export const getVapiSecrets = action({
 	args: {
 		contactSessionId: v.id("contactSessions"),
 	},
-	handler: async (ctx, args) => {
-		const contactSession = (await ctx.runQuery(
+	returns: vapiSecretsValidator,
+	handler: async (ctx, args): Promise<{ publicApiKey: string }> => {
+		const contactSession: Doc<"contactSessions"> | null = await ctx.runQuery(
 			internal.system.contactSessions.getOne,
 			{ contactSessionId: args.contactSessionId },
-		)) as { organizationId: string; expiresAt: number } | null;
+		);
 
 		if (!contactSession || contactSession.expiresAt < Date.now()) {
 			throw new ConvexError({
@@ -22,21 +29,15 @@ export const getVapiSecrets = action({
 		// Organization is derived from the validated session, never from the caller.
 		const organizationId = contactSession.organizationId;
 
-		const plugin = (await ctx.runAction(
+		const secret: string | VapiCredentials = await ctx.runAction(
 			internal.system.secrets.getByOrganizationIdAndService,
 			{
 				organizationId,
 				service: "vapi",
 			},
-		)) as { privateApiKey: string; publicApiKey: string } | null;
+		);
 
-		if (!plugin) {
-			throw new ConvexError({ code: "NOT_FOUND", message: "Plugin Not Found" });
-		}
-
-		const { privateApiKey, publicApiKey } = plugin;
-
-		if (!privateApiKey || !publicApiKey) {
+		if (!isVapiCredentials(secret)) {
 			throw new ConvexError({
 				code: "NOT_FOUND",
 				message: "Credentials incomplete. Please reconnect your Vapi account",
@@ -45,7 +46,7 @@ export const getVapiSecrets = action({
 
 		// Only the public key is returned; the private key is never exposed.
 		return {
-			publicApiKey: publicApiKey,
+			publicApiKey: secret.publicApiKey,
 		};
 	},
 });

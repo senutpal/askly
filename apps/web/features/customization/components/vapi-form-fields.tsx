@@ -58,7 +58,7 @@ export const VapiFormField = ({ form }: VapiFormFieldProps) => {
 								{assistants.map((assistant) => (
 									<SelectItem key={assistant.id} value={assistant.id}>
 										{assistant.name || "Unnamed Assistant"} -{" "}
-										{assistant.model?.model || "Unknown Model"}
+										{assistant.model || "Unknown Model"}
 									</SelectItem>
 								))}
 							</SelectContent>

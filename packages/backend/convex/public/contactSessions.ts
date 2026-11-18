@@ -1,6 +1,10 @@
 import { v } from "convex/values";
 import { mutation } from "../_generated/server";
 import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
+import {
+	contactSessionMetadataValidator,
+	contactSessionValidationValidator,
+} from "../lib/validators";
 
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const MAX_NAME_LENGTH = 120;
@@ -11,23 +15,9 @@ export const create = mutation({
 		name: v.string(),
 		email: v.string(),
 		organizationId: v.string(),
-		metadata: v.optional(
-			v.object({
-				userAgent: v.optional(v.string()),
-				language: v.optional(v.string()),
-				languages: v.optional(v.string()),
-				platform: v.optional(v.string()),
-				vendor: v.optional(v.string()),
-				screenResolution: v.optional(v.string()),
-				viewportSize: v.optional(v.string()),
-				timezone: v.optional(v.string()),
-				timezoneOffset: v.optional(v.number()),
-				cookieEnabled: v.optional(v.boolean()),
-				referrer: v.optional(v.string()),
-				currentUrl: v.optional(v.string()),
-			}),
-		),
+		metadata: v.optional(contactSessionMetadataValidator),
 	},
+	returns: v.id("contactSessions"),
 	handler: async (ctx, args) => {
 		const name = args.name.trim();
 		if (!name) {
@@ -85,6 +75,7 @@ export const validate = mutation({
 	args: {
 		contactSessionId: v.id("contactSessions"),
 	},
+	returns: contactSessionValidationValidator,
 	handler: async (ctx, args) => {
 		const contactSession = await ctx.db.get(args.contactSessionId);
 

@@ -1,41 +1,22 @@
-import { ConvexError, v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { v } from "convex/values";
+import { authedMutation, authedQuery } from "../lib/functions";
+import {
+	defaultSuggestionsValidator,
+	vapiSettingsValidator,
+	widgetSettingsDocValidator,
+} from "../lib/validators";
 
-export const upsert = mutation({
+export const upsert = authedMutation({
 	args: {
 		greetMessage: v.string(),
-		defaultSuggestions: v.object({
-			suggestion1: v.optional(v.string()),
-			suggestion2: v.optional(v.string()),
-			suggestion3: v.optional(v.string()),
-		}),
-		vapiSettings: v.object({
-			assistantId: v.optional(v.string()),
-			phoneNumber: v.optional(v.string()),
-		}),
+		defaultSuggestions: defaultSuggestionsValidator,
+		vapiSettings: vapiSettingsValidator,
 	},
+	returns: v.union(widgetSettingsDocValidator, v.null()),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const existingWidgetSettings = await ctx.db
 			.query("widgetSettings")
-			.withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+			.withIndex("by_organization_id", (q) => q.eq("organizationId", ctx.orgId))
 			.unique();
 
 		if (existingWidgetSettings) {
@@ -45,44 +26,25 @@ export const upsert = mutation({
 				vapiSettings: args.vapiSettings,
 			});
 			return await ctx.db.get(existingWidgetSettings._id);
-		} else {
-			const newId = await ctx.db.insert("widgetSettings", {
-				organizationId: orgId,
-				greetMessage: args.greetMessage,
-				defaultSuggestions: args.defaultSuggestions,
-				vapiSettings: args.vapiSettings,
-			});
-			return await ctx.db.get(newId);
 		}
+
+		const newId = await ctx.db.insert("widgetSettings", {
+			organizationId: ctx.orgId,
+			greetMessage: args.greetMessage,
+			defaultSuggestions: args.defaultSuggestions,
+			vapiSettings: args.vapiSettings,
+		});
+		return await ctx.db.get(newId);
 	},
 });
 
-export const getOne = query({
+export const getOne = authedQuery({
 	args: {},
+	returns: v.union(widgetSettingsDocValidator, v.null()),
 	handler: async (ctx) => {
-		const identity = await ctx.auth.getUserIdentity();
-
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
-		const widgetSettings = await ctx.db
+		return await ctx.db
 			.query("widgetSettings")
-			.withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+			.withIndex("by_organization_id", (q) => q.eq("organizationId", ctx.orgId))
 			.unique();
-
-		return widgetSettings;
 	},
 });

@@ -3,14 +3,22 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { internalAction } from "../_generated/server";
+import {
+	isVapiCredentials,
+	pluginServiceValidator,
+	secretValidator,
+} from "../lib/validators";
 import { decrypt, encrypt } from "../userApiKeys/helpers";
 
 export const upsert = internalAction({
 	args: {
 		organizationId: v.string(),
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
-		text: v.any(),
+		service: pluginServiceValidator,
+		text: secretValidator,
 	},
+	returns: v.object({
+		status: v.string(),
+	}),
 	handler: async (ctx, args) => {
 		const textToEncrypt =
 			typeof args.text === "string" ? args.text : JSON.stringify(args.text);
@@ -30,8 +38,9 @@ export const upsert = internalAction({
 export const getByOrganizationIdAndService = internalAction({
 	args: {
 		organizationId: v.string(),
-		service: v.union(v.literal("vapi"), v.literal("google-ai")),
+		service: pluginServiceValidator,
 	},
+	returns: secretValidator,
 	handler: async (ctx, args) => {
 		const encrypted = await ctx.runQuery(
 			internal.system.plugins.getByOrganizationIdAndService,
@@ -48,7 +57,13 @@ export const getByOrganizationIdAndService = internalAction({
 		const decrypted = decrypt(iv, secretContent, authTag);
 
 		try {
-			return JSON.parse(decrypted);
+			const parsed: unknown = JSON.parse(decrypted);
+
+			if (typeof parsed === "string") {
+				return parsed;
+			}
+
+			return isVapiCredentials(parsed) ? parsed : decrypted;
 		} catch {
 			return decrypted;
 		}

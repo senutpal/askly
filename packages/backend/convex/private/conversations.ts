@@ -1,73 +1,27 @@
-import { type PaginationResult, paginationOptsValidator } from "convex/server";
+import type { PaginationResult } from "convex/server";
+import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
-import { mutation, query } from "../_generated/server";
 import {
 	adjustConversationStats,
 	countConversations,
 } from "../lib/conversationStats";
+import { authedMutation, authedQuery } from "../lib/functions";
 import {
-	contactSessionFields,
+	conversationListItemValidator,
+	conversationStatsValidator,
 	conversationStatusValidator,
-	lastMessageValidator,
-} from "../lib/conversations";
+	conversationWithContactSessionValidator,
+	paginationResultValidator,
+} from "../lib/validators";
 
-const paginationResultValidator = v.object({
-	page: v.array(
-		v.object({
-			_id: v.id("conversations"),
-			_creationTime: v.number(),
-			threadId: v.string(),
-			organizationId: v.string(),
-			contactSessionId: v.id("contactSessions"),
-			status: conversationStatusValidator,
-			lastMessage: v.union(lastMessageValidator, v.null()),
-			contactSession: v.object({
-				_id: v.id("contactSessions"),
-				_creationTime: v.number(),
-				...contactSessionFields,
-			}),
-		}),
-	),
-	isDone: v.boolean(),
-	continueCursor: v.string(),
-	splitCursor: v.optional(v.union(v.string(), v.null())),
-	pageStatus: v.optional(
-		v.union(
-			v.literal("SplitRecommended"),
-			v.literal("SplitRequired"),
-			v.null(),
-		),
-	),
-});
-
-export const updateStatus = mutation({
+export const updateStatus = authedMutation({
 	args: {
 		conversationId: v.id("conversations"),
-		status: v.union(
-			v.literal("unresolved"),
-			v.literal("escalated"),
-			v.literal("resolved"),
-		),
+		status: conversationStatusValidator,
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const conversation = await ctx.db.get(args.conversationId);
 		if (!conversation) {
 			throw new ConvexError({
@@ -76,48 +30,34 @@ export const updateStatus = mutation({
 			});
 		}
 
-		if (conversation.organizationId !== orgId) {
+		if (conversation.organizationId !== ctx.orgId) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Conversation does not belong to your organization",
 			});
 		}
 
-		if (conversation.status === args.status) return;
+		if (conversation.status === args.status) return null;
 
 		await ctx.db.patch(args.conversationId, {
 			status: args.status,
 		});
 		await adjustConversationStats(ctx, {
-			organizationId: orgId,
+			organizationId: ctx.orgId,
 			from: conversation.status,
 			to: args.status,
 		});
+
+		return null;
 	},
 });
 
-export const getOne = query({
+export const getOne = authedQuery({
 	args: {
 		conversationId: v.id("conversations"),
 	},
+	returns: conversationWithContactSessionValidator,
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const conversation = await ctx.db.get(args.conversationId);
 		if (!conversation) {
 			throw new ConvexError({
@@ -126,7 +66,7 @@ export const getOne = query({
 			});
 		}
 
-		if (conversation.organizationId !== orgId) {
+		if (conversation.organizationId !== ctx.orgId) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Organization ID",
@@ -149,46 +89,30 @@ export const getOne = query({
 	},
 });
 
-export const getMany = query({
+export const getMany = authedQuery({
 	args: {
 		paginationOpts: paginationOptsValidator,
 		status: v.optional(conversationStatusValidator),
 	},
-	returns: paginationResultValidator,
+	returns: paginationResultValidator(conversationListItemValidator),
 	handler: async (ctx, args) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		let conversations: PaginationResult<Doc<"conversations">>;
+		const status = args.status;
 
-		if (args.status) {
+		if (status) {
 			conversations = await ctx.db
 				.query("conversations")
 				.withIndex("by_status_and_organization_id", (q) =>
-					q
-						.eq("status", args.status as Doc<"conversations">["status"])
-						.eq("organizationId", orgId),
+					q.eq("status", status).eq("organizationId", ctx.orgId),
 				)
 				.order("desc")
 				.paginate(args.paginationOpts);
 		} else {
 			conversations = await ctx.db
 				.query("conversations")
-				.withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+				.withIndex("by_organization_id", (q) =>
+					q.eq("organizationId", ctx.orgId),
+				)
 				.order("desc")
 				.paginate(args.paginationOpts);
 		}
@@ -220,36 +144,13 @@ export const getMany = query({
 	},
 });
 
-export const getStats = query({
+export const getStats = authedQuery({
 	args: {},
-	returns: v.object({
-		unresolved: v.number(),
-		escalated: v.number(),
-		resolved: v.number(),
-		total: v.number(),
-		approximate: v.boolean(),
-	}),
+	returns: conversationStatsValidator,
 	handler: async (ctx) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (identity === null) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Identity Not Found",
-			});
-		}
-
-		const orgId = identity.orgId as string;
-
-		if (!orgId) {
-			throw new ConvexError({
-				code: "UNAUTHORIZED",
-				message: "Organization Not Found",
-			});
-		}
-
 		const stats = await ctx.db
 			.query("conversationStats")
-			.withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+			.withIndex("by_organization_id", (q) => q.eq("organizationId", ctx.orgId))
 			.unique();
 
 		if (stats) {
@@ -264,7 +165,7 @@ export const getStats = query({
 			};
 		}
 
-		const { counts, approximate } = await countConversations(ctx.db, orgId);
+		const { counts, approximate } = await countConversations(ctx.db, ctx.orgId);
 
 		return {
 			...counts,

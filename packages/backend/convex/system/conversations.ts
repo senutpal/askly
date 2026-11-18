@@ -1,12 +1,16 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
 import { adjustConversationStats } from "../lib/conversationStats";
-import { lastMessageRoleValidator } from "../lib/conversations";
+import {
+	conversationDocValidator,
+	lastMessageRoleValidator,
+} from "../lib/validators";
 
 export const escalate = internalMutation({
 	args: {
 		threadId: v.string(),
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
 		const conversation = await ctx.db
 			.query("conversations")
@@ -20,7 +24,7 @@ export const escalate = internalMutation({
 			});
 		}
 
-		if (conversation.status === "escalated") return;
+		if (conversation.status === "escalated") return null;
 
 		await ctx.db.patch(conversation._id, { status: "escalated" });
 		await adjustConversationStats(ctx, {
@@ -28,6 +32,8 @@ export const escalate = internalMutation({
 			from: conversation.status,
 			to: "escalated",
 		});
+
+		return null;
 	},
 });
 
@@ -35,6 +41,7 @@ export const resolve = internalMutation({
 	args: {
 		threadId: v.string(),
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
 		const conversation = await ctx.db
 			.query("conversations")
@@ -48,7 +55,7 @@ export const resolve = internalMutation({
 			});
 		}
 
-		if (conversation.status === "resolved") return;
+		if (conversation.status === "resolved") return null;
 
 		await ctx.db.patch(conversation._id, { status: "resolved" });
 		await adjustConversationStats(ctx, {
@@ -56,6 +63,8 @@ export const resolve = internalMutation({
 			from: conversation.status,
 			to: "resolved",
 		});
+
+		return null;
 	},
 });
 
@@ -67,11 +76,12 @@ export const updateLastMessage = internalMutation({
 		at: v.number(),
 		agentName: v.optional(v.string()),
 	},
+	returns: v.null(),
 	handler: async (ctx, args) => {
 		const conversation = await ctx.db.get(args.conversationId);
-		if (!conversation) return;
+		if (!conversation) return null;
 		if (conversation.lastMessage && conversation.lastMessage.at > args.at) {
-			return;
+			return null;
 		}
 
 		await ctx.db.patch(args.conversationId, {
@@ -82,6 +92,8 @@ export const updateLastMessage = internalMutation({
 				...(args.agentName ? { agentName: args.agentName } : {}),
 			},
 		});
+
+		return null;
 	},
 });
 
@@ -89,12 +101,11 @@ export const getByThreadId = internalQuery({
 	args: {
 		threadId: v.string(),
 	},
+	returns: v.union(conversationDocValidator, v.null()),
 	handler: async (ctx, args) => {
-		const conversation = ctx.db
+		return await ctx.db
 			.query("conversations")
 			.withIndex("by_thread_id", (q) => q.eq("threadId", args.threadId))
 			.unique();
-
-		return conversation;
 	},
 });
