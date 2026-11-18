@@ -1,5 +1,7 @@
 "use client";
 
+import { SignInButton } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LANDING_LINKS } from "../config";
@@ -144,9 +146,11 @@ export const SiteNav = () => {
 					<Link href={LANDING_LINKS.docs}>Docs</Link>
 					<a href={LANDING_LINKS.github}>GitHub</a>
 				</div>
-				<Link className={styles.signIn} href={LANDING_LINKS.signIn}>
-					Sign in <Arrow />
-				</Link>
+				<SignInButton mode="modal" appearance={{ baseTheme: dark }}>
+					<button type="button" className={styles.signIn}>
+						Sign in <Arrow />
+					</button>
+				</SignInButton>
 				<button
 					ref={toggleRef}
 					type="button"
@@ -191,14 +195,11 @@ export const SiteNav = () => {
 					>
 						GitHub <Arrow />
 					</a>
-					<Link
-						href={LANDING_LINKS.signIn}
-						onClick={(event) => {
-							if (isCurrentTabClick(event)) closeMenu();
-						}}
-					>
-						Sign in <Arrow />
-					</Link>
+					<SignInButton mode="modal" appearance={{ baseTheme: dark }}>
+						<button type="button" onClick={closeMenu}>
+							Sign in <Arrow />
+						</button>
+					</SignInButton>
 				</div>
 			</nav>
 		</header>

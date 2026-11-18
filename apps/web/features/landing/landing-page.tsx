@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { SignUpButton } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { Arrow } from "./components/arrow";
 import { ChatDemo } from "./components/chat-demo";
 import { DashboardPreview } from "./components/dashboard-preview";
@@ -6,7 +7,6 @@ import { Landscape } from "./components/landscape";
 import { Setup } from "./components/setup";
 import { SiteFooter } from "./components/site-footer";
 import { SiteNav } from "./components/site-nav";
-import { LANDING_LINKS } from "./config";
 import { inter } from "./font";
 import styles from "./styles/landing.module.css";
 
@@ -34,9 +34,11 @@ export const LandingPage = () => {
 							conversation to your team when needed.
 						</p>
 						<div className={styles.heroActions}>
-							<Link className={styles.startLink} href={LANDING_LINKS.signUp}>
-								Get started <Arrow />
-							</Link>
+							<SignUpButton mode="modal" appearance={{ baseTheme: dark }}>
+								<button type="button" className={styles.startLink}>
+									Get started <Arrow />
+								</button>
+							</SignUpButton>
 						</div>
 					</div>
 					<DashboardPreview />

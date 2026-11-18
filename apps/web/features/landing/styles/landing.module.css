@@ -131,6 +131,11 @@
 .signIn {
 	justify-self: end;
 	gap: 8px;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	cursor: pointer;
 	font-size: 14px;
 	font-weight: 500;
 }
@@ -228,6 +233,10 @@ a:hover > .arrow {
 }
 
 .startLink {
+	border: 0;
+	background: transparent;
+	padding: 0;
+	cursor: pointer;
 	font-size: 15px;
 	font-weight: 650;
 	transition:
@@ -839,23 +848,33 @@ a:hover > .arrow {
 		padding-bottom: 24px;
 	}
 
-	.mobileLinks a {
+	.mobileLinks a,
+	.mobileLinks button {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		width: 100%;
 		min-height: 68px;
+		border: 0;
 		border-bottom: 1px solid var(--line);
+		background: transparent;
+		padding: 0;
+		color: inherit;
 		font-size: 30px;
 		font-weight: 550;
 		letter-spacing: -0.035em;
+		text-align: left;
+		cursor: pointer;
 		transition: color 160ms var(--ease);
 	}
 
-	.mobileLinks a:hover {
+	.mobileLinks a:hover,
+	.mobileLinks button:hover {
 		color: var(--accent);
 	}
 
-	.mobileLinks a .arrow {
+	.mobileLinks a .arrow,
+	.mobileLinks button .arrow {
 		margin-right: 2px;
 	}
 
