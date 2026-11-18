@@ -9,15 +9,33 @@ import { Logo } from "./logo";
 
 const focusableSelector = "a[href], button:not([disabled])";
 
+const isCurrentTabClick = (event: React.MouseEvent<HTMLAnchorElement>) =>
+	event.button === 0 &&
+	!event.altKey &&
+	!event.ctrlKey &&
+	!event.metaKey &&
+	!event.shiftKey;
+
 export const SiteNav = () => {
 	const [open, setOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
+	const brandRef = useRef<HTMLAnchorElement>(null);
 	const toggleRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
 		const media = window.matchMedia("(max-width: 660px)");
 		const closeOnDesktop = (event: MediaQueryListEvent) => {
-			if (!event.matches) setOpen(false);
+			if (event.matches) return;
+
+			const activeElement = document.activeElement;
+			const focusLost =
+				activeElement === toggleRef.current ||
+				(activeElement instanceof HTMLElement &&
+					Boolean(activeElement.closest("#landing-mobile-menu")));
+
+			setOpen(false);
+
+			if (focusLost) brandRef.current?.focus();
 		};
 
 		media.addEventListener("change", closeOnDesktop);
@@ -86,6 +104,7 @@ export const SiteNav = () => {
 				onKeyDown={handleKeyDown}
 			>
 				<a
+					ref={brandRef}
 					className={styles.brand}
 					href={LANDING_LINKS.top}
 					aria-label="Askly home"
@@ -107,7 +126,10 @@ export const SiteNav = () => {
 					className={styles.menuToggle}
 					aria-expanded={open}
 					aria-controls="landing-mobile-menu"
-					onClick={() => setOpen((value) => !value)}
+					onClick={() => {
+						if (!open) toggleRef.current?.focus();
+						setOpen((value) => !value);
+					}}
 				>
 					<span className={styles.visuallyHidden}>
 						{open ? "Close menu" : "Menu"}
@@ -128,14 +150,28 @@ export const SiteNav = () => {
 				>
 					<a
 						href={LANDING_LINKS.demo}
-						onClick={() => closeMenuForHash(LANDING_LINKS.demo)}
+						onClick={(event) => {
+							if (isCurrentTabClick(event)) {
+								closeMenuForHash(LANDING_LINKS.demo);
+							}
+						}}
 					>
 						Demo <Arrow />
 					</a>
-					<Link href={LANDING_LINKS.docs} onClick={closeMenu}>
+					<Link
+						href={LANDING_LINKS.docs}
+						onClick={(event) => {
+							if (isCurrentTabClick(event)) closeMenu();
+						}}
+					>
 						Docs <Arrow />
 					</Link>
-					<Link href={LANDING_LINKS.signIn} onClick={closeMenu}>
+					<Link
+						href={LANDING_LINKS.signIn}
+						onClick={(event) => {
+							if (isCurrentTabClick(event)) closeMenu();
+						}}
+					>
 						Sign in <Arrow />
 					</Link>
 				</div>

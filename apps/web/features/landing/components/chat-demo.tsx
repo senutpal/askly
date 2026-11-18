@@ -21,6 +21,10 @@ export const ChatDemo = () => {
 		const updateOrientation = () => setStacked(media.matches);
 
 		updateOrientation();
+		const focusedPanel = panelsRef.current.findIndex((panel) =>
+			panel?.contains(document.activeElement),
+		);
+		if (focusedPanel > 0) setActive(focusedPanel);
 		setEnhanced(true);
 		media.addEventListener("change", updateOrientation);
 
@@ -100,7 +104,7 @@ export const ChatDemo = () => {
 				"details[open]",
 			);
 
-		if (!citation) return;
+		if (!citation || !citation.contains(event.target as Node)) return;
 
 		citation.removeAttribute("open");
 		tabsRef.current[active]?.focus();
@@ -172,6 +176,7 @@ export const ChatDemo = () => {
 									id={`sample-${index}`}
 									role="tabpanel"
 									aria-labelledby={`sample-tab-${index}`}
+									tabIndex={enhanced ? 0 : undefined}
 									hidden={enhanced && index !== active}
 								>
 									<h3 className={styles.demoFallbackTitle}>{name}</h3>
