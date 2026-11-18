@@ -17,7 +17,7 @@ import {
 	Label,
 	Separator,
 } from "@workspace/ui";
-import { useMutation } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Globe2, Phone, PhoneCall, Workflow } from "lucide-react";
 import { useState } from "react";
@@ -62,7 +62,7 @@ const VapiPluginForm = ({
 	open: boolean;
 	setOpen: (value: boolean) => void;
 }) => {
-	const upsertSecret = useMutation(api.private.secrets.upsert);
+	const upsertSecret = useAction(api.private.secrets.upsert);
 	const form = useForm<z.infer<typeof formSchema>>({
 		defaultValues: {
 			publicApiKey: "",
