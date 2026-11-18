@@ -1,7 +1,7 @@
 import { ConvexError } from "convex/values";
 import { convexTest } from "convex-test";
-import { describe, expect, it } from "vitest";
-import { api } from "../_generated/api";
+import { afterAll, describe, expect, it } from "vitest";
+import { api, internal } from "../_generated/api";
 import schema from "../schema";
 
 declare global {
@@ -11,6 +11,17 @@ declare global {
 }
 
 const modules = import.meta.glob(["../**/*.ts", "!../**/*.test.ts"]);
+
+const originalMasterKey = process.env.MASTER_KEY;
+process.env.MASTER_KEY = "test-master-key";
+
+afterAll(() => {
+	if (originalMasterKey === undefined) {
+		delete process.env.MASTER_KEY;
+	} else {
+		process.env.MASTER_KEY = originalMasterKey;
+	}
+});
 
 const setup = () => convexTest(schema, modules);
 
@@ -120,15 +131,50 @@ describe("authed functions", () => {
 		});
 	});
 
-	it("runs actions for an authenticated organization", async () => {
+	it("uses the authenticated organization for Vapi lookups", async () => {
 		const t = setup();
-		process.env.MASTER_KEY = "test-master-key";
 
-		await expect(
+		await t.action(internal.system.secrets.upsert, {
+			organizationId: "org_a",
+			service: "vapi",
+			text: "invalid-credentials",
+		});
+
+		await expectConvexError(
 			t
 				.withIdentity({ orgId: "org_a" })
 				.action(api.private.vapi.getPhoneNumbers),
+			{
+				code: "NOT_FOUND",
+				message: "Credentials incomplete. Please reconnect your Vapi account",
+			},
+		);
+
+		await expect(
+			t
+				.withIdentity({ orgId: "org_b" })
+				.action(api.private.vapi.getPhoneNumbers),
 		).rejects.toThrow("Plugin not found");
+	});
+
+	it("rejects Vapi credentials with empty keys", async () => {
+		const t = setup();
+
+		await t.action(internal.system.secrets.upsert, {
+			organizationId: "org_a",
+			service: "vapi",
+			text: { privateApiKey: "", publicApiKey: "public-key" },
+		});
+
+		await expectConvexError(
+			t
+				.withIdentity({ orgId: "org_a" })
+				.action(api.private.vapi.getPhoneNumbers),
+			{
+				code: "NOT_FOUND",
+				message: "Credentials incomplete. Please reconnect your Vapi account",
+			},
+		);
 	});
 
 	it("creates widget settings for the authenticated organization", async () => {

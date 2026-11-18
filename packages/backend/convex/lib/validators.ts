@@ -153,8 +153,10 @@ export const isVapiCredentials = (value: unknown): value is VapiCredentials => {
 	return (
 		"privateApiKey" in value &&
 		typeof value.privateApiKey === "string" &&
+		value.privateApiKey.length > 0 &&
 		"publicApiKey" in value &&
-		typeof value.publicApiKey === "string"
+		typeof value.publicApiKey === "string" &&
+		value.publicApiKey.length > 0
 	);
 };
 
