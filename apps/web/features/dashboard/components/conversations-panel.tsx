@@ -16,6 +16,7 @@ import {
 	Skeleton,
 	useInfiniteScroll,
 } from "@workspace/ui";
+import { useConvex } from "convex/react";
 import { usePaginatedQuery } from "convex-helpers/react/cache/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { useAtomValue, useSetAtom } from "jotai/react";
@@ -28,6 +29,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import { statusFilterAtom } from "../atoms";
 
 export const ConversationsPanel = () => {
@@ -35,6 +37,27 @@ export const ConversationsPanel = () => {
 	const setStatusFilter = useSetAtom(statusFilterAtom);
 
 	const pathname = usePathname();
+	const convex = useConvex();
+
+	const handlePrefetch = useCallback(
+		(conv: (typeof conversations.results)[number]) => {
+			convex.prewarmQuery({
+				query: api.private.conversations.getOne,
+				args: { conversationId: conv._id },
+			});
+			if (conv.threadId) {
+				convex.prewarmQuery({
+					query: api.private.messages.getMany,
+					args: {
+						threadId: conv.threadId,
+						paginationOpts: { numItems: 10, cursor: null },
+					},
+				});
+			}
+		},
+		[convex],
+	);
+
 	const conversations = usePaginatedQuery(
 		api.private.conversations.getMany,
 		{
@@ -116,6 +139,8 @@ export const ConversationsPanel = () => {
 											"bg-accent text-accent-foreground",
 									)}
 									href={`/conversations/${conversation._id}`}
+									onPointerEnter={() => handlePrefetch(conversation)}
+									onFocus={() => handlePrefetch(conversation)}
 								>
 									<div
 										className={cn(

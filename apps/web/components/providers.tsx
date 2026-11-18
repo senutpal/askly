@@ -30,7 +30,9 @@ function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
 			<Toaster />
 			<ClerkProvider appearance={appearance}>
 				<ConvexProviderWithClerk useAuth={useAuth} client={convex}>
-					<ConvexQueryCacheProvider>{children}</ConvexQueryCacheProvider>
+					<ConvexQueryCacheProvider expiration={300000} maxIdleEntries={64}>
+						{children}
+					</ConvexQueryCacheProvider>
 				</ConvexProviderWithClerk>
 			</ClerkProvider>
 		</>

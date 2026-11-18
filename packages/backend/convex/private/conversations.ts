@@ -10,9 +10,7 @@ import {
 	contactSessionFields,
 	conversationStatusValidator,
 	lastMessageValidator,
-	toLastMessage,
 } from "../lib/conversations";
-import { supportAgent } from "../system/ai/agents/supportAgent";
 
 const paginationResultValidator = v.object({
 	page: v.array(
@@ -203,23 +201,9 @@ export const getMany = query({
 					return null;
 				}
 
-				let lastMessage = conversation.lastMessage ?? null;
-
-				if (!conversation.lastMessage) {
-					const messages = await supportAgent.listMessages(ctx, {
-						threadId: conversation.threadId,
-						paginationOpts: {
-							numItems: 1,
-							cursor: null,
-						},
-					});
-					const message = messages.page[0];
-					lastMessage = message ? toLastMessage(message) : null;
-				}
-
 				return {
 					...conversation,
-					lastMessage,
+					lastMessage: conversation.lastMessage ?? null,
 					contactSession,
 				};
 			}),

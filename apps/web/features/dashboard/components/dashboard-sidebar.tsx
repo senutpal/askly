@@ -17,6 +17,7 @@ import {
 	SidebarRail,
 	useSidebar,
 } from "@workspace/ui";
+import { useConvex } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import {
 	Blocks,
@@ -30,11 +31,63 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 
 export const DashboardSidebar = () => {
 	const pathname = usePathname();
 	const { state } = useSidebar();
 	const isCollapsed = state === "collapsed";
+	const convex = useConvex();
+
+	const handlePrefetch = useCallback(
+		(url: string) => {
+			if (url === "/conversations") {
+				convex.prewarmQuery({
+					query: api.private.conversations.getMany,
+					args: { paginationOpts: { numItems: 20, cursor: null } },
+				});
+			} else if (url === "/files") {
+				convex.prewarmQuery({
+					query: api.private.files.list,
+					args: { paginationOpts: { numItems: 10, cursor: null } },
+				});
+			} else if (url === "/customization") {
+				convex.prewarmQuery({
+					query: api.private.widgetSettings.getOne,
+					args: {},
+				});
+			} else if (url === "/integrations") {
+				convex.prewarmQuery({
+					query: api.private.plugins.getOne,
+					args: { service: "vapi" },
+				});
+				convex.prewarmQuery({
+					query: api.private.plugins.getOne,
+					args: { service: "google-ai" },
+				});
+			} else if (url === "/plugins/vapi") {
+				convex.prewarmQuery({
+					query: api.private.plugins.getOne,
+					args: { service: "vapi" },
+				});
+			} else if (url === "/plugins/gemini") {
+				convex.prewarmQuery({
+					query: api.private.plugins.getOne,
+					args: { service: "google-ai" },
+				});
+			} else if (url === "/") {
+				convex.prewarmQuery({
+					query: api.private.conversations.getMany,
+					args: { paginationOpts: { numItems: 5, cursor: null } },
+				});
+				convex.prewarmQuery({
+					query: api.private.conversations.getStats,
+					args: {},
+				});
+			}
+		},
+		[convex],
+	);
 
 	const escalatedStats = useQuery(api.private.conversations.getStats);
 	const escalatedCount = escalatedStats?.escalated ?? 0;
@@ -177,6 +230,8 @@ export const DashboardSidebar = () => {
 												<Link
 													href={item.url}
 													className="flex items-center gap-3"
+													onPointerEnter={() => handlePrefetch(item.url)}
+													onFocus={() => handlePrefetch(item.url)}
 												>
 													<item.icon
 														className={cn(
