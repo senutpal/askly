@@ -97,6 +97,13 @@ export const getOrganizationEmbeddingModel = async (
 	return {
 		settings,
 		embedding: settings.embedding,
-		model: createEmbeddingModel({ embedding: settings.embedding, apiKey }),
+		model: createEmbeddingModel({
+			embedding: settings.embedding,
+			apiKey,
+			baseUrl:
+				settings.embedding.provider === settings.provider
+					? settings.baseUrl
+					: undefined,
+		}),
 	};
 };

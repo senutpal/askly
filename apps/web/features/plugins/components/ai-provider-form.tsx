@@ -36,7 +36,7 @@ import {
 	TriangleAlert,
 	XCircle,
 } from "lucide-react";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { getConvexErrorData, getErrorMessage } from "../lib/convex-error";
 import { AiProviderCard } from "./ai-provider-card";
@@ -66,6 +66,12 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 	const [isTesting, setIsTesting] = useState(false);
 	const [testResult, setTestResult] = useState<TestResult | null>(null);
 	const [isReembedOpen, setIsReembedOpen] = useState(false);
+	const testRequestId = useRef(0);
+
+	const resetTestResult = () => {
+		testRequestId.current += 1;
+		setTestResult(null);
+	};
 
 	const definition = getProviderDefinition(provider);
 	const hasStoredKey = settings.keys[provider];
@@ -117,7 +123,7 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 		setBaseUrl(next === settings.provider ? (settings.baseUrl ?? "") : "");
 		setApiKey("");
 		setEmbeddingApiKey("");
-		setTestResult(null);
+		resetTestResult();
 	};
 
 	const persist = async (acknowledgeReembed: boolean) => {
@@ -137,7 +143,7 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 
 			setApiKey("");
 			setEmbeddingApiKey("");
-			setTestResult(null);
+			resetTestResult();
 			setIsReembedOpen(false);
 			toast.success(
 				result.reembedRequired
@@ -179,6 +185,9 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 	};
 
 	const onTest = async () => {
+		const requestId = testRequestId.current + 1;
+		testRequestId.current = requestId;
+
 		setIsTesting(true);
 		setTestResult(null);
 
@@ -190,12 +199,16 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 				baseUrl: baseUrl.trim() || undefined,
 			});
 
-			setTestResult(result);
+			if (testRequestId.current === requestId) {
+				setTestResult(result);
+			}
 		} catch (error) {
-			setTestResult({
-				ok: false,
-				message: getErrorMessage(error, "Could not test the connection."),
-			});
+			if (testRequestId.current === requestId) {
+				setTestResult({
+					ok: false,
+					message: getErrorMessage(error, "Could not test the connection."),
+				});
+			}
 		} finally {
 			setIsTesting(false);
 		}
@@ -223,15 +236,15 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 					</div>
 
 					<div className="space-y-2">
-						<Label>Model</Label>
+						<Label htmlFor="ai-model">Model</Label>
 						<Select
 							onValueChange={(value) => {
 								setModel(value);
-								setTestResult(null);
+								resetTestResult();
 							}}
 							value={model}
 						>
-							<SelectTrigger className="h-11 w-full rounded-xl">
+							<SelectTrigger className="h-11 w-full rounded-xl" id="ai-model">
 								<SelectValue placeholder="Choose a model" />
 							</SelectTrigger>
 							<SelectContent>
@@ -273,7 +286,7 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 							id="ai-api-key"
 							onChange={(event) => {
 								setApiKey(event.target.value);
-								setTestResult(null);
+								resetTestResult();
 							}}
 							placeholder={
 								hasStoredKey
@@ -303,7 +316,7 @@ export const AiProviderForm = ({ settings }: AiProviderFormProps) => {
 							id="ai-base-url"
 							onChange={(event) => {
 								setBaseUrl(event.target.value);
-								setTestResult(null);
+								resetTestResult();
 							}}
 							placeholder={`${definition.name} default endpoint`}
 							value={baseUrl}

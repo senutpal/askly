@@ -185,6 +185,21 @@ export const requiresReembed = (
 	next: EmbeddingConfig,
 ) => embeddingSignature(current) !== embeddingSignature(next);
 
+const LEGACY_RAG_NAMESPACE_SIGNATURE = embeddingSignature(
+	EMBEDDING_CONFIGS.google,
+);
+
+export const ragNamespaceForEmbedding = (
+	organizationId: string,
+	embedding: EmbeddingConfig,
+) => {
+	const signature = embeddingSignature(embedding);
+
+	return signature === LEGACY_RAG_NAMESPACE_SIGNATURE
+		? organizationId
+		: `${organizationId}:${signature}`;
+};
+
 export const pluginServiceForProvider = (provider: AiProvider) =>
 	provider === "google" ? "google-ai" : provider;
 

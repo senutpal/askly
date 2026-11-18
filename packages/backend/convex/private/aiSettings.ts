@@ -11,6 +11,7 @@ import {
 	requiresReembed,
 } from "../lib/aiProviders";
 import { authedAction, authedMutation, authedQuery } from "../lib/functions";
+import { assertPublicHostname, assertPublicHttpUrl } from "../lib/publicUrl";
 import {
 	aiConnectionTestValidator,
 	aiSettingsViewValidator,
@@ -20,6 +21,7 @@ import { createLanguageModel } from "../system/ai/providers";
 import { resolveAiSettings } from "../system/ai/settings";
 
 const MAX_API_KEY_LENGTH = 4096;
+const INVALID_BASE_URL_MESSAGE = "Base URL must be a public http(s) URL.";
 
 const normalizeApiKey = (value: string | undefined) => {
 	const trimmed = value?.trim();
@@ -39,28 +41,20 @@ const normalizeModel = (value: string) => {
 	return trimmed;
 };
 
-const normalizeBaseUrl = (value: string | undefined) => {
+const normalizeBaseUrl = async (value: string | undefined) => {
 	const trimmed = value?.trim();
 
 	if (!trimmed) {
 		return undefined;
 	}
 
-	let url: URL;
-
 	try {
-		url = new URL(trimmed);
+		assertPublicHttpUrl(trimmed);
+		await assertPublicHostname(new URL(trimmed).hostname);
 	} catch {
 		throw new ConvexError({
 			code: "INVALID_BASE_URL",
-			message: "Base URL must be a valid http(s) URL.",
-		});
-	}
-
-	if (url.protocol !== "http:" && url.protocol !== "https:") {
-		throw new ConvexError({
-			code: "INVALID_BASE_URL",
-			message: "Base URL must be a valid http(s) URL.",
+			message: INVALID_BASE_URL_MESSAGE,
 		});
 	}
 
@@ -138,7 +132,7 @@ export const save = authedAction({
 
 		const provider = getProviderDefinition(args.provider);
 		const model = normalizeModel(args.model);
-		const baseUrl = normalizeBaseUrl(args.baseUrl);
+		const baseUrl = await normalizeBaseUrl(args.baseUrl);
 		const apiKey = normalizeApiKey(args.apiKey);
 		const embeddingApiKey = normalizeApiKey(args.embeddingApiKey);
 
@@ -229,12 +223,12 @@ export const testConnection = authedAction({
 		let baseUrl: string | undefined;
 
 		try {
-			baseUrl = normalizeBaseUrl(args.baseUrl);
+			baseUrl = await normalizeBaseUrl(args.baseUrl);
 		} catch {
 			return {
 				ok: false,
 				code: "INVALID_BASE_URL",
-				message: "Base URL must be a valid http(s) URL.",
+				message: INVALID_BASE_URL_MESSAGE,
 			};
 		}
 

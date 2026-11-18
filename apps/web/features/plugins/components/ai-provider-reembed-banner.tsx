@@ -36,9 +36,9 @@ export const AiProviderReembedBanner = () => {
 			<AlertTitle>Knowledge base re-embedding required</AlertTitle>
 			<AlertDescription className="text-amber-800 dark:text-amber-200">
 				<p>
-					The embedding model changed. Knowledge base search keeps using the
-					previous vectors, so new files may not be found until the knowledge
-					base is re-embedded.
+					The embedding model changed. New uploads use the new model, but files
+					that were uploaded before the change are not searchable until the
+					knowledge base is re-embedded.
 				</p>
 				<Button
 					className="mt-2 border-amber-500/40 text-amber-900 hover:bg-amber-100/60 dark:text-amber-100 dark:hover:bg-amber-900/40"

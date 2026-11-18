@@ -85,7 +85,7 @@ export const upsert = internalMutation({
 			embeddingProvider: args.embeddingProvider,
 			embeddingModel: args.embeddingModel,
 			embeddingDimension: args.embeddingDimension,
-			reembedRequired: args.reembedRequired,
+			reembedRequired: existing?.reembedRequired || args.reembedRequired,
 			updatedAt: Date.now(),
 		};
 

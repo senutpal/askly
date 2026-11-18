@@ -437,7 +437,7 @@ export const addSelectedResources = action({
 			error?: string;
 		}> = [];
 
-		const orgRag = await createOrganizationRAG(ctx, orgId);
+		const { rag: orgRag, namespace } = await createOrganizationRAG(ctx, orgId);
 
 		for (const resourceId of args.selectedResourceIds) {
 			try {
@@ -510,7 +510,7 @@ export const addSelectedResources = action({
 					organizationId: orgId,
 				});
 				const { entryId, created } = await orgRag.add(ctx, {
-					namespace: orgId,
+					namespace,
 					text,
 					key: filename,
 					metadata: {

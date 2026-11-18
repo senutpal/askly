@@ -7,7 +7,7 @@ import {
 
 export const remove = authedMutation({
 	args: {
-		service: pluginServiceValidator,
+		service: v.literal("vapi"),
 	},
 	returns: v.null(),
 	handler: async (ctx, args) => {

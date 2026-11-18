@@ -3,6 +3,7 @@ import { convexTest } from "convex-test";
 import { afterAll, describe, expect, it } from "vitest";
 import { api, internal } from "../_generated/api";
 import schema from "../schema";
+import { getEmbeddingConfig, ragNamespaceForEmbedding } from "./aiProviders";
 
 declare global {
 	interface ImportMeta {
@@ -307,5 +308,77 @@ describe("AI settings", () => {
 			.query(api.private.aiSettings.get);
 
 		expect(view.reembedRequired).toBe(false);
+	});
+
+	it("keeps a pending re-embed warning when a stale save arrives", async () => {
+		const t = setup();
+
+		await saveOpenAi(t, "org_a");
+
+		await t.mutation(internal.system.ai.settings.upsert, {
+			organizationId: "org_a",
+			provider: "openai",
+			model: "gpt-6.1-terra",
+			embeddingProvider: "openai",
+			embeddingModel: "text-embedding-3-large",
+			embeddingDimension: 3072,
+			reembedRequired: false,
+		});
+
+		const view = await t
+			.withIdentity({ orgId: "org_a" })
+			.query(api.private.aiSettings.get);
+
+		expect(view.reembedRequired).toBe(true);
+		expect(view.model).toBe("gpt-6.1-terra");
+	});
+
+	it("rejects a base URL that points at private infrastructure", async () => {
+		const t = setup();
+
+		await expectConvexError(
+			t.withIdentity({ orgId: "org_a" }).action(api.private.aiSettings.save, {
+				provider: "openai",
+				model: "gpt-6.2-sol",
+				apiKey: "sk-test-openai",
+				baseUrl: "http://169.254.169.254/v1",
+				acknowledgeReembed: true,
+			}),
+			{
+				code: "INVALID_BASE_URL",
+				message: "Base URL must be a public http(s) URL.",
+			},
+		);
+	});
+
+	it("refuses to test a private base URL", async () => {
+		const t = setup();
+
+		const result = await t
+			.withIdentity({ orgId: "org_a" })
+			.action(api.private.aiSettings.testConnection, {
+				provider: "openai",
+				model: "gpt-6.2-sol",
+				apiKey: "sk-test-openai",
+				baseUrl: "http://127.0.0.1:8080/v1",
+			});
+
+		expect(result).toEqual({
+			ok: false,
+			code: "INVALID_BASE_URL",
+			message: "Base URL must be a public http(s) URL.",
+		});
+	});
+
+	it("keeps the legacy vector namespace for Google embeddings", () => {
+		const organizationId = "org_a";
+
+		expect(
+			ragNamespaceForEmbedding(organizationId, getEmbeddingConfig("google")),
+		).toBe(organizationId);
+
+		expect(
+			ragNamespaceForEmbedding(organizationId, getEmbeddingConfig("openai")),
+		).toBe(`${organizationId}:openai:text-embedding-3-large:3072`);
 	});
 });

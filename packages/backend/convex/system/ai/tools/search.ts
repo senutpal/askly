@@ -30,10 +30,10 @@ export const search = createTool({
 		}
 
 		const orgId = conversation.organizationId;
-		const orgRag = await createOrganizationRAG(ctx, orgId);
+		const { rag, namespace } = await createOrganizationRAG(ctx, orgId);
 
-		const searchResult = await orgRag.search(ctx, {
-			namespace: orgId,
+		const searchResult = await rag.search(ctx, {
+			namespace,
 			query: args.query,
 			limit: 5,
 		});

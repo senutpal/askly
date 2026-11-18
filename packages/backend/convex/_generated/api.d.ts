@@ -14,6 +14,7 @@ import type * as lib_aiProviders from "../lib/aiProviders.js";
 import type * as lib_conversationStats from "../lib/conversationStats.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_publicUrl from "../lib/publicUrl.js";
 import type * as lib_rateLimit from "../lib/rateLimit.js";
 import type * as lib_validators from "../lib/validators.js";
 import type * as lib_webCrawler from "../lib/webCrawler.js";
@@ -70,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   "lib/conversationStats": typeof lib_conversationStats;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "lib/functions": typeof lib_functions;
+  "lib/publicUrl": typeof lib_publicUrl;
   "lib/rateLimit": typeof lib_rateLimit;
   "lib/validators": typeof lib_validators;
   "lib/webCrawler": typeof lib_webCrawler;

@@ -34,20 +34,21 @@ export const deleteFile = authedMutation({
 				organizationId: ctx.orgId,
 			}),
 		);
-		const orgRag = createRagForEmbedding(settings.embedding);
+		const { rag, namespace } = createRagForEmbedding(
+			ctx.orgId,
+			settings.embedding,
+		);
 
-		const namespace = await orgRag.getNamespace(ctx, {
-			namespace: ctx.orgId,
-		});
+		const namespaceDoc = await rag.getNamespace(ctx, { namespace });
 
-		if (!namespace) {
+		if (!namespaceDoc) {
 			throw new ConvexError({
 				code: "UNAUTHORIZED",
 				message: "Invalid Namespace",
 			});
 		}
 
-		const entry = await orgRag.getEntry(ctx, {
+		const entry = await rag.getEntry(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -71,7 +72,7 @@ export const deleteFile = authedMutation({
 			await ctx.storage.delete(metadata.storageId);
 		}
 
-		await orgRag.deleteAsync(ctx, {
+		await rag.deleteAsync(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -103,10 +104,10 @@ export const addFile = authedAction({
 			organizationId: ctx.orgId,
 		});
 
-		const orgRag = await createOrganizationRAG(ctx, ctx.orgId);
+		const { rag, namespace } = await createOrganizationRAG(ctx, ctx.orgId);
 
-		const { entryId, created } = await orgRag.add(ctx, {
-			namespace: ctx.orgId,
+		const { entryId, created } = await rag.add(ctx, {
+			namespace,
 			text,
 			key: filename,
 			metadata: {
@@ -124,7 +125,7 @@ export const addFile = authedAction({
 			console.debug("Entry already exists, skipping upload metadata");
 			await ctx.storage.delete(storageId);
 
-			const existingEntry = await orgRag.getEntry(ctx, { entryId });
+			const existingEntry = await rag.getEntry(ctx, { entryId });
 			const existingMetadata = existingEntry?.metadata;
 
 			url =
@@ -153,18 +154,19 @@ export const list = authedQuery({
 				organizationId: ctx.orgId,
 			}),
 		);
-		const orgRag = createRagForEmbedding(settings.embedding);
+		const { rag, namespace } = createRagForEmbedding(
+			ctx.orgId,
+			settings.embedding,
+		);
 
-		const namespace = await orgRag.getNamespace(ctx, {
-			namespace: ctx.orgId,
-		});
+		const namespaceDoc = await rag.getNamespace(ctx, { namespace });
 
-		if (!namespace) {
+		if (!namespaceDoc) {
 			return { page: [], isDone: true, continueCursor: "" };
 		}
 
-		const results = await orgRag.list(ctx, {
-			namespaceId: namespace.namespaceId,
+		const results = await rag.list(ctx, {
+			namespaceId: namespaceDoc.namespaceId,
 			paginationOpts: args.paginationOpts,
 		});
 
