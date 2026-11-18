@@ -13,7 +13,7 @@ export const DashboardPreview = () => {
 				src={dashboard}
 				sizes={sizes}
 				quality={85}
-				loading="lazy"
+				priority
 				decoding="async"
 				alt="Example Askly dashboard showing the overview, conversations, and quick actions."
 			/>
