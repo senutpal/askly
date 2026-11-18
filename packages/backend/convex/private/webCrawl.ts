@@ -13,6 +13,7 @@ import {
 	mutation,
 	query,
 } from "../_generated/server";
+import { embeddingSignature } from "../lib/aiProviders";
 import { extractTextContent } from "../lib/extractTextContent";
 import { RATE_LIMITS } from "../lib/rateLimit";
 import {
@@ -24,7 +25,7 @@ import {
 	MAX_CRAWL_DEPTH,
 	MAX_RESOURCES_PER_JOB,
 } from "../lib/webCrawler";
-import { createRAG } from "../system/ai/rag";
+import { createOrganizationRAG } from "../system/ai/rag";
 
 /**
  * Persisting one crawl batch keeps each mutation comfortably below the
@@ -82,6 +83,7 @@ const crawlResultFields = {
 	selected: v.boolean(),
 	addedToKnowledgeBase: v.boolean(),
 	sourceUrl: v.string(),
+	embeddingSignature: v.optional(v.string()),
 	error: v.optional(v.string()),
 };
 
@@ -375,6 +377,7 @@ export const getResults = query({
 				selected: row.selected,
 				addedToKnowledgeBase: row.addedToKnowledgeBase,
 				sourceUrl: row.sourceUrl,
+				embeddingSignature: row.embeddingSignature,
 				error: row.error,
 			})),
 			isDone: result.isDone,
@@ -437,7 +440,12 @@ export const addSelectedResources = action({
 			error?: string;
 		}> = [];
 
-		const orgRag = await createRAG(ctx, orgId);
+		const {
+			rag: orgRag,
+			namespace,
+			embedding,
+		} = await createOrganizationRAG(ctx, orgId);
+		const signature = embeddingSignature(embedding);
 
 		for (const resourceId of args.selectedResourceIds) {
 			try {
@@ -461,7 +469,10 @@ export const addSelectedResources = action({
 					});
 					continue;
 				}
-				if (resource.addedToKnowledgeBase) {
+				if (
+					resource.addedToKnowledgeBase &&
+					resource.embeddingSignature === signature
+				) {
 					results.push({
 						resourceId,
 						success: true,
@@ -510,7 +521,7 @@ export const addSelectedResources = action({
 					organizationId: orgId,
 				});
 				const { entryId, created } = await orgRag.add(ctx, {
-					namespace: orgId,
+					namespace,
 					text,
 					key: filename,
 					metadata: {
@@ -528,6 +539,7 @@ export const addSelectedResources = action({
 				}
 				await ctx.runMutation(internal.private.webCrawl.markAsAdded, {
 					resourceId,
+					embeddingSignature: signature,
 				});
 				results.push({
 					resourceId,
@@ -730,11 +742,15 @@ export const getJobDocument = internalQuery({
 });
 
 export const markAsAdded = internalMutation({
-	args: { resourceId: v.id("crawlResults") },
+	args: {
+		resourceId: v.id("crawlResults"),
+		embeddingSignature: v.string(),
+	},
 	returns: v.null(),
 	handler: async (ctx, args) => {
 		await ctx.db.patch(args.resourceId, {
 			addedToKnowledgeBase: true,
+			embeddingSignature: args.embeddingSignature,
 		});
 		return null;
 	},

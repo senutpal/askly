@@ -23,7 +23,9 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "^2.0.0",
 		"@ai-sdk/google": "^2.0.17",
+		"@ai-sdk/openai": "^2.0.0",
 		"@clerk/backend": "^2.17.2",
 		"@convex-dev/agent": "^0.2.10",
 		"@convex-dev/rag": "^0.5.3",

@@ -1,6 +1,7 @@
 import type { MessageDoc } from "@convex-dev/agent";
 import { vMessageDoc } from "@convex-dev/agent/validators";
 import { type Infer, type Validator, v } from "convex/values";
+import { aiProviderValidator, embeddingProviderValidator } from "./aiProviders";
 
 export const conversationStatusValidator = v.union(
 	v.literal("unresolved"),
@@ -104,6 +105,8 @@ export const conversationStatsValidator = v.object({
 export const pluginServiceValidator = v.union(
 	v.literal("vapi"),
 	v.literal("google-ai"),
+	v.literal("openai"),
+	v.literal("anthropic"),
 );
 
 export const pluginDocValidator = v.object({
@@ -114,6 +117,51 @@ export const pluginDocValidator = v.object({
 	secretContent: v.string(),
 	iv: v.string(),
 	authTag: v.string(),
+});
+
+export const pluginSummaryValidator = v.object({
+	service: pluginServiceValidator,
+});
+
+export const aiSettingsFields = {
+	organizationId: v.string(),
+	provider: aiProviderValidator,
+	model: v.string(),
+	baseUrl: v.optional(v.string()),
+	embeddingProvider: embeddingProviderValidator,
+	embeddingModel: v.string(),
+	embeddingDimension: v.number(),
+	reembedRequired: v.boolean(),
+	updatedAt: v.number(),
+};
+
+export const aiSettingsDocValidator = v.object({
+	_id: v.id("aiSettings"),
+	_creationTime: v.number(),
+	...aiSettingsFields,
+});
+
+export const aiSettingsViewValidator = v.object({
+	provider: aiProviderValidator,
+	model: v.string(),
+	baseUrl: v.union(v.string(), v.null()),
+	hasApiKey: v.boolean(),
+	keys: v.object({
+		google: v.boolean(),
+		openai: v.boolean(),
+		anthropic: v.boolean(),
+	}),
+	embeddingProvider: embeddingProviderValidator,
+	embeddingModel: v.string(),
+	embeddingDimension: v.number(),
+	embeddingHasApiKey: v.boolean(),
+	reembedRequired: v.boolean(),
+});
+
+export const aiConnectionTestValidator = v.object({
+	ok: v.boolean(),
+	code: v.optional(v.string()),
+	message: v.string(),
 });
 
 export const defaultSuggestionsValidator = v.object({

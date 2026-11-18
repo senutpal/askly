@@ -2,14 +2,15 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { Agent } from "@convex-dev/agent";
 import { components } from "../../../_generated/api";
 import type { ActionCtx } from "../../../_generated/server";
-import { GEMINI_MODEL, SUPPORT_AGENT_PROMPT } from "../constants";
-import { createGoogleAI } from "../helpers";
+import { DEFAULT_AI_MODEL } from "../../../lib/aiProviders";
+import { getOrganizationLanguageModel } from "../config";
+import { SUPPORT_AGENT_PROMPT } from "../constants";
 
 export async function createSupportAgent(
 	ctx: ActionCtx,
 	organizationId: string,
 ) {
-	const model = await createGoogleAI(ctx, organizationId, GEMINI_MODEL);
+	const { model } = await getOrganizationLanguageModel(ctx, organizationId);
 
 	return new Agent(components.agent, {
 		name: "Askly",
@@ -19,7 +20,7 @@ export async function createSupportAgent(
 }
 
 const google = createGoogleGenerativeAI({ apiKey: "PLACEHOLDER_FOR_INIT" });
-const defaultModel = google(GEMINI_MODEL);
+const defaultModel = google(DEFAULT_AI_MODEL);
 
 export const supportAgent = new Agent(components.agent, {
 	name: "Askly",

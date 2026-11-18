@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
+	aiSettingsFields,
 	contactSessionFields,
 	conversationStatusValidator,
 	defaultSuggestionsValidator,
@@ -54,6 +55,9 @@ export default defineSchema({
 	})
 		.index("by_organization_id", ["organizationId"])
 		.index("by_organization_id_and_service", ["organizationId", "service"]),
+	aiSettings: defineTable(aiSettingsFields).index("by_organization_id", [
+		"organizationId",
+	]),
 	crawlJobs: defineTable({
 		organizationId: v.string(),
 		url: v.string(),
@@ -91,6 +95,7 @@ export default defineSchema({
 		selected: v.boolean(),
 		addedToKnowledgeBase: v.boolean(),
 		sourceUrl: v.string(),
+		embeddingSignature: v.optional(v.string()),
 		// Extracted text captured at crawl time so importing a page does not
 		// re-fetch it. Only set for text resources, and only when it fits in a
 		// single Convex document (see MAX_STORED_TEXT_CHARS).
