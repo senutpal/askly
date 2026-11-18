@@ -1,12 +1,21 @@
 "use client";
 
-import { RedirectToSignIn, useAuth } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { Button } from "@workspace/ui";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { AuthLayout } from "@/features/auth";
 
 const UnauthenticatedFallback = () => {
 	const { isSignedIn, signOut } = useAuth();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (!isSignedIn) {
+			router.replace("/");
+		}
+	}, [isSignedIn, router]);
 
 	if (isSignedIn) {
 		return (
@@ -22,7 +31,7 @@ const UnauthenticatedFallback = () => {
 		);
 	}
 
-	return <RedirectToSignIn />;
+	return null;
 };
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
