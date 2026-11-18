@@ -144,8 +144,12 @@ export const ConversationIdView = ({
 		}
 	};
 
-	if (conversation === undefined || messages.status === "LoadingFirstPage") {
-		return <ConversationIdViewLoading />;
+	if (conversation === null) {
+		return (
+			<div className="flex h-full items-center justify-center text-muted-foreground">
+				Conversation not found
+			</div>
+		);
 	}
 
 	return (
@@ -154,49 +158,85 @@ export const ConversationIdView = ({
 				<Button size="sm" variant="ghost">
 					<MoreHorizontalIcon />
 				</Button>
-				{!!conversation && (
+				{conversation ? (
 					<ConversationStatusButton
 						onclick={handleToggleStatus}
-						status={conversation?.status}
+						status={conversation.status}
 						disabled={isUpdatingStatus}
 					/>
+				) : (
+					<Skeleton className="h-8 w-24 rounded-full" />
 				)}
 			</header>
 
 			<AIConversation className="min-h-[calc(100vh-180px)] max-h-[calc(100vh-180px)]">
 				<AIConversationContent>
-					<InfiniteScrollTrigger
-						canLoadMore={canLoadMore}
-						isLoadingMore={isLoadingMore}
-						onLoadMore={handleLoadMore}
-						ref={topElementRef}
-					/>
-					{toUIMessages(messages.results ?? [])
-						?.filter(
-							(message) => message.text && message.text.trim().length > 0,
-						)
-						?.map((message) => (
-							<AIMessage
-								from={message.role === "user" ? "user" : "assistant"}
-								key={message.id}
-							>
-								<AIMessageContent>
-									<AIResponse>{message.text}</AIResponse>
-								</AIMessageContent>
-								{message.role === "user" && (
-									<DiceBearAvatar
-										seed={conversation?.contactSessionId ?? "user"}
-										size={36}
+					{messages.status === "LoadingFirstPage" ? (
+						[
+							"skeleton-1",
+							"skeleton-2",
+							"skeleton-3",
+							"skeleton-4",
+							"skeleton-5",
+							"skeleton-6",
+							"skeleton-7",
+							"skeleton-8",
+						].map((skeletonId, index) => {
+							const isUser = index % 2 === 0;
+							const widths = ["w-48", "w-60", "w-72"];
+							const width = widths[index % widths.length];
+
+							return (
+								<div
+									className={cn(
+										"group flex w-full items-end justify-end gap-2 py-2 [&>div]:max-w-[80%] ",
+										isUser ? "is-user" : "is-assistant flex-row-reverse",
+									)}
+									key={skeletonId}
+								>
+									<Skeleton
+										className={`h-9 ${width} rounded-lg bg-neutral-200 dark:bg-gray-600 `}
 									/>
-								)}
-							</AIMessage>
-						))}
-					{pendingMessage && (
-						<AIMessage className="opacity-60" from="assistant">
-							<AIMessageContent>
-								<AIResponse>{pendingMessage}</AIResponse>
-							</AIMessageContent>
-						</AIMessage>
+									<Skeleton className="size-8 rounded-full bg-neutral-200 dark:bg-gray-600" />
+								</div>
+							);
+						})
+					) : (
+						<>
+							<InfiniteScrollTrigger
+								canLoadMore={canLoadMore}
+								isLoadingMore={isLoadingMore}
+								onLoadMore={handleLoadMore}
+								ref={topElementRef}
+							/>
+							{toUIMessages(messages.results ?? [])
+								?.filter(
+									(message) => message.text && message.text.trim().length > 0,
+								)
+								?.map((message) => (
+									<AIMessage
+										from={message.role === "user" ? "user" : "assistant"}
+										key={message.id}
+									>
+										<AIMessageContent>
+											<AIResponse>{message.text}</AIResponse>
+										</AIMessageContent>
+										{message.role === "user" && (
+											<DiceBearAvatar
+												seed={conversation?.contactSessionId ?? "user"}
+												size={36}
+											/>
+										)}
+									</AIMessage>
+								))}
+							{pendingMessage && (
+								<AIMessage className="opacity-60" from="assistant">
+									<AIMessageContent>
+										<AIResponse>{pendingMessage}</AIResponse>
+									</AIMessageContent>
+								</AIMessage>
+							)}
+						</>
 					)}
 				</AIConversationContent>
 				<AIConversationScrollButton />
