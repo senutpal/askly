@@ -33,7 +33,7 @@
 	margin: 0;
 }
 
-.page a {
+.page :where(a) {
 	color: inherit;
 	text-decoration: none;
 }
@@ -697,6 +697,10 @@ a:hover > .arrow {
 
 .siteFooter {
 	position: relative;
+}
+
+.siteFooter :focus-visible {
+	outline-color: #bee1a7;
 }
 
 .footerRow {
