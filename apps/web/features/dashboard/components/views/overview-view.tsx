@@ -26,7 +26,7 @@ import {
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 
-export default function Page() {
+export const OverviewView = () => {
 	const conversations = useQuery(api.private.conversations.getMany, {
 		paginationOpts: { numItems: 5, cursor: null },
 	});
@@ -284,7 +284,7 @@ export default function Page() {
 			</div>
 		</div>
 	);
-}
+};
 
 function StatCard({
 	label,

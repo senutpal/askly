@@ -17,4 +17,5 @@ export * from "./components/layouts/dashboard-layout";
 // Views
 export * from "./components/views/conversation-id-view";
 export * from "./components/views/conversations-view";
+export * from "./components/views/overview-view";
 export * from "./constants";
