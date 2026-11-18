@@ -140,6 +140,9 @@ export const FilesView = () => {
 											<TableHead className="px-6 py-4 font-medium">
 												Size
 											</TableHead>
+											<TableHead className="px-6 py-4 font-medium">
+												Status
+											</TableHead>
 											<TableHead className="px-6 py-4 font-medium text-right">
 												Actions
 											</TableHead>
@@ -150,7 +153,7 @@ export const FilesView = () => {
 											if (isLoadingFirstPage) {
 												return (
 													<TableRow>
-														<TableCell className="h-32 text-center" colSpan={4}>
+														<TableCell className="h-32 text-center" colSpan={5}>
 															<div className="flex items-center justify-center gap-2 text-muted-foreground">
 																<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
 																Loading Files...
@@ -162,7 +165,7 @@ export const FilesView = () => {
 											if (files.results.length === 0) {
 												return (
 													<TableRow>
-														<TableCell className="h-64 text-center" colSpan={4}>
+														<TableCell className="h-64 text-center" colSpan={5}>
 															<div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">
 																<div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
 																	<FileText className="h-8 w-8 opacity-50" />
@@ -197,6 +200,31 @@ export const FilesView = () => {
 													</TableCell>
 													<TableCell className="px-6 py-4 text-muted-foreground font-mono text-sm">
 														{file.size}
+													</TableCell>
+													<TableCell className="px-6 py-4">
+														{file.status === "processing" ? (
+															<Badge
+																className="rounded-md border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono text-xs font-normal"
+																variant="outline"
+															>
+																<span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+																PROCESSING
+															</Badge>
+														) : file.status === "error" ? (
+															<Badge
+																className="rounded-md border-destructive/20 bg-destructive/10 text-destructive font-mono text-xs font-normal"
+																variant="outline"
+															>
+																ERROR
+															</Badge>
+														) : (
+															<Badge
+																className="rounded-md border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-normal"
+																variant="outline"
+															>
+																READY
+															</Badge>
+														)}
 													</TableCell>
 													<TableCell className="px-6 py-4 text-right">
 														<DropdownMenu>

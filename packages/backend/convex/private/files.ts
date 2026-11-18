@@ -187,6 +187,9 @@ export const addFile = authedAction({
 export const list = authedQuery({
 	args: {
 		paginationOpts: paginationOptsValidator,
+		status: v.optional(
+			v.union(v.literal("ready"), v.literal("pending"), v.literal("all")),
+		),
 	},
 	returns: fileListValidator,
 	handler: async (ctx, args) => {
@@ -205,17 +208,68 @@ export const list = authedQuery({
 			return { page: [], isDone: true, continueCursor: "" };
 		}
 
+		if (args.status === "pending") {
+			const results = await resolved.rag.list(ctx, {
+				namespaceId: resolved.namespaceId,
+				paginationOpts: args.paginationOpts,
+				status: "pending",
+			});
+			const files = await Promise.all(
+				results.page.map((entry) => convertEntryToPublicFile(ctx, entry)),
+			);
+			return {
+				page: files,
+				isDone: results.isDone,
+				continueCursor: results.continueCursor,
+			};
+		}
+
+		if (args.status === "ready") {
+			const results = await resolved.rag.list(ctx, {
+				namespaceId: resolved.namespaceId,
+				paginationOpts: args.paginationOpts,
+				status: "ready",
+			});
+			const files = await Promise.all(
+				results.page.map((entry) => convertEntryToPublicFile(ctx, entry)),
+			);
+			return {
+				page: files,
+				isDone: results.isDone,
+				continueCursor: results.continueCursor,
+			};
+		}
+
+		const isFirstPage = args.paginationOpts.cursor === null;
+
+		const pendingResults = isFirstPage
+			? await resolved.rag.list(ctx, {
+					namespaceId: resolved.namespaceId,
+					status: "pending",
+					limit: 20,
+				})
+			: null;
+
 		const results = await resolved.rag.list(ctx, {
 			namespaceId: resolved.namespaceId,
 			paginationOpts: args.paginationOpts,
+			status: "ready",
 		});
 
-		const files = await Promise.all(
+		const readyFiles = await Promise.all(
 			results.page.map((entry) => convertEntryToPublicFile(ctx, entry)),
 		);
 
+		const pendingFiles = pendingResults
+			? await Promise.all(
+					pendingResults.page.map((entry) =>
+						convertEntryToPublicFile(ctx, entry),
+					),
+				)
+			: [];
+
 		return {
-			page: files,
+			page: [...pendingFiles, ...readyFiles],
 			isDone: results.isDone,
 			continueCursor: results.continueCursor,
 		};
