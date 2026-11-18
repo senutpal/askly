@@ -63,7 +63,14 @@ export const getByOrganizationIdAndService = internalAction({
 				return parsed;
 			}
 
-			return isVapiCredentials(parsed) ? parsed : decrypted;
+			if (isVapiCredentials(parsed)) {
+				return {
+					privateApiKey: parsed.privateApiKey,
+					publicApiKey: parsed.publicApiKey,
+				};
+			}
+
+			return decrypted;
 		} catch {
 			return decrypted;
 		}

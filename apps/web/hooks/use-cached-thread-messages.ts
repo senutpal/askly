@@ -1,24 +1,21 @@
 "use client";
 import type { MessageDoc } from "@convex-dev/agent";
-import {
-	type ThreadMessagesQuery,
-	useThreadMessages,
-} from "@convex-dev/agent/react";
-
-type CachedThreadMessagesArgs<
-	Query extends ThreadMessagesQuery<unknown, MessageDoc>,
-> = Parameters<typeof useThreadMessages<Query>>[1];
-
-type CachedThreadMessagesResult<
-	Query extends ThreadMessagesQuery<unknown, MessageDoc>,
-> = ReturnType<typeof useThreadMessages<Query>>;
+import type { ThreadMessagesQuery } from "@convex-dev/agent/react";
+import type {
+	PaginatedQueryArgs,
+	UsePaginatedQueryReturnType,
+} from "convex/react";
+import { usePaginatedQuery } from "convex-helpers/react/cache/hooks";
 
 export function useCachedThreadMessages<
 	Query extends ThreadMessagesQuery<unknown, MessageDoc>,
 >(
 	query: Query,
-	args: CachedThreadMessagesArgs<Query>,
+	args: PaginatedQueryArgs<Query> | "skip",
 	options: { initialNumItems: number },
-): CachedThreadMessagesResult<Query> {
-	return useThreadMessages(query, args, options);
+): UsePaginatedQueryReturnType<Query> {
+	return usePaginatedQuery(query, args, {
+		initialNumItems: options.initialNumItems,
+		customPagination: true,
+	});
 }

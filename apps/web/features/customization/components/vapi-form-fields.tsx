@@ -28,6 +28,10 @@ export const VapiFormField = ({ form }: VapiFormFieldProps) => {
 		useVapiPhoneNumbers();
 
 	const disabled = form.formState.isSubmitting;
+	const dialablePhoneNumbers = phoneNumbers.filter(
+		(phone): phone is (typeof phoneNumbers)[number] & { number: string } =>
+			Boolean(phone.number),
+	);
 
 	return (
 		<>
@@ -94,9 +98,9 @@ export const VapiFormField = ({ form }: VapiFormFieldProps) => {
 							</FormControl>
 							<SelectContent>
 								<SelectItem value="none">None</SelectItem>
-								{phoneNumbers.map((phone) => (
-									<SelectItem key={phone.id} value={phone.number ?? phone.id}>
-										{phone.number || "Unknown"} - {phone.name || "Unnamed"}
+								{dialablePhoneNumbers.map((phone) => (
+									<SelectItem key={phone.id} value={phone.number}>
+										{phone.number} - {phone.name || "Unnamed"}
 									</SelectItem>
 								))}
 							</SelectContent>
