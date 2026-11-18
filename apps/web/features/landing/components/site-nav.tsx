@@ -90,13 +90,6 @@ export const SiteNav = () => {
 
 	const closeMenu = () => setOpen(false);
 
-	const closeMenuForHash = (href: string) => {
-		setOpen(false);
-		requestAnimationFrame(() => {
-			document.getElementById(href.slice(1))?.focus();
-		});
-	};
-
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
 		if (!open) return;
 
@@ -148,8 +141,8 @@ export const SiteNav = () => {
 					<span>Askly</span>
 				</a>
 				<div className={styles.navLinks}>
-					<a href={LANDING_LINKS.demo}>Demo</a>
 					<Link href={LANDING_LINKS.docs}>Docs</Link>
+					<a href={LANDING_LINKS.github}>GitHub</a>
 				</div>
 				<Link className={styles.signIn} href={LANDING_LINKS.signIn}>
 					Sign in <Arrow />
@@ -182,16 +175,6 @@ export const SiteNav = () => {
 					className={styles.mobileLinks}
 					hidden={!open}
 				>
-					<a
-						href={LANDING_LINKS.demo}
-						onClick={(event) => {
-							if (isCurrentTabClick(event)) {
-								closeMenuForHash(LANDING_LINKS.demo);
-							}
-						}}
-					>
-						Demo <Arrow />
-					</a>
 					<Link
 						href={LANDING_LINKS.docs}
 						onClick={(event) => {
@@ -200,6 +183,14 @@ export const SiteNav = () => {
 					>
 						Docs <Arrow />
 					</Link>
+					<a
+						href={LANDING_LINKS.github}
+						onClick={(event) => {
+							if (isCurrentTabClick(event)) closeMenu();
+						}}
+					>
+						GitHub <Arrow />
+					</a>
 					<Link
 						href={LANDING_LINKS.signIn}
 						onClick={(event) => {
