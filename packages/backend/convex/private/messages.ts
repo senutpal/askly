@@ -7,20 +7,17 @@ import { adjustConversationStats } from "../lib/conversationStats";
 import { authedAction, authedMutation, authedQuery } from "../lib/functions";
 import { messagePaginationValidator } from "../lib/validators";
 import { supportAgent } from "../system/ai/agents/supportAgent";
-import {
-	GEMINI_MODEL,
-	OPERATOR_MESSAGE_ENHANCEMENT_PROMPT,
-} from "../system/ai/constants";
-import { createGoogleAI } from "../system/ai/helpers";
+import { getOrganizationLanguageModel } from "../system/ai/config";
+import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
 
 export const enhanceResponse = authedAction({
 	args: { prompt: v.string() },
 	returns: v.string(),
 	handler: async (ctx, args) => {
-		const gemini = await createGoogleAI(ctx, ctx.orgId, GEMINI_MODEL);
+		const { model } = await getOrganizationLanguageModel(ctx, ctx.orgId);
 
 		const response = await generateText({
-			model: gemini,
+			model,
 			messages: [
 				{
 					role: "system",

@@ -3,8 +3,7 @@ import type { StorageActionWriter } from "convex/server";
 import { assert } from "convex-helpers";
 import type { Id } from "../_generated/dataModel";
 import type { ActionCtx } from "../_generated/server";
-import { GEMINI_MODEL } from "../system/ai/constants";
-import { createGoogleAI } from "../system/ai/helpers";
+import { getOrganizationLanguageModel } from "../system/ai/config";
 
 const SUPPORTED_IMAGE_TYPES = [
 	"image/jpeg",
@@ -74,7 +73,7 @@ async function extractTextFileContent(
 	const text = new TextDecoder().decode(arrayBuffer);
 
 	if (mimeType.toLowerCase() !== "text/plain") {
-		const model = await createGoogleAI(ctx, organizationId, GEMINI_MODEL);
+		const { model } = await getOrganizationLanguageModel(ctx, organizationId);
 		const result = await generateText({
 			model,
 			system: SYSTEM_PROMPTS.html,
@@ -108,7 +107,7 @@ async function extractPdfText(
 	mimeType: string,
 	filename: string,
 ): Promise<string> {
-	const model = await createGoogleAI(ctx, organizationId, GEMINI_MODEL);
+	const { model } = await getOrganizationLanguageModel(ctx, organizationId);
 	const result = await generateText({
 		model,
 		system: SYSTEM_PROMPTS.pdf,
@@ -140,7 +139,7 @@ async function extractImageText(
 	organizationId: string,
 	url: string,
 ): Promise<string> {
-	const model = await createGoogleAI(ctx, organizationId, GEMINI_MODEL);
+	const { model } = await getOrganizationLanguageModel(ctx, organizationId);
 	const result = await generateText({
 		model,
 		system: SYSTEM_PROMPTS.images,

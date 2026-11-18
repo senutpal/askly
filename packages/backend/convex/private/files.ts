@@ -8,12 +8,14 @@ import {
 } from "@convex-dev/rag";
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { extractTextContent } from "../lib/extractTextContent";
 import { authedAction, authedMutation, authedQuery } from "../lib/functions";
 import { fileListValidator, fileUploadValidator } from "../lib/validators";
-import rag, { createRAG } from "../system/ai/rag";
+import { createOrganizationRAG, createRagForEmbedding } from "../system/ai/rag";
+import { resolveAiSettings } from "../system/ai/settings";
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
 	return (
@@ -27,7 +29,14 @@ export const deleteFile = authedMutation({
 	args: { entryId: vEntryId },
 	returns: v.null(),
 	handler: async (ctx, args) => {
-		const namespace = await rag.getNamespace(ctx, {
+		const settings = resolveAiSettings(
+			await ctx.runQuery(internal.system.ai.settings.getForOrganization, {
+				organizationId: ctx.orgId,
+			}),
+		);
+		const orgRag = createRagForEmbedding(settings.embedding);
+
+		const namespace = await orgRag.getNamespace(ctx, {
 			namespace: ctx.orgId,
 		});
 
@@ -38,7 +47,7 @@ export const deleteFile = authedMutation({
 			});
 		}
 
-		const entry = await rag.getEntry(ctx, {
+		const entry = await orgRag.getEntry(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -62,7 +71,7 @@ export const deleteFile = authedMutation({
 			await ctx.storage.delete(metadata.storageId);
 		}
 
-		await rag.deleteAsync(ctx, {
+		await orgRag.deleteAsync(ctx, {
 			entryId: args.entryId,
 		});
 
@@ -94,7 +103,7 @@ export const addFile = authedAction({
 			organizationId: ctx.orgId,
 		});
 
-		const orgRag = await createRAG(ctx, ctx.orgId);
+		const orgRag = await createOrganizationRAG(ctx, ctx.orgId);
 
 		const { entryId, created } = await orgRag.add(ctx, {
 			namespace: ctx.orgId,
@@ -139,7 +148,14 @@ export const list = authedQuery({
 	},
 	returns: fileListValidator,
 	handler: async (ctx, args) => {
-		const namespace = await rag.getNamespace(ctx, {
+		const settings = resolveAiSettings(
+			await ctx.runQuery(internal.system.ai.settings.getForOrganization, {
+				organizationId: ctx.orgId,
+			}),
+		);
+		const orgRag = createRagForEmbedding(settings.embedding);
+
+		const namespace = await orgRag.getNamespace(ctx, {
 			namespace: ctx.orgId,
 		});
 
@@ -147,7 +163,7 @@ export const list = authedQuery({
 			return { page: [], isDone: true, continueCursor: "" };
 		}
 
-		const results = await rag.list(ctx, {
+		const results = await orgRag.list(ctx, {
 			namespaceId: namespace.namespaceId,
 			paginationOpts: args.paginationOpts,
 		});

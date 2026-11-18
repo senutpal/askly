@@ -3,9 +3,9 @@ import { generateText } from "ai";
 import z from "zod";
 import { internal } from "../../../_generated/api";
 import { supportAgent } from "../agents/supportAgent";
-import { GEMINI_MODEL, SEARCH_INTERPRETER_PROMPT } from "../constants";
-import { createGoogleAI } from "../helpers";
-import { createRAG } from "../rag";
+import { getOrganizationLanguageModel } from "../config";
+import { SEARCH_INTERPRETER_PROMPT } from "../constants";
+import { createOrganizationRAG } from "../rag";
 
 export const search = createTool({
 	description:
@@ -30,7 +30,7 @@ export const search = createTool({
 		}
 
 		const orgId = conversation.organizationId;
-		const orgRag = await createRAG(ctx, orgId);
+		const orgRag = await createOrganizationRAG(ctx, orgId);
 
 		const searchResult = await orgRag.search(ctx, {
 			namespace: orgId,
@@ -53,11 +53,10 @@ export const search = createTool({
 			.filter((t) => t !== null)
 			.join(", ")}. Here is the context:\n\n${searchResult.text}`;
 
-		// Use organization-specific API key
-		const gemini = await createGoogleAI(ctx, orgId, GEMINI_MODEL);
+		const { model } = await getOrganizationLanguageModel(ctx, orgId);
 
 		const response = await generateText({
-			model: gemini,
+			model,
 			messages: [
 				{
 					role: "system",

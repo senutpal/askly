@@ -9,12 +9,15 @@
  */
 
 import type * as crons from "../crons.js";
+import type * as lib_aiErrors from "../lib/aiErrors.js";
+import type * as lib_aiProviders from "../lib/aiProviders.js";
 import type * as lib_conversationStats from "../lib/conversationStats.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as lib_functions from "../lib/functions.js";
 import type * as lib_rateLimit from "../lib/rateLimit.js";
 import type * as lib_validators from "../lib/validators.js";
 import type * as lib_webCrawler from "../lib/webCrawler.js";
+import type * as private_aiSettings from "../private/aiSettings.js";
 import type * as private_conversations from "../private/conversations.js";
 import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
@@ -30,9 +33,11 @@ import type * as public_organizations from "../public/organizations.js";
 import type * as public_secrets from "../public/secrets.js";
 import type * as public_widgetSettings from "../public/widgetSettings.js";
 import type * as system_ai_agents_supportAgent from "../system/ai/agents/supportAgent.js";
+import type * as system_ai_config from "../system/ai/config.js";
 import type * as system_ai_constants from "../system/ai/constants.js";
-import type * as system_ai_helpers from "../system/ai/helpers.js";
+import type * as system_ai_providers from "../system/ai/providers.js";
 import type * as system_ai_rag from "../system/ai/rag.js";
+import type * as system_ai_settings from "../system/ai/settings.js";
 import type * as system_ai_tools_escalateConversation from "../system/ai/tools/escalateConversation.js";
 import type * as system_ai_tools_resolveConversation from "../system/ai/tools/resolveConversation.js";
 import type * as system_ai_tools_search from "../system/ai/tools/search.js";
@@ -60,12 +65,15 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
+  "lib/aiErrors": typeof lib_aiErrors;
+  "lib/aiProviders": typeof lib_aiProviders;
   "lib/conversationStats": typeof lib_conversationStats;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "lib/functions": typeof lib_functions;
   "lib/rateLimit": typeof lib_rateLimit;
   "lib/validators": typeof lib_validators;
   "lib/webCrawler": typeof lib_webCrawler;
+  "private/aiSettings": typeof private_aiSettings;
   "private/conversations": typeof private_conversations;
   "private/files": typeof private_files;
   "private/messages": typeof private_messages;
@@ -81,9 +89,11 @@ declare const fullApi: ApiFromModules<{
   "public/secrets": typeof public_secrets;
   "public/widgetSettings": typeof public_widgetSettings;
   "system/ai/agents/supportAgent": typeof system_ai_agents_supportAgent;
+  "system/ai/config": typeof system_ai_config;
   "system/ai/constants": typeof system_ai_constants;
-  "system/ai/helpers": typeof system_ai_helpers;
+  "system/ai/providers": typeof system_ai_providers;
   "system/ai/rag": typeof system_ai_rag;
+  "system/ai/settings": typeof system_ai_settings;
   "system/ai/tools/escalateConversation": typeof system_ai_tools_escalateConversation;
   "system/ai/tools/resolveConversation": typeof system_ai_tools_resolveConversation;
   "system/ai/tools/search": typeof system_ai_tools_search;

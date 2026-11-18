@@ -1,6 +1,9 @@
 import { ConvexError, v } from "convex/values";
 import { authedMutation, authedQuery } from "../lib/functions";
-import { pluginDocValidator, pluginServiceValidator } from "../lib/validators";
+import {
+	pluginServiceValidator,
+	pluginSummaryValidator,
+} from "../lib/validators";
 
 export const remove = authedMutation({
 	args: {
@@ -32,13 +35,15 @@ export const getOne = authedQuery({
 	args: {
 		service: pluginServiceValidator,
 	},
-	returns: v.union(pluginDocValidator, v.null()),
+	returns: v.union(pluginSummaryValidator, v.null()),
 	handler: async (ctx, args) => {
-		return await ctx.db
+		const plugin = await ctx.db
 			.query("plugins")
 			.withIndex("by_organization_id_and_service", (q) =>
 				q.eq("organizationId", ctx.orgId).eq("service", args.service),
 			)
 			.unique();
+
+		return plugin ? { service: plugin.service } : null;
 	},
 });

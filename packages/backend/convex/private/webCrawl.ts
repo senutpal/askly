@@ -24,7 +24,7 @@ import {
 	MAX_CRAWL_DEPTH,
 	MAX_RESOURCES_PER_JOB,
 } from "../lib/webCrawler";
-import { createRAG } from "../system/ai/rag";
+import { createOrganizationRAG } from "../system/ai/rag";
 
 /**
  * Persisting one crawl batch keeps each mutation comfortably below the
@@ -437,7 +437,7 @@ export const addSelectedResources = action({
 			error?: string;
 		}> = [];
 
-		const orgRag = await createRAG(ctx, orgId);
+		const orgRag = await createOrganizationRAG(ctx, orgId);
 
 		for (const resourceId of args.selectedResourceIds) {
 			try {

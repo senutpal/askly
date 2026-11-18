@@ -70,10 +70,10 @@ export const DashboardSidebar = () => {
 					query: api.private.plugins.getOne,
 					args: { service: "vapi" },
 				});
-			} else if (url === "/plugins/gemini") {
+			} else if (url === "/plugins/ai") {
 				convex.prewarmQuery({
-					query: api.private.plugins.getOne,
-					args: { service: "google-ai" },
+					query: api.private.aiSettings.get,
+					args: {},
 				});
 			} else if (url === "/") {
 				convex.prewarmQuery({
@@ -143,8 +143,8 @@ export const DashboardSidebar = () => {
 					icon: Mic,
 				},
 				{
-					title: "Gemini",
-					url: "/plugins/gemini",
+					title: "AI Provider",
+					url: "/plugins/ai",
 					icon: Brain,
 				},
 			],

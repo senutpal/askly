@@ -1,7 +1,7 @@
-import { GoogleAIView } from "@/features/plugins";
+import { redirect } from "next/navigation";
 
 const Page = () => {
-	return <GoogleAIView />;
+	redirect("/plugins/ai");
 };
 
 export default Page;

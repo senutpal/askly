@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
+	aiSettingsFields,
 	contactSessionFields,
 	conversationStatusValidator,
 	defaultSuggestionsValidator,
@@ -54,6 +55,9 @@ export default defineSchema({
 	})
 		.index("by_organization_id", ["organizationId"])
 		.index("by_organization_id_and_service", ["organizationId", "service"]),
+	aiSettings: defineTable(aiSettingsFields).index("by_organization_id", [
+		"organizationId",
+	]),
 	crawlJobs: defineTable({
 		organizationId: v.string(),
 		url: v.string(),
