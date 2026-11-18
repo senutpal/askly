@@ -888,6 +888,14 @@ a:hover > .arrow {
 	.landscape {
 		top: clamp(188px, 35vw, 230px);
 	}
+
+	.footerBrand {
+		display: none;
+	}
+
+	.footerRow {
+		justify-content: space-between;
+	}
 }
 
 @media (max-width: 740px) {
@@ -945,14 +953,7 @@ a:hover > .arrow {
 
 @media (max-width: 400px) {
 	.footerRow {
-		flex-wrap: wrap;
-		gap: 0 16px;
 		padding-block: 8px;
-	}
-
-	.footerRow nav {
-		flex-basis: 100%;
-		margin-left: 0;
 	}
 }
 
