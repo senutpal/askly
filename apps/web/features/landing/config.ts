@@ -1,6 +1,6 @@
 export const SITE_URL = "https://asklyxsen.vercel.app";
 
-export const LANDING_TITLE = "Askly — AI support that reads your docs";
+export const LANDING_TITLE = "Askly";
 
 export const LANDING_DESCRIPTION =
 	"Askly answers from your docs in your customer’s language and sends the full conversation to your team when needed.";
