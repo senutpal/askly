@@ -46,7 +46,7 @@ const MessageRowSkeleton = ({ index }: { index: number }) => {
 	return (
 		<div
 			className={cn(
-				"flex w-full items-end gap-2 py-2",
+				"flex w-full items-end gap-2 py-2 [&>div]:max-w-[80%]",
 				isFromCustomer ? "flex-row-reverse justify-end" : "justify-end",
 			)}
 		>
