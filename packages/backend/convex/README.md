@@ -97,4 +97,4 @@ Askly uses vector embeddings for semantic document retrieval via `@convex-dev/ra
 - **OpenAI**: Uses `text-embedding-3-large` with **3072** dimensions.
 
 ### Provider Switching & Re-embedding
-Vector spaces across different embedding providers and models are mathematically incompatible. Switching providers invalidates existing stored vectors in the RAG namespace. When changing the embedding provider in Settings, existing files cannot be searched with the new provider until a re-embed job is executed to re-index the knowledge base.
+Vector spaces across different embedding providers and models are mathematically incompatible. Each provider searches its own vector namespace. When changing the embedding provider in Settings, existing files cannot be searched with the new provider until they are re-uploaded to index into the new provider's namespace.
