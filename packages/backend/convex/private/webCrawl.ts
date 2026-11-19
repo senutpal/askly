@@ -15,7 +15,7 @@ import {
 } from "../_generated/server";
 import { embeddingSignature } from "../lib/aiProviders";
 import { extractTextContent } from "../lib/extractTextContent";
-import { RATE_LIMITS } from "../lib/rateLimit";
+import { consumeRateLimit, RATE_LIMITS } from "../lib/rateLimit";
 import {
 	assertPublicUrl,
 	CrawlCancelledError,
@@ -419,8 +419,8 @@ async function importResource(
 			resourceId,
 			success: false,
 			error: "Resource does not belong to this job",
-			url: resource.url,
-			title: resource.title,
+			url: "",
+			title: "",
 		};
 	}
 	if (
@@ -447,10 +447,14 @@ async function importResource(
 			? `# ${resource.title}\n\n${resource.text}`
 			: await fetchPageText(resource.url, resource.title);
 
+		const titlePrefix = `# ${resource.title}\n\n`;
 		const textOnly = (
-			resource.text ?? pageText.replace(/^#[^\n]*\n\n/, "")
+			resource.text ??
+			(pageText.startsWith(titlePrefix)
+				? pageText.slice(titlePrefix.length)
+				: pageText)
 		).trim();
-		if (!textOnly || textOnly.length < 20) {
+		if (!textOnly) {
 			return {
 				resourceId,
 				success: false,
@@ -478,13 +482,19 @@ async function importResource(
 
 	const blob = new Blob([bytes], { type: mimeType });
 	const storageId = await ctx.storage.store(blob);
-	const text = await extractTextContent(ctx, {
-		storageId,
-		filename,
-		bytes,
-		mimeType,
-		organizationId: orgId,
-	});
+	let text: string;
+	try {
+		text = await extractTextContent(ctx, {
+			storageId,
+			filename,
+			bytes,
+			mimeType,
+			organizationId: orgId,
+		});
+	} catch (error) {
+		await ctx.storage.delete(storageId);
+		throw error;
+	}
 	const { entryId, created } = await orgRag.add(ctx, {
 		namespace,
 		text,
@@ -514,6 +524,29 @@ async function importResource(
 		title: resource.title,
 	};
 }
+
+export const startImport = mutation({
+	args: {
+		jobId: v.id("crawlJobs"),
+	},
+	returns: v.null(),
+	handler: async (ctx, args) => {
+		const orgId = await requireOrgId(ctx);
+		const job = await ctx.db.get(args.jobId);
+		if (!job || job.organizationId !== orgId) {
+			throw new ConvexError({
+				code: "NOT_FOUND",
+				message: "Job not found",
+			});
+		}
+		await consumeRateLimit(
+			ctx,
+			`crawl:import:org:${orgId}`,
+			RATE_LIMITS.crawlImportPerOrganization,
+		);
+		return null;
+	},
+});
 
 export const addSingleResource = action({
 	args: {
@@ -548,15 +581,6 @@ export const addSingleResource = action({
 			throw new ConvexError({ code: "NOT_FOUND", message: "Job not found" });
 		}
 
-		await ctx.runMutation(internal.system.rateLimit.consumeMany, {
-			buckets: [
-				{
-					key: `crawl:import:org:${orgId}`,
-					...RATE_LIMITS.crawlImportPerOrganization,
-				},
-			],
-		});
-
 		const {
 			rag: orgRag,
 			namespace,
@@ -575,12 +599,16 @@ export const addSingleResource = action({
 				signature,
 			);
 		} catch (error) {
+			const resource = await ctx.runQuery(
+				internal.private.webCrawl.getResource,
+				{ resourceId: args.resourceId },
+			);
 			return {
 				resourceId: args.resourceId,
 				success: false,
 				error: error instanceof Error ? error.message : "Unknown error",
-				url: "",
-				title: "",
+				url: resource && resource.jobId === args.jobId ? resource.url : "",
+				title: resource && resource.jobId === args.jobId ? resource.title : "",
 			};
 		}
 	},

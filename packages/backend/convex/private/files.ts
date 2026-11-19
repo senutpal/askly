@@ -319,6 +319,7 @@ async function convertEntryToPublicFile(
 	const storageId = metadata?.storageId ?? null;
 
 	let fileSize = "unknown";
+	let hasStorage = false;
 
 	if (storageId) {
 		try {
@@ -326,6 +327,7 @@ async function convertEntryToPublicFile(
 
 			if (storageMetadata) {
 				fileSize = formatFileSize(storageMetadata.size);
+				hasStorage = true;
 			}
 		} catch (error) {
 			console.error("Failed to get storage metadata:", error);
@@ -339,7 +341,7 @@ async function convertEntryToPublicFile(
 	if (entry.status === "ready") {
 		status = "ready";
 	} else if (entry.status === "pending") {
-		status = "processing";
+		status = storageId && !hasStorage ? "error" : "processing";
 	}
 
 	const url = storageId ? await ctx.storage.getUrl(storageId) : null;

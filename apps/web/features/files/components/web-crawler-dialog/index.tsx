@@ -15,7 +15,7 @@ import { useAction, useMutation, usePaginatedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { CheckCircleIcon, GlobeIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CompleteStep, type ImportFailure } from "./complete-step";
 import { CrawlInputStep } from "./crawl-input-step";
 import { CrawlProgressStep } from "./crawl-progress-step";
@@ -54,8 +54,14 @@ export const WebCrawlerDialog = ({
 	onOpenChange,
 }: WebCrawlerDialogProps) => {
 	const startCrawl = useAction(api.private.webCrawl.startCrawl);
+	const startImport = useMutation(api.private.webCrawl.startImport);
 	const addSingleResource = useAction(api.private.webCrawl.addSingleResource);
 	const cancelCrawl = useMutation(api.private.webCrawl.cancelCrawl);
+
+	const autoCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
+	const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const [step, setStep] = useState<CrawlStep>("input");
 	const [url, setUrl] = useState("");
@@ -80,6 +86,27 @@ export const WebCrawlerDialog = ({
 		failed: 0,
 	});
 	const [importFailures, setImportFailures] = useState<ImportFailure[]>([]);
+
+	useEffect(() => {
+		if (open) {
+			if (autoCloseTimeoutRef.current) {
+				clearTimeout(autoCloseTimeoutRef.current);
+				autoCloseTimeoutRef.current = null;
+			}
+			if (resetTimeoutRef.current) {
+				clearTimeout(resetTimeoutRef.current);
+				resetTimeoutRef.current = null;
+			}
+		}
+		return () => {
+			if (autoCloseTimeoutRef.current) {
+				clearTimeout(autoCloseTimeoutRef.current);
+			}
+			if (resetTimeoutRef.current) {
+				clearTimeout(resetTimeoutRef.current);
+			}
+		};
+	}, [open]);
 
 	const job = useQuery(api.private.webCrawl.getJob, jobId ? { jobId } : "skip");
 
@@ -178,6 +205,14 @@ export const WebCrawlerDialog = ({
 	const handleImport = async () => {
 		if (selectedResourceIds.size === 0 || !jobId) return;
 
+		try {
+			await startImport({ jobId });
+		} catch (error) {
+			setCrawlError(getErrorMessage(error, "Failed to start import"));
+			setStep("results");
+			return;
+		}
+
 		setCrawlError(null);
 		setImportFailures([]);
 		setStep("importing");
@@ -189,12 +224,14 @@ export const WebCrawlerDialog = ({
 		});
 
 		const ids = Array.from(selectedResourceIds) as Id<"crawlResults">[];
+		const resourceMap = new Map(results.results.map((r) => [r._id, r]));
 		const failures: ImportFailure[] = [];
 		let successful = 0;
 		let failed = 0;
 
 		let i = 0;
 		for (const resourceId of ids) {
+			const res = resourceMap.get(resourceId);
 			try {
 				const result = await addSingleResource({
 					jobId,
@@ -206,17 +243,17 @@ export const WebCrawlerDialog = ({
 				} else {
 					failed++;
 					failures.push({
-						url: result.url,
+						url: result.url || res?.url || "Unknown URL",
 						error: result.error || "Failed to import",
-						title: result.title,
+						title: result.title || res?.title || "Unknown",
 					});
 				}
 			} catch (error) {
 				failed++;
 				failures.push({
-					url: `Resource ${resourceId}`,
+					url: res?.url || `Resource ${resourceId}`,
 					error: getErrorMessage(error, "Failed to import"),
-					title: "Unknown",
+					title: res?.title || "Unknown",
 				});
 			}
 
@@ -232,15 +269,22 @@ export const WebCrawlerDialog = ({
 		setImportFailures(failures);
 		setStep("complete");
 		if (failed === 0) {
-			setTimeout(() => {
+			autoCloseTimeoutRef.current = setTimeout(() => {
 				handleClose();
 			}, 2000);
 		}
 	};
 
 	const handleClose = () => {
+		if (autoCloseTimeoutRef.current) {
+			clearTimeout(autoCloseTimeoutRef.current);
+			autoCloseTimeoutRef.current = null;
+		}
+		if (resetTimeoutRef.current) {
+			clearTimeout(resetTimeoutRef.current);
+		}
 		onOpenChange(false);
-		setTimeout(() => {
+		resetTimeoutRef.current = setTimeout(() => {
 			setStep("input");
 			setUrl("");
 			setMaxDepth("1");
@@ -317,6 +361,12 @@ export const WebCrawlerDialog = ({
 			case "importing":
 				return "Importing selected resources...";
 			case "complete":
+				if (importProgress.failed > 0 && importProgress.successful === 0) {
+					return "Import failed";
+				}
+				if (importProgress.failed > 0) {
+					return "Import completed with errors";
+				}
 				return "Resources imported successfully";
 			default:
 				return "";
